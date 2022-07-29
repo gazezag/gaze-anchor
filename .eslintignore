@@ -1,0 +1,7 @@
+/node_modules
+/dist
+/doc
+**/dist
+**/types
+**/node_modules
+/script

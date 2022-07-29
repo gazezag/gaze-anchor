@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "declaration": true,
+    "declarationDir": "./types",
+    "declarationMap": false,
+    "strict": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "paths": {
+      "core/*": ["packages/core/*"],
+      "api/*": ["packages/api/*"],
+      "types/*": ["packages/types/*"],
+      "utils/*": ["packages/utils/*"]
+    }
+  },
+  "include": ["packages/**/*.ts", "packages/**/*.d.ts"],
+  "exclude": [
+    "*tests/*",
+    "packages/**/__tests__/*",
+    "packages/**/**/__tests__/*"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
