@@ -1,1 +1,2 @@
-export const a = () => {};
+export * from './envInfo';
+export * from './performanceInfo';

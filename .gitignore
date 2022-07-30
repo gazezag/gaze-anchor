@@ -7,19 +7,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# libs
 node_modules
+tests/mock-project/node_modules
+
+# output
 dist
 /types
-*.local
-
 coverage
-tests/mock-project/node_modules
-tests/mock-project/.vscode
 
+# dev
+local_demo
 DEV_DOCS.md
 
 # Editor directories and files
 .vscode/*
+tests/mock-project/.vscode
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -28,3 +31,6 @@ DEV_DOCS.md
 *.njsproj
 *.sln
 *.sw?
+
+# other
+*.local
