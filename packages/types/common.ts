@@ -1,4 +1,5 @@
 const entryTypes = {
+  // 'frame' is no longer supported
   navigator: 'navigation',
   resource: 'resource',
   mark: 'mark',
