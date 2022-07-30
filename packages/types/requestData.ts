@@ -3,22 +3,12 @@ import { PerformanceInfo } from './performanceInfo';
 import { ApiPerformanceInfo } from './apiPerformanceInfo';
 import { ErrorInfo } from './errorInfo';
 
-interface RequestData {
+export interface RequestData<T> {
   sendTime: DOMHighResTimeStamp;
+  data: T;
 }
 
-export interface EnvInfoRequest extends RequestData {
-  data: EnvInfo;
-}
-
-export interface PerformanceInfoRequest extends RequestData {
-  data: PerformanceInfo;
-}
-
-export interface ApiPerformanceInfoRequest extends RequestData {
-  data: ApiPerformanceInfo;
-}
-
-export interface ErrorInfoRequest extends RequestData {
-  data: ErrorInfo;
-}
+export type EnvInfoRequest = RequestData<EnvInfo>;
+export type PerformanceInfoRequest = RequestData<PerformanceInfo>;
+export type ApiPerformanceInfoRequest = RequestData<ApiPerformanceInfo>;
+export type ErrorInfoRequest = RequestData<ErrorInfo>;

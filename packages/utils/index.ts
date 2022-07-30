@@ -1,1 +1,2 @@
-export const add = () => {};
+export * from './stringHandler';
+export * from './typeJudgment';
