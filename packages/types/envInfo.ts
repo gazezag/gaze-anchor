@@ -21,7 +21,14 @@ export interface MetaInfo<T> {
 }
 
 export interface EnvInfo {
+  origin: string;
   url: string;
+  title: string;
+  referer: string;
+
   os: MetaInfo<OSType>;
   browser: MetaInfo<BrowserType>;
+
+  language: string;
+  network: string;
 }

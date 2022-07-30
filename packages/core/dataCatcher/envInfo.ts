@@ -2,22 +2,32 @@ import { BrowserType, EnvInfo, MetaInfo, OSType } from 'types/envInfo';
 import { getMatched, getTestStrFn } from 'utils/index';
 
 export class Env implements EnvInfo {
+  readonly origin: string;
   readonly url: string;
+  readonly title: string;
+  readonly referer: string;
+
   readonly os: MetaInfo<OSType>;
   readonly browser: MetaInfo<BrowserType>;
 
-  constructor() {
-    const ua = window.navigator.userAgent;
+  readonly language: string;
+  readonly network: string;
 
-    this.url = getUrl();
-    this.os = getOS(ua);
-    this.browser = getBrowser(ua);
+  constructor() {
+    const { navigator: nvg, location: loc, document: doc } = window;
+
+    this.origin = loc.origin;
+    this.url = loc.href;
+    this.title = doc.title;
+    this.referer = doc.referrer;
+
+    this.os = getOS(nvg.userAgent);
+    this.browser = getBrowser(nvg.userAgent);
+
+    this.language = nvg.language;
+    this.network = nvg.connection.type; // problem here
   }
 }
-
-const getUrl = (): string => {
-  return window.location.href;
-};
 
 type BrowserInfoEnum = Array<{
   type: BrowserType;
