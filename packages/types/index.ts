@@ -1,3 +1,4 @@
+export * from './common';
 export * from './apiPerformanceInfo';
 export * from './envInfo';
 export * from './errorInfo';
