@@ -1,6 +1,3 @@
-// 'frame' not supported
-export type EntryType = 'navigation' | 'resource' | 'mark' | 'paint';
-
 /**
  * @example
  * {
@@ -19,13 +16,13 @@ export type EntryType = 'navigation' | 'resource' | 'mark' | 'paint';
  */
 export interface PerformanceEntry {
   readonly name: string;
-  readonly entryType: EntryType;
+  readonly entryType: string;
   readonly startTime: DOMHighResTimeStamp;
   readonly duration: DOMHighResTimeStamp;
 }
 
 export interface ObserverEntry {
   getEntries(): Array<PerformanceEntry>;
-  getEntriesByName(name: string, type?: EntryType): Array<PerformanceEntry>;
-  getEntriesByType(type: EntryType): Array<PerformanceEntry>;
+  getEntriesByName(name: string, type?: string): Array<PerformanceEntry>;
+  getEntriesByType(type: string): Array<PerformanceEntry>;
 }
