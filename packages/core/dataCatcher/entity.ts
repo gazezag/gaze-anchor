@@ -32,17 +32,17 @@ const getBrowser: GetMetaInfoFn<BrowserType> = ua => {
     {
       type: BrowserType.Chrome,
       flag: ua.indexOf('Chrome') > -1 || ua.indexOf('CriOS') > -1,
-      version: getMatched(ua, /Chrome\/([\d.]+)/)
+      version: getMatched(ua, /Chrome\/([\d.]+)/, 1)
     },
     {
       type: BrowserType.Safari,
       flag: ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1,
-      version: getMatched(ua, /Version\/([\d.]+)/)
+      version: getMatched(ua, /Version\/([\d.]+)/, 1)
     },
     {
       type: BrowserType.Edge,
       flag: ua.indexOf('Edge') > -1,
-      version: getMatched(ua, /Edge\/([\d.]+)/)
+      version: getMatched(ua, /Edge\/([\d.]+)/, 1)
     },
     {
       type: BrowserType.IE,
@@ -52,12 +52,12 @@ const getBrowser: GetMetaInfoFn<BrowserType> = ua => {
     {
       type: BrowserType.Firefox,
       flag: ua.indexOf('Firefox') > -1,
-      version: getMatched(ua, /Firefox\/([\d.]+)/)
+      version: getMatched(ua, /Firefox\/([\d.]+)/, 1)
     },
     {
       type: BrowserType.Opera,
       flag: ua.indexOf('Opera') > -1 || ua.indexOf('OPR') > -1,
-      version: getMatched(ua, /Opera\/([\d.]+)/)
+      version: getMatched(ua, /Opera\/([\d.]+)/, 1)
     }
   ];
 
