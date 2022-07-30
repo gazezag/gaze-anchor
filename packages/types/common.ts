@@ -1,13 +1,21 @@
 const entryTypes = {
   // 'frame' is no longer supported
-  navigator: 'navigation',
+  navigaton: 'navigation',
   resource: 'resource',
   mark: 'mark',
   measure: 'measure',
-  paint: 'paint'
+
+  // FP & FCP
+  paint: 'paint',
+  // FMP: First Meaningful Paint
+  element: 'element',
+  // FIP: First Input
+  ['first-input']: 'First Input',
+  // LCP: Largest Contentful Paint
+  ['largest-contentful-paint']: 'Largest Contentful Paint'
 };
 
-export type EntryTypes = keyof typeof entryTypes;
+export type EntryType = keyof typeof entryTypes;
 
 /**
  * @example
