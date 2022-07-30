@@ -1,3 +1,13 @@
+const entryTypes = {
+  navigator: 'navigation',
+  resource: 'resource',
+  mark: 'mark',
+  measure: 'measure',
+  paint: 'paint'
+};
+
+export type EntryTypes = keyof typeof entryTypes;
+
 /**
  * @example
  * {
