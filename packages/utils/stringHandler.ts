@@ -3,7 +3,7 @@
 export const getMatched = (
   src: string,
   reg: RegExp,
-  idx: number = 1
+  idx = 1
 ): string => {
   const matched = src.match(reg);
   return matched ? matched[idx] : '';
