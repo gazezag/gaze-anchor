@@ -1,9 +1,10 @@
 /**
  * @Author: Ethan Teng
  * @Date: 2022-07-29 11:05:53
- * @LastEditTime: 2022-07-29 14:32:07
+ * @LastEditTime: 2022-07-30 11:04:26
  * @Description:
  */
-import { add } from 'core/apiListener';
 
-console.log(add(1, 2).res);
+export const add = (x: number, y: number): number => {
+  return x + y;
+};
