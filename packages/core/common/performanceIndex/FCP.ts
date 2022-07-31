@@ -15,7 +15,7 @@ export const getFCP = (): Promise<PerformanceEntry> | undefined => {
         reject(new Error('browser has no fcp'));
       }
     } else {
-      const paintObserver = getObserveFn([EntryTypes.paint]);
+      const fcpObserver = getObserveFn([EntryTypes.paint]);
       const callback: ObserveHandler = entry => {
         if (entry.name === EntryNames.FCP) {
           // if the observer already exists
@@ -26,7 +26,7 @@ export const getFCP = (): Promise<PerformanceEntry> | undefined => {
         }
       };
 
-      const observer = paintObserver(callback);
+      const observer = fcpObserver(callback);
     }
   });
 };

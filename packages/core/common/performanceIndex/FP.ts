@@ -15,7 +15,7 @@ export const getFP = (): Promise<PerformanceEntry> | undefined => {
         reject(new Error('browser has no fp'));
       }
     } else {
-      const paintObserver = getObserveFn([EntryTypes.paint]);
+      const fpObserver = getObserveFn([EntryTypes.paint]);
       const callback: ObserveHandler = entry => {
         if (entry.name === EntryNames.FP) {
           // if the observer already exists
@@ -26,7 +26,7 @@ export const getFP = (): Promise<PerformanceEntry> | undefined => {
         }
       };
 
-      const observer = paintObserver(callback);
+      const observer = fpObserver(callback);
     }
   });
 };

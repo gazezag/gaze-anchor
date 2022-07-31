@@ -15,7 +15,7 @@ export const getLCP = (): Promise<PerformanceEntry> | undefined => {
         reject(new Error('browser has no lcp'));
       }
     } else {
-      const paintObserver = getObserveFn([EntryTypes.LCP]);
+      const lcpObserver = getObserveFn([EntryTypes.LCP]);
       const callback: ObserveHandler = entry => {
         if (entry.name === EntryNames.LCP) {
           // if the observer already exists
@@ -26,7 +26,7 @@ export const getLCP = (): Promise<PerformanceEntry> | undefined => {
         }
       };
 
-      const observer = paintObserver(callback);
+      const observer = lcpObserver(callback);
     }
   });
 };

@@ -50,13 +50,13 @@ export const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | und
     if (isPerformanceObserverSupported()) {
       const callback = (navigation: PerformanceNavigationTiming) => {
         if (navigation.entryType === EntryTypes.navigation) {
-          observer && disconnect(observer);
+          navigationObserver && disconnect(navigationObserver);
 
           resolveNavigation(navigation, resolve);
         }
       };
 
-      const observer = observe(
+      const navigationObserver = observe(
         [EntryTypes.navigation],
         // must be asserted
         // maybe bug here
