@@ -24,3 +24,26 @@ export interface PerformanceNavigationIndex {
   // loadEventStart - fetchStart
   L: number;
 }
+
+export interface ResourceFlowTiming {
+  name: string;
+  initiatorType: string;
+  transferSize: number;
+  startTime: number;
+  responseEnd: number;
+
+  // domainLookupEnd - domainLookupStart
+  DNS: number;
+  // connectEnd - secureConnectionStart
+  SSL: number;
+  // responseStart - requestStart
+  TTFB: number;
+  // responseEnd - responseStart
+  transmit: number;
+  // connectEnd - connectStart
+  initialConnect: number;
+  // responseStart - requestStart
+  request: number;
+  // responseStart - requestStart
+  contentDownload: number;
+}
