@@ -1,5 +1,5 @@
 import { EnvInfo } from './envInfo';
-import { PerformanceInfo } from './performanceInfo';
+import { PerformanceNavigationIndex } from './performanceIndex';
 import { ApiPerformanceInfo } from './apiPerformanceInfo';
 import { ErrorInfo } from './errorInfo';
 
@@ -9,6 +9,6 @@ export interface RequestData<T> {
 }
 
 export type EnvInfoRequest = RequestData<EnvInfo>;
-export type PerformanceInfoRequest = RequestData<PerformanceInfo>;
+export type PerformanceNavigationIndexRequest = RequestData<PerformanceNavigationIndex>;
 export type ApiPerformanceInfoRequest = RequestData<ApiPerformanceInfo>;
 export type ErrorInfoRequest = RequestData<ErrorInfo>;
