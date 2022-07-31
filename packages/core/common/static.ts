@@ -8,6 +8,9 @@ export const EntryNames = {
 export const EntryTypes = {
   paint: 'paint',
   navigation: 'navigation',
+  resource: 'resource',
 
-  LCP: 'largest-contentful-paint'
+  LCP: 'largest-contentful-paint',
+  FID: 'first-input',
+  CLS: 'layout-shift'
 };
