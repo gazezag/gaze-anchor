@@ -1,8 +1,4 @@
-import {
-  isPerformanceObserverSupported,
-  isPerformanceSupported
-} from 'utils/compatible';
-import { roundOff } from 'utils/math';
+import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { disconnect, getObserveFn, ObserveHandler } from '../observe';
 import { EntryNames, EntryTypes } from '../static';
 
@@ -35,11 +31,11 @@ export const getFP = (): Promise<PerformanceEntry> | undefined => {
   });
 };
 
-getFP()
-  ?.then(entry => {
-    console.log(roundOff(entry.startTime));
-    console.log(entry.duration);
-  })
-  .catch(err => {
-    console.error(err);
-  });
+// getFP()
+//   ?.then(entry => {
+//     console.log(roundOff(entry.startTime));
+//     console.log(entry.duration);
+//   })
+//   .catch(err => {
+//     console.error(err);
+//   });

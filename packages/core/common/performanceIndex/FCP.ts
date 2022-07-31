@@ -1,7 +1,4 @@
-import {
-  isPerformanceObserverSupported,
-  isPerformanceSupported
-} from 'utils/compatible';
+import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { disconnect, getObserveFn, ObserveHandler } from '../observe';
 import { EntryNames, EntryTypes } from '../static';
 

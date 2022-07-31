@@ -1,3 +1,3 @@
-export const roundOff = (num: number, range: number = 3): number => {
+export const roundOff = (num: number, range = 3): number => {
   return Number.parseFloat(num.toFixed(range));
 };

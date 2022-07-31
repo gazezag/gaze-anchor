@@ -3,11 +3,7 @@ export const isNavigatorSupported = (): boolean => {
 };
 
 export const isPerformanceSupported = (): boolean => {
-  return (
-    !!window.performance &&
-    !!window.performance.getEntriesByType &&
-    !!window.performance.mark
-  );
+  return !!window.performance && !!window.performance.getEntriesByType && !!window.performance.mark;
 };
 
 export const isPerformanceObserverSupported = (): boolean => {
