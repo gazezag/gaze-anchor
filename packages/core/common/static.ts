@@ -14,3 +14,17 @@ export const EntryTypes = {
   FID: 'first-input',
   CLS: 'layout-shift'
 };
+
+export enum PerformanceInfoType {
+  // performance
+  CLS = 'cumulative-layout-shift',
+  NT = 'navigation-timing',
+  FP = 'first-paint',
+  FCP = 'first-contentful-paint',
+  LCP = 'largest-contentful-paint',
+  FID = 'first-input-delay',
+  RL = 'resource-flow',
+
+  // info
+  DI = 'device-info'
+}
