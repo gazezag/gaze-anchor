@@ -1,1 +1,3 @@
-aaa;
+const a = () => {
+  console.log('');
+};
