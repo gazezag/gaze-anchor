@@ -1,8 +1,11 @@
+import { ReportHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
+import { roundOff } from 'utils/math';
 import { disconnect, getObserveFn, ObserveHandler } from '../observe';
-import { EntryNames, EntryTypes } from '../static';
+import { EntryNames, EntryTypes, PerformanceInfoType } from '../static';
+import { Store } from '../store';
 
-export const getFP = (): Promise<PerformanceEntry> | undefined => {
+const getFP = (): Promise<PerformanceEntry> | undefined => {
   return new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
@@ -31,11 +34,17 @@ export const getFP = (): Promise<PerformanceEntry> | undefined => {
   });
 };
 
-// getFP()
-//   ?.then(entry => {
-//     console.log(roundOff(entry.startTime));
-//     console.log(entry.duration);
-//   })
-//   .catch(err => {
-//     console.error(err);
-//   });
+export const initFP = (store: Store, report: ReportHandler, immediately = true) => {
+  getFP()
+    ?.then(entry => {
+      const indexValue = {
+        type: PerformanceInfoType.FP,
+        value: roundOff(entry.startTime)
+      };
+
+      store.set(PerformanceInfoType.FP, indexValue);
+
+      immediately && report(indexValue);
+    })
+    .catch(err => console.error(err));
+};

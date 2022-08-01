@@ -1,6 +1,9 @@
+import { ReportHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
+import { roundOff } from 'utils/math';
 import { disconnect, getObserveFn, ObserveHandler } from '../observe';
-import { EntryTypes } from '../static';
+import { EntryTypes, PerformanceInfoType } from '../static';
+import { Store } from '../store';
 
 interface LayoutShift extends PerformanceEntry {
   value: number;
@@ -8,7 +11,7 @@ interface LayoutShift extends PerformanceEntry {
 }
 
 // Cumulative Layout Shift
-export const getCLS = (): Promise<PerformanceEntry> | undefined => {
+const getCLS = (): Promise<PerformanceEntry> | undefined => {
   return new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
@@ -31,4 +34,19 @@ export const getCLS = (): Promise<PerformanceEntry> | undefined => {
       const observer = clsObserver(callback);
     }
   });
+};
+
+export const initCLS = (store: Store, report: ReportHandler, immediately = true) => {
+  getCLS()
+    ?.then(entry => {
+      const indexValue = {
+        type: PerformanceInfoType.CLS,
+        value: roundOff(entry.startTime)
+      };
+
+      store.set(PerformanceInfoType.CLS, indexValue);
+
+      immediately && report(indexValue);
+    })
+    .catch(err => console.error(err));
 };

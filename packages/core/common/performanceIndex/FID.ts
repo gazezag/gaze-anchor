@@ -1,9 +1,12 @@
+import { ReportHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
-import { disconnect, getObserveFn, ObserveHandler } from '../observe';
-import { EntryTypes } from '../static';
+import { roundOff } from 'utils/math';
+import { disconnect, getObserveFn } from '../observe';
+import { EntryTypes, PerformanceInfoType } from '../static';
+import { Store } from '../store';
 
 // First Input Delay
-export const getFID = (): Promise<PerformanceEntry> | undefined => {
+const getFID = (): Promise<PerformanceEventTiming> | undefined => {
   return new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
@@ -13,7 +16,7 @@ export const getFID = (): Promise<PerformanceEntry> | undefined => {
       }
     } else {
       const fidObserver = getObserveFn([EntryTypes.FID]);
-      const callback: ObserveHandler = entry => {
+      const callback = (entry: PerformanceEventTiming) => {
         if (entry.entryType === EntryTypes.FID) {
           // if the observer already exists
           // prevent performance watchers from continuing to observe
@@ -26,4 +29,21 @@ export const getFID = (): Promise<PerformanceEntry> | undefined => {
       const observer = fidObserver(callback);
     }
   });
+};
+
+export const initFID = (store: Store, report: ReportHandler, immediately = true) => {
+  getFID()
+    ?.then((entry: PerformanceEventTiming) => {
+      const indexValue = {
+        type: PerformanceInfoType.FID,
+        value: roundOff(entry.startTime),
+        delay: roundOff(entry.processingStart - entry.startTime, 2),
+        eventHandleTime: roundOff(entry.processingEnd - entry.processingStart, 2)
+      };
+
+      store.set(PerformanceInfoType.FID, indexValue);
+
+      immediately && report(indexValue);
+    })
+    .catch(err => console.error(err));
 };

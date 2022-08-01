@@ -1,10 +1,12 @@
 import { PerformanceNavigationIndex } from 'types/performanceIndex';
+import { ReportHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from '../observe';
-import { EntryTypes } from '../static';
+import { EntryTypes, PerformanceInfoType } from '../static';
+import { Store } from '../store';
 
-export const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined => {
+const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined => {
   if (!isPerformanceSupported()) {
     console.warn('Performance API not support');
     return;
@@ -71,4 +73,19 @@ export const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | und
       resolveNavigation(navigation as PerformanceNavigationTiming, resolve);
     }
   });
+};
+
+export const initNavigationTiming = (store: Store, report: ReportHandler, immediately = true) => {
+  getNavigationTiming()
+    ?.then(navigation => {
+      const indexValue = {
+        type: PerformanceInfoType.NT,
+        value: navigation
+      };
+
+      store.set(PerformanceInfoType.NT, indexValue);
+
+      immediately && report(indexValue);
+    })
+    .catch(err => console.error(err));
 };

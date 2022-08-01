@@ -1,8 +1,11 @@
+import { ReportHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
+import { roundOff } from 'utils/math';
 import { disconnect, getObserveFn, ObserveHandler } from '../observe';
-import { EntryNames, EntryTypes } from '../static';
+import { EntryNames, EntryTypes, PerformanceInfoType } from '../static';
+import { Store } from '../store';
 
-export const getLCP = (): Promise<PerformanceEntry> | undefined => {
+const getLCP = (): Promise<PerformanceEntry> | undefined => {
   return new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
@@ -29,4 +32,19 @@ export const getLCP = (): Promise<PerformanceEntry> | undefined => {
       const observer = lcpObserver(callback);
     }
   });
+};
+
+export const initLCP = (store: Store, report: ReportHandler, immediately = true) => {
+  getLCP()
+    ?.then(entry => {
+      const indexValue = {
+        type: PerformanceInfoType.LCP,
+        value: roundOff(entry.startTime)
+      };
+
+      store.set(PerformanceInfoType.LCP, indexValue);
+
+      immediately && report(indexValue);
+    })
+    .catch(err => console.error(err));
 };
