@@ -15,7 +15,8 @@
     "test:verbose": "jest --verbose",
     "build": "tsc && vite build",
     "format": "prettier --write \"packages/**/*.ts?(x)\" && eslint --fix --ext .ts packages",
-    "format:package": "prettier --write \"packages/**/package.json\""
+    "format:package": "prettier --write \"packages/**/package.json\"",
+    "merge-and-push": "node ./scripts/git.js"
   },
   "main": "./dist/gaze-anchor.umd.js",
   "module": "./dist/gaze-anchor.es.js",

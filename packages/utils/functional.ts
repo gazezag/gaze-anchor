@@ -16,3 +16,13 @@ export const curry = (fn: Function, ...args: Array<any>) => {
     }
   };
 };
+
+export const promisify = (fn: Function) => {
+  return (...rest: Array<any>) => {
+    return new Promise((resolve, reject) => {
+      fn.length === rest.length
+        ? resolve(fn.apply(this, rest)) // may need to handle panic with try-catch
+        : reject(new Error(`[insufficient arguments]: expect ${fn.length} but got ${rest.length}`));
+    });
+  };
+};
