@@ -1,3 +1,5 @@
+import { PerformanceInfoType } from 'core/common';
+
 export interface PerformanceNavigationIndex {
   // redirectEnd - redirectStart
   redirect: number;
@@ -46,4 +48,13 @@ export interface ResourceFlowTiming {
   request: number;
   // responseStart - requestStart
   contentDownload: number;
+}
+
+export interface PerformanceInfo {
+  type: PerformanceInfoType;
+  value: any;
+}
+
+export interface PerformanceInfoObj {
+  [name: string]: PerformanceInfo;
 }
