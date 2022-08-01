@@ -1,4 +1,4 @@
 export * from './apiPerformanceInfo';
-export * from './envInfo';
+export * from './deviceEnvInfo';
 export * from './errorInfo';
-export * from './requestData';
+export * from './uploader';
