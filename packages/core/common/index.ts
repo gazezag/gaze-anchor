@@ -1,2 +1,3 @@
 export * from './observe';
-export * from './performanceIndex';
+export * from './static';
+export * from './store';

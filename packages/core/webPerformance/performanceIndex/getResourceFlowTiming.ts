@@ -1,10 +1,12 @@
 import { ResourceFlowTiming } from 'types/performanceIndex';
+import { ReportHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, observe, ObserveHandler } from '../observe';
-import { EntryTypes } from '../static';
+import { disconnect, observe, ObserveHandler } from 'core/common/observe';
+import { EntryTypes, PerformanceInfoType } from 'core/common/static';
+import { Store } from 'core/common/store';
 
-export const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
+const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
   if (!isPerformanceSupported()) {
     console.warn('Performance API not support');
     return;
@@ -64,4 +66,21 @@ export const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined
       );
     }
   });
+};
+
+export const initResourceFlowTiming = (store: Store, report: ReportHandler, immediately = true) => {
+  getResourceFlowTiming()
+    // maybe bug here
+    // resourceFlow sounds like a Array....
+    ?.then(resourceFlow => {
+      const indexValue = {
+        type: PerformanceInfoType.FP,
+        value: resourceFlow
+      };
+
+      store.set(PerformanceInfoType.FP, indexValue);
+
+      immediately && report(indexValue);
+    })
+    .catch(err => console.error(err));
 };

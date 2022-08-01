@@ -1,33 +1,9 @@
-import { BrowserType, EnvInfo, MetaInfo, OSType } from 'types/envInfo';
+import { BrowserType, DeviceEnvInfo, OSType } from 'types/deviceEnvInfo';
+import { ReportHandler } from 'types/uploader';
+import { isNavigatorSupported, isPerformanceSupported } from 'utils/compatible';
 import { getMatched, getTestStrFn } from 'utils/index';
-
-export class Env implements EnvInfo {
-  readonly origin: string;
-  readonly url: string;
-  readonly title: string;
-  readonly referer: string;
-
-  readonly os: MetaInfo<OSType>;
-  readonly browser: MetaInfo<BrowserType>;
-
-  readonly language: string;
-  readonly network: string;
-
-  constructor() {
-    const { navigator: nvg, location: loc, document: doc } = window;
-
-    this.origin = loc.origin;
-    this.url = loc.href;
-    this.title = doc.title;
-    this.referer = doc.referrer;
-
-    this.os = getOS(nvg.userAgent);
-    this.browser = getBrowser(nvg.userAgent);
-
-    this.language = nvg.language;
-    this.network = nvg.connection.type; // problem here
-  }
-}
+import { PerformanceInfoType } from 'core/common/static';
+import { Store } from 'core/common/store';
 
 type BrowserInfoEnum = Array<{
   type: BrowserType;
@@ -101,4 +77,44 @@ const getOS: GetMetaInfoFn<OSType> = ua => {
     //TODO no idea to get the detailed version number for the time being...
     version: ''
   };
+};
+
+const getDeviceInfo = (): DeviceEnvInfo | undefined => {
+  if (!isPerformanceSupported()) {
+    console.error('browser do not support performance');
+    return;
+  }
+  if (!isNavigatorSupported()) {
+    console.error('browser do not support navigator');
+    return;
+  }
+
+  const { navigator: nvg, location: loc, document: doc } = window;
+
+  return {
+    origin: loc.origin,
+    url: loc.href,
+    title: doc.title,
+    referer: doc.referrer,
+
+    os: getOS(nvg.userAgent),
+    browser: getBrowser(nvg.userAgent),
+
+    language: nvg.language,
+    network: nvg.connection.type // problem here
+  };
+};
+
+export const initDeviceInfo = (store: Store, report: ReportHandler, immediately = true) => {
+  const deviceInfo = getDeviceInfo();
+  if (deviceInfo) {
+    const value = {
+      type: PerformanceInfoType.DI,
+      value: deviceInfo
+    };
+
+    store.set(PerformanceInfoType.DI, value);
+
+    immediately && report(value);
+  }
 };

@@ -20,7 +20,7 @@ export interface MetaInfo<T> {
   version: string;
 }
 
-export interface EnvInfo {
+export interface DeviceEnvInfo {
   origin: string;
   url: string;
   title: string;

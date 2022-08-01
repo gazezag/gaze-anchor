@@ -1,8 +1,11 @@
+import { ReportHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
-import { disconnect, getObserveFn, ObserveHandler } from '../observe';
-import { EntryNames, EntryTypes } from '../static';
+import { roundOff } from 'utils/math';
+import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
+import { EntryNames, EntryTypes, PerformanceInfoType } from 'core/common/static';
+import { Store } from 'core/common/store';
 
-export const getFCP = (): Promise<PerformanceEntry> | undefined => {
+const getFCP = (): Promise<PerformanceEntry> | undefined => {
   return new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
@@ -29,4 +32,19 @@ export const getFCP = (): Promise<PerformanceEntry> | undefined => {
       const observer = fcpObserver(callback);
     }
   });
+};
+
+export const initFCP = (store: Store, report: ReportHandler, immediately = true) => {
+  getFCP()
+    ?.then(entry => {
+      const indexValue = {
+        type: PerformanceInfoType.FCP,
+        value: roundOff(entry.startTime)
+      };
+
+      store.set(PerformanceInfoType.FCP, indexValue);
+
+      immediately && report(indexValue);
+    })
+    .catch(err => console.error(err));
 };
