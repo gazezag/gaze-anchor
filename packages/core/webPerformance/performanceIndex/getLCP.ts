@@ -1,9 +1,9 @@
 import { ReportHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, getObserveFn, ObserveHandler } from '../observe';
-import { EntryNames, EntryTypes, PerformanceInfoType } from '../static';
-import { Store } from '../store';
+import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
+import { EntryNames, EntryTypes, PerformanceInfoType } from 'core/common/static';
+import { Store } from 'core/common/store';
 
 const getLCP = (): Promise<PerformanceEntry> | undefined => {
   return new Promise((resolve, reject) => {

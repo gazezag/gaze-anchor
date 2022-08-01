@@ -1,9 +1,9 @@
 import { ReportHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, getObserveFn } from '../observe';
-import { EntryTypes, PerformanceInfoType } from '../static';
-import { Store } from '../store';
+import { disconnect, getObserveFn } from 'core/common/observe';
+import { EntryTypes, PerformanceInfoType } from 'core/common/static';
+import { Store } from 'core/common/store';
 
 // First Input Delay
 const getFID = (): Promise<PerformanceEventTiming> | undefined => {
