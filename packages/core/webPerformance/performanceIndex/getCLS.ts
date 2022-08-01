@@ -1,4 +1,4 @@
-import { ReportHandler } from 'types/uploader';
+import { UploadHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
@@ -36,7 +36,7 @@ const getCLS = (): Promise<PerformanceEntry> | undefined => {
   });
 };
 
-export const initCLS = (store: Store, report: ReportHandler, immediately = true) => {
+export const initCLS = (store: Store, upload: UploadHandler, immediately = true) => {
   getCLS()
     ?.then(entry => {
       const indexValue = {
@@ -46,7 +46,7 @@ export const initCLS = (store: Store, report: ReportHandler, immediately = true)
 
       store.set(PerformanceInfoType.CLS, indexValue);
 
-      immediately && report(indexValue);
+      immediately && upload(indexValue);
     })
     .catch(err => console.error(err));
 };
