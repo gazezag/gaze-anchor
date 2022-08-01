@@ -1,4 +1,4 @@
-import { ReportHandler } from 'types/uploader';
+import { UploadHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, getObserveFn } from 'core/common/observe';
@@ -31,7 +31,7 @@ const getFID = (): Promise<PerformanceEventTiming> | undefined => {
   });
 };
 
-export const initFID = (store: Store, report: ReportHandler, immediately = true) => {
+export const initFID = (store: Store, upload: UploadHandler, immediately = true) => {
   getFID()
     ?.then((entry: PerformanceEventTiming) => {
       const indexValue = {
@@ -43,7 +43,7 @@ export const initFID = (store: Store, report: ReportHandler, immediately = true)
 
       store.set(PerformanceInfoType.FID, indexValue);
 
-      immediately && report(indexValue);
+      immediately && upload(indexValue);
     })
     .catch(err => console.error(err));
 };

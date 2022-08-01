@@ -1,5 +1,5 @@
 import { BrowserType, DeviceEnvInfo, OSType } from 'types/deviceEnvInfo';
-import { ReportHandler } from 'types/uploader';
+import { UploadHandler } from 'types/uploader';
 import { isNavigatorSupported, isPerformanceSupported } from 'utils/compatible';
 import { getMatched, getTestStrFn } from 'utils/index';
 import { PerformanceInfoType } from 'core/common/static';
@@ -105,7 +105,7 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
   };
 };
 
-export const initDeviceInfo = (store: Store, report: ReportHandler, immediately = true) => {
+export const initDeviceInfo = (store: Store, upload: UploadHandler, immediately = true) => {
   const deviceInfo = getDeviceInfo();
   if (deviceInfo) {
     const value = {
@@ -115,6 +115,6 @@ export const initDeviceInfo = (store: Store, report: ReportHandler, immediately 
 
     store.set(PerformanceInfoType.DI, value);
 
-    immediately && report(value);
+    immediately && upload(value);
   }
 };

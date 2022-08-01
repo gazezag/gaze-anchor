@@ -1,4 +1,4 @@
-import { ReportHandler } from 'types/uploader';
+import { UploadHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
@@ -34,7 +34,7 @@ const getFP = (): Promise<PerformanceEntry> | undefined => {
   });
 };
 
-export const initFP = (store: Store, report: ReportHandler, immediately = true) => {
+export const initFP = (store: Store, upload: UploadHandler, immediately = true) => {
   getFP()
     ?.then(entry => {
       const indexValue = {
@@ -44,7 +44,7 @@ export const initFP = (store: Store, report: ReportHandler, immediately = true) 
 
       store.set(PerformanceInfoType.FP, indexValue);
 
-      immediately && report(indexValue);
+      immediately && upload(indexValue);
     })
     .catch(err => console.error(err));
 };

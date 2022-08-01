@@ -3,7 +3,7 @@ import { PerformanceInfo, PerformanceInfoObj, PerformanceNavigationIndex } from 
 import { ApiPerformanceInfo } from './apiPerformanceInfo';
 import { ErrorInfo } from './errorInfo';
 
-export type ReportHandler = (data: PerformanceInfo | PerformanceInfoObj) => void;
+export type UploadHandler = (data: PerformanceInfo | PerformanceInfoObj) => void;
 
 export interface RequestData<T> {
   sendTime: DOMHighResTimeStamp;

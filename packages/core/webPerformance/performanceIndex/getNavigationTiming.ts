@@ -1,5 +1,5 @@
 import { PerformanceNavigationIndex } from 'types/performanceIndex';
-import { ReportHandler } from 'types/uploader';
+import { UploadHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
@@ -75,7 +75,7 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined 
   });
 };
 
-export const initNavigationTiming = (store: Store, report: ReportHandler, immediately = true) => {
+export const initNavigationTiming = (store: Store, upload: UploadHandler, immediately = true) => {
   getNavigationTiming()
     ?.then(navigation => {
       const indexValue = {
@@ -85,7 +85,7 @@ export const initNavigationTiming = (store: Store, report: ReportHandler, immedi
 
       store.set(PerformanceInfoType.NT, indexValue);
 
-      immediately && report(indexValue);
+      immediately && upload(indexValue);
     })
     .catch(err => console.error(err));
 };

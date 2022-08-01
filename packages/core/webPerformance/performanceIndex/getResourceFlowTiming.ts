@@ -1,5 +1,5 @@
 import { ResourceFlowTiming } from 'types/performanceIndex';
-import { ReportHandler } from 'types/uploader';
+import { UploadHandler } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
@@ -68,7 +68,7 @@ const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
   });
 };
 
-export const initResourceFlowTiming = (store: Store, report: ReportHandler, immediately = true) => {
+export const initResourceFlowTiming = (store: Store, upload: UploadHandler, immediately = true) => {
   getResourceFlowTiming()
     // maybe bug here
     // resourceFlow sounds like a Array....
@@ -80,7 +80,7 @@ export const initResourceFlowTiming = (store: Store, report: ReportHandler, imme
 
       store.set(PerformanceInfoType.FP, indexValue);
 
-      immediately && report(indexValue);
+      immediately && upload(indexValue);
     })
     .catch(err => console.error(err));
 };

@@ -32,3 +32,7 @@ export class Store {
     }, {});
   }
 }
+
+export const createStore = (): Store => {
+  return new Store();
+};
