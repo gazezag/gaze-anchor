@@ -28,3 +28,9 @@ export enum PerformanceInfoType {
   // info
   DI = 'device-info'
 }
+
+export const uploadTarget = {
+  proformance: '',
+  errInfo: '',
+  userBehavior: ''
+};
