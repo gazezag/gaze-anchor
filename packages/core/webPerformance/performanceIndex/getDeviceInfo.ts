@@ -1,5 +1,5 @@
 import { BrowserType, DeviceEnvInfo, OSType } from 'types/deviceEnvInfo';
-import { UploadHandler } from 'types/uploader';
+import { PerformanceInfoUploader } from 'types/uploader';
 import { isNavigatorSupported, isPerformanceSupported } from 'utils/compatible';
 import { getMatched, getTestStrFn } from 'utils/index';
 import { PerformanceInfoType } from 'core/common/static';
@@ -105,7 +105,7 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
   };
 };
 
-export const initDeviceInfo = (store: Store, upload: UploadHandler, immediately = true) => {
+export const initDeviceInfo = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
   const deviceInfo = getDeviceInfo();
   if (deviceInfo) {
     const value = {

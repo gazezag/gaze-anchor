@@ -9,3 +9,7 @@ export const isPerformanceSupported = (): boolean => {
 export const isPerformanceObserverSupported = (): boolean => {
   return !!window.PerformanceObserver;
 };
+
+export const isBeaconSupported = (): boolean => {
+  return !!window.navigator.sendBeacon;
+};

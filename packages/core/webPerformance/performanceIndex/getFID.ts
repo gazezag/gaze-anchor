@@ -1,4 +1,4 @@
-import { UploadHandler } from 'types/uploader';
+import { PerformanceInfoUploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, getObserveFn } from 'core/common/observe';
@@ -31,7 +31,7 @@ const getFID = (): Promise<PerformanceEventTiming> | undefined => {
   });
 };
 
-export const initFID = (store: Store, upload: UploadHandler, immediately = true) => {
+export const initFID = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
   getFID()
     ?.then((entry: PerformanceEventTiming) => {
       const indexValue = {

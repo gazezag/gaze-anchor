@@ -5,3 +5,6 @@ export interface ApiPerformanceInfo {
   response: any;
   // TODO
 }
+
+// TODO to be replenished
+export type UserBehaviorInfo = ApiPerformanceInfo;
