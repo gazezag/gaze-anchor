@@ -1,4 +1,4 @@
-import { UploadHandler } from 'types/uploader';
+import { PerformanceInfoUploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
@@ -34,7 +34,7 @@ const getFCP = (): Promise<PerformanceEntry> | undefined => {
   });
 };
 
-export const initFCP = (store: Store, upload: UploadHandler, immediately = true) => {
+export const initFCP = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
   getFCP()
     ?.then(entry => {
       const indexValue = {

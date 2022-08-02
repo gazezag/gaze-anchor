@@ -1,15 +1,15 @@
-import { createStore, createUploader, Store } from 'core/common';
-import { UploadHandler } from 'types/uploader';
+import { createStore, createPerformanceUploader, Store } from 'core/common';
+import { PerformanceInfoUploader } from 'types/uploader';
 import { afterLoad } from 'utils/pageHook';
 import { initCLS, initDeviceInfo, initFCP, initFID, initFP, initLCP, initNavigationTiming } from './performanceIndex';
 
 export class WebPerformanceObserver {
   private store: Store;
-  private uploader: UploadHandler;
+  private uploader: PerformanceInfoUploader;
 
   constructor() {
     this.store = createStore();
-    this.uploader = createUploader();
+    this.uploader = createPerformanceUploader();
   }
 
   init() {
