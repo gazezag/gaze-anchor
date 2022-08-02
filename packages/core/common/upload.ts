@@ -1,4 +1,9 @@
-import { UploadHandler } from 'types/uploader';
+import { ErrorInfo } from 'types/errorInfo';
+import { PerformanceInfo } from 'types/performanceIndex';
+import { BehaviorInfoUploader, ErrorInfoUploader, PerformanceInfoUploader, RequestData } from 'types/uploader';
+import { UserBehaviorInfo } from 'types/userBehavior';
+import { isBeaconSupported } from 'utils/compatible';
+import { uploadTarget } from './static';
 
 const imgRequest = (url: string, data: any) => {
   if (!url || !data) return;
@@ -16,7 +21,7 @@ const imgRequest = (url: string, data: any) => {
   img.src = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`;
 };
 
-const sendBeacon = (url: string, data: any) => {
+const beaconRequest = (url: string, data: any) => {
   if (!url || !data) return;
 
   const headers = {
@@ -26,7 +31,9 @@ const sendBeacon = (url: string, data: any) => {
   navigator.sendBeacon(url, new Blob([JSON.stringify(data)], headers));
 };
 
-const sendAjax = (url: string, data: any) => {
+const ajaxRequest = (url: string, data: any) => {
+  if (!url || !data) return;
+
   const client = new XMLHttpRequest();
   client.open('POST', url, false);
   client.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
@@ -36,16 +43,35 @@ const sendAjax = (url: string, data: any) => {
 const upload = (url: string, data: any) => {
   const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`.length;
 
+  // 2083 compatible with ie browser
+  // chrome 8182
+  // safari 80000
+  // firefox 65536
+  // opera 190000
   if (len < 2083) {
     imgRequest(url, data);
-  } else if (!!navigator.sendBeacon) {
-    sendBeacon(url, data);
+  } else if (isBeaconSupported()) {
+    beaconRequest(url, data);
   } else {
-    sendAjax(url, data);
+    ajaxRequest(url, data);
   }
 };
 
-// TODO
-export const createUploader = (config?: any): UploadHandler => {
-  return data => {};
+const getRequestData = <T>(data: T): RequestData<T> => {
+  return {
+    sendTime: performance.now(),
+    data
+  };
+};
+
+export const createPerformanceUploader = (config?: any): PerformanceInfoUploader => {
+  return (data: PerformanceInfo) => upload(uploadTarget.proformance, getRequestData(data));
+};
+
+export const createErrInfoUploader = (config?: any): ErrorInfoUploader => {
+  return (data: ErrorInfo) => upload(uploadTarget.errInfo, getRequestData(data));
+};
+
+export const createBehaviorInfoUploader = (config?: any): BehaviorInfoUploader => {
+  return (data: UserBehaviorInfo) => upload(uploadTarget.userBehavior, getRequestData(data));
 };
