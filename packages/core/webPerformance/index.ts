@@ -13,7 +13,6 @@ import {
 
 export class WebPerformanceObserver {
   private store: Store;
-
   private uploader: PerformanceInfoUploader;
 
   // TODO

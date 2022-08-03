@@ -23,6 +23,7 @@ export interface ErrorInfo {
 //   callStack: any; // any just for now
 // }
 // 错误类型
+//! 静态枚举一般命名开头首字母也大写  MechanismType
 export enum mechanismType {
   JS = 'js',
   RS = 'resource',
