@@ -7,9 +7,10 @@ export class WebPerformanceObserver {
   private store: Store;
   private uploader: PerformanceInfoUploader;
 
-  constructor() {
+  // TODO
+  constructor(config: any) {
     this.store = createStore();
-    this.uploader = createPerformanceUploader();
+    this.uploader = createPerformanceUploader(config);
   }
 
   init() {
