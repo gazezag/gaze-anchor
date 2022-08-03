@@ -33,6 +33,4 @@ export class Store {
   }
 }
 
-export const createStore = (): Store => {
-  return new Store();
-};
+export const createStore = (): Store => new Store();

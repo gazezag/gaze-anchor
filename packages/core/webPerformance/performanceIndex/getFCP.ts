@@ -5,8 +5,8 @@ import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
 import { EntryNames, EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 
-const getFCP = (): Promise<PerformanceEntry> | undefined => {
-  return new Promise((resolve, reject) => {
+const getFCP = (): Promise<PerformanceEntry> | undefined =>
+  new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
         reject(new Error('browser do not support performance api'));
@@ -32,7 +32,6 @@ const getFCP = (): Promise<PerformanceEntry> | undefined => {
       const observer = fcpObserver(callback);
     }
   });
-};
 
 export const initFCP = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
   getFCP()

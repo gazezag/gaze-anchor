@@ -1,6 +1,6 @@
 export const curry = (fn: Function, ...args: Array<any>) => {
   const _args = args || [];
-  const length = fn.length;
+  const { length } = fn;
 
   return (...rest: Array<any>) => {
     const _allArgs = _args.slice(0);
@@ -10,19 +10,17 @@ export const curry = (fn: Function, ...args: Array<any>) => {
     if (_allArgs.length < length) {
       // rreturn currying function while the parameters are insufficient
       return curry.call(this, fn, ..._allArgs);
-    } else {
-      // call the function while sufficient parameters are obtained
-      return fn.apply(this, _allArgs);
     }
+    // call the function while sufficient parameters are obtained
+    return fn.apply(this, _allArgs);
   };
 };
 
-export const promisify = (fn: Function) => {
-  return (...rest: Array<any>) => {
-    return new Promise((resolve, reject) => {
+export const promisify =
+  (fn: Function) =>
+  (...rest: Array<any>) =>
+    new Promise((resolve, reject) => {
       fn.length === rest.length
         ? resolve(fn.apply(this, rest)) // may need to handle panic with try-catch
         : reject(new Error(`expect ${fn.length} arguments but got ${rest.length}`));
     });
-  };
-};

@@ -1,6 +1,11 @@
 import { ErrorInfo } from 'types/errorInfo';
 import { PerformanceInfo } from 'types/performanceIndex';
-import { BehaviorInfoUploader, ErrorInfoUploader, PerformanceInfoUploader, RequestData } from 'types/uploader';
+import {
+  BehaviorInfoUploader,
+  ErrorInfoUploader,
+  PerformanceInfoUploader,
+  RequestData
+} from 'types/uploader';
 import { UserBehaviorInfo } from 'types/userBehavior';
 import { isBeaconSupported } from 'utils/compatible';
 import { uploadTarget } from './static';
@@ -41,7 +46,8 @@ const ajaxRequest = (url: string, data: any) => {
 };
 
 const upload = (url: string, data: any) => {
-  const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`.length;
+  const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`
+    .length;
 
   // 2083 compatible with ie browser
   // chrome 8182
@@ -57,21 +63,22 @@ const upload = (url: string, data: any) => {
   }
 };
 
-const getRequestData = <T>(data: T): RequestData<T> => {
-  return {
-    sendTime: performance.now(),
-    data
-  };
-};
+const getRequestData = <T>(data: T): RequestData<T> => ({
+  sendTime: performance.now(),
+  data
+});
 
-export const createPerformanceUploader = (config?: any): PerformanceInfoUploader => {
-  return (data: PerformanceInfo) => upload(uploadTarget.proformance, getRequestData(data));
-};
+export const createPerformanceUploader =
+  (config?: any): PerformanceInfoUploader =>
+  (data: PerformanceInfo) =>
+    upload(uploadTarget.proformance, getRequestData(data));
 
-export const createErrInfoUploader = (config?: any): ErrorInfoUploader => {
-  return (data: ErrorInfo) => upload(uploadTarget.errInfo, getRequestData(data));
-};
+export const createErrInfoUploader =
+  (config?: any): ErrorInfoUploader =>
+  (data: ErrorInfo) =>
+    upload(uploadTarget.errInfo, getRequestData(data));
 
-export const createBehaviorInfoUploader = (config?: any): BehaviorInfoUploader => {
-  return (data: UserBehaviorInfo) => upload(uploadTarget.userBehavior, getRequestData(data));
-};
+export const createBehaviorInfoUploader =
+  (config?: any): BehaviorInfoUploader =>
+  (data: UserBehaviorInfo) =>
+    upload(uploadTarget.userBehavior, getRequestData(data));

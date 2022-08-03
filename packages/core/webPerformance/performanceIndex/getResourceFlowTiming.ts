@@ -68,7 +68,11 @@ const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
   });
 };
 
-export const initResourceFlowTiming = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
+export const initResourceFlowTiming = (
+  store: Store,
+  upload: PerformanceInfoUploader,
+  immediately = true
+) => {
   getResourceFlowTiming()
     // maybe bug here
     // resourceFlow sounds like a Array....
