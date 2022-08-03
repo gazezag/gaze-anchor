@@ -2,7 +2,10 @@ import { curry } from 'utils/functional';
 
 export type ObserveHandler = (entry: PerformanceEntry) => void;
 
-export const observe = (entryTypes: Array<string>, callback: ObserveHandler): PerformanceObserver => {
+export const observe = (
+  entryTypes: Array<string>,
+  callback: ObserveHandler
+): PerformanceObserver => {
   const observer = new PerformanceObserver(
     entryList =>
       entryList // entryList is the main entrance to the matched
@@ -36,6 +39,5 @@ export const disconnect = (observer: PerformanceObserver) => {
   observer.disconnect();
 };
 
-export const takeRecord = (observer: PerformanceObserver): Array<PerformanceEntry> => {
-  return observer.takeRecords();
-};
+export const takeRecord = (observer: PerformanceObserver): Array<PerformanceEntry> =>
+  observer.takeRecords();

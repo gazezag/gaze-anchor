@@ -11,8 +11,8 @@ interface LayoutShift extends PerformanceEntry {
 }
 
 // Cumulative Layout Shift
-const getCLS = (): Promise<PerformanceEntry> | undefined => {
-  return new Promise((resolve, reject) => {
+const getCLS = (): Promise<PerformanceEntry> | undefined =>
+  new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
         reject(new Error('browser do not support performance api'));
@@ -34,7 +34,6 @@ const getCLS = (): Promise<PerformanceEntry> | undefined => {
       const observer = clsObserver(callback);
     }
   });
-};
 
 export const initCLS = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
   getCLS()

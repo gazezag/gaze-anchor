@@ -1,7 +1,15 @@
 import { createStore, createPerformanceUploader, Store } from 'core/common';
 import { PerformanceInfoUploader } from 'types/uploader';
 import { afterLoad } from 'utils/pageHook';
-import { initCLS, initDeviceInfo, initFCP, initFID, initFP, initLCP, initNavigationTiming } from './performanceIndex';
+import {
+  initCLS,
+  initDeviceInfo,
+  initFCP,
+  initFID,
+  initFP,
+  initLCP,
+  initNavigationTiming
+} from './performanceIndex';
 
 export class WebPerformanceObserver {
   private store: Store;

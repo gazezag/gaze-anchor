@@ -6,8 +6,8 @@ import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 
 // First Input Delay
-const getFID = (): Promise<PerformanceEventTiming> | undefined => {
-  return new Promise((resolve, reject) => {
+const getFID = (): Promise<PerformanceEventTiming> | undefined =>
+  new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
         reject(new Error('browser do not support performance api'));
@@ -29,7 +29,6 @@ const getFID = (): Promise<PerformanceEventTiming> | undefined => {
       const observer = fidObserver(callback);
     }
   });
-};
 
 export const initFID = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
   getFID()

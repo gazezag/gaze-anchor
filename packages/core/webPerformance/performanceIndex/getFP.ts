@@ -5,8 +5,8 @@ import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
 import { EntryNames, EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 
-const getFP = (): Promise<PerformanceEntry> | undefined => {
-  return new Promise((resolve, reject) => {
+const getFP = (): Promise<PerformanceEntry> | undefined =>
+  new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
         reject(new Error('browser do not support performance api'));
@@ -32,7 +32,6 @@ const getFP = (): Promise<PerformanceEntry> | undefined => {
       const observer = fpObserver(callback);
     }
   });
-};
 
 export const initFP = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
   getFP()

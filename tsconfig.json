@@ -24,10 +24,6 @@
     }
   },
   "include": ["packages/**/*.ts", "packages/**/*.d.ts"],
-  "exclude": [
-    "*tests/*",
-    "packages/**/__tests__/*",
-    "packages/**/**/__tests__/*"
-  ],
+  "exclude": ["*tests/*", "packages/**/__tests__/*", "packages/**/**/__tests__/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
