@@ -2,9 +2,7 @@ import { curry, promisify } from '../functional';
 
 describe('functional.ts', () => {
   describe('curry', () => {
-    const add = (a: number, b: number, c: number) => {
-      return a + b + c;
-    };
+    const add = (a: number, b: number, c: number) => a + b + c;
     const curryAdd = curry(add);
     const addOne = curryAdd(1);
     const addTwo = curry(add, 2);
@@ -33,9 +31,10 @@ describe('functional.ts', () => {
     const pmFn = promisify(fn);
 
     test('return a function with return a promise', () => {
-      const isPromise = (obj: any) => {
-        return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
-      };
+      const isPromise = (obj: any) =>
+        !!obj &&
+        (typeof obj === 'object' || typeof obj === 'function') &&
+        typeof obj.then === 'function';
 
       expect(typeof pmFn).toStrictEqual('function');
       expect(isPromise(pmFn(1, 2))).toBeTruthy();

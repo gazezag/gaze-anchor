@@ -1,4 +1,3 @@
-
 // 错误堆栈
 const FULL_MATCH =
   /^\s*at (?:(.*?) ?\()?((?:file|https?|blob|chrome-extension|address|native|eval|webpack|<anonymous>|[-a-z]+:|.*bundle|\/).*?)(?::(\d+))?(?::(\d+))?\)?\s*$/i;
@@ -18,7 +17,7 @@ export function parseStackLine(line: string) {
     filename,
     functionName,
     lineno,
-    colno,
+    colno
   };
 }
 

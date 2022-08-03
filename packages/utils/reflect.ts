@@ -1,10 +1,6 @@
-export const getKeys = (o: Object): Array<PropertyKey> => {
-  return Reflect.ownKeys(o);
-};
+export const getKeys = (o: Object): Array<PropertyKey> => Reflect.ownKeys(o);
 
-export const has = (o: Object, k: PropertyKey): boolean => {
-  return Reflect.has(o, k);
-};
+export const has = (o: Object, k: PropertyKey): boolean => Reflect.has(o, k);
 
 export const get = (o: Object, k: PropertyKey): any => {
   if (has(o, k)) {
@@ -15,6 +11,4 @@ export const get = (o: Object, k: PropertyKey): any => {
 };
 
 // can clear the sdie-effect
-export const set = (o: Object, k: PropertyKey, v: any): boolean => {
-  return Reflect.set(o, k, v);
-};
+export const set = (o: Object, k: PropertyKey, v: any): boolean => Reflect.set(o, k, v);

@@ -12,7 +12,10 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined 
     return;
   }
 
-  const resolveNavigation = (navigation: PerformanceNavigationTiming, resolve: (value: any) => void) => {
+  const resolveNavigation = (
+    navigation: PerformanceNavigationTiming,
+    resolve: (value: any) => void
+  ) => {
     const {
       redirectStart,
       redirectEnd,
@@ -75,7 +78,11 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined 
   });
 };
 
-export const initNavigationTiming = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
+export const initNavigationTiming = (
+  store: Store,
+  upload: PerformanceInfoUploader,
+  immediately = true
+) => {
   getNavigationTiming()
     ?.then(navigation => {
       const indexValue = {

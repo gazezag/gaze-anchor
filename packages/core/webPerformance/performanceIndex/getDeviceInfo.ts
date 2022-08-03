@@ -74,7 +74,7 @@ const getOS: GetMetaInfoFn<OSType> = ua => {
       ? OSType.Linux
       : OSType.Unknown,
 
-    //TODO no idea to get the detailed version number for the time being...
+    // TODO no idea to get the detailed version number for the time being...
     version: ''
   };
 };
@@ -105,7 +105,11 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
   };
 };
 
-export const initDeviceInfo = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
+export const initDeviceInfo = (
+  store: Store,
+  upload: PerformanceInfoUploader,
+  immediately = true
+) => {
   const deviceInfo = getDeviceInfo();
   if (deviceInfo) {
     const value = {

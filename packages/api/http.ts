@@ -6,25 +6,21 @@ const service = axios.create({
 });
 
 service.interceptors.request.use(
-  config => {
+  config =>
     // before request send...
-    return config;
-  },
-  err => {
+    config,
+  err =>
     // after request error...
-    return Promise.reject(err);
-  }
+    Promise.reject(err)
 );
 
 service.interceptors.response.use(
-  res => {
+  res =>
     // do something with response data
-    return res;
-  },
-  err => {
+    res,
+  err =>
     // error handling
-    return Promise.reject(err);
-  }
+    Promise.reject(err)
 );
 
 export default service;

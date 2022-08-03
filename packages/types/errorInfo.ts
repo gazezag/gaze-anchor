@@ -37,7 +37,7 @@ export enum metricsName {
   RCR = 'router-change-record',
   CBR = 'click-behavior-record',
   CDR = 'custom-define-record',
-  HT = 'http-record',
+  HT = 'http-record'
 }
 
 export interface behaviorStack {

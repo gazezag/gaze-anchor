@@ -5,17 +5,16 @@ export const getMatched = (src: string, reg: RegExp, idx = 0): string => {
   return matched ? matched[idx] : '';
 };
 
-export const getTestStrFn = (src: string) => {
+export const getTestStrFn =
+  (src: string) =>
   // match multiple regular express
   // and return true as soon as one test passes
-  return (reg: RegExp | Array<RegExp>): boolean => {
+  (reg: RegExp | Array<RegExp>): boolean => {
     if (Array.isArray(reg)) {
       for (const r of reg) {
         if (r.test(src)) return true;
       }
       return false;
-    } else {
-      return reg.test(src);
     }
+    return reg.test(src);
   };
-};
