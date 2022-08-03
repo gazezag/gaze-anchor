@@ -2,6 +2,7 @@ import { WebPerformanceObserver } from 'core/webPerformance';
 import { GazeConfig } from 'types/gaze';
 import { get, getKeys, has, set } from 'utils/reflect';
 
+// TODO
 const mergeConfig = (userConfig: GazeConfig): GazeConfig => {
   return getKeys(userConfig).reduce(
     (prev, k) => {
