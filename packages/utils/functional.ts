@@ -22,7 +22,7 @@ export const promisify = (fn: Function) => {
     return new Promise((resolve, reject) => {
       fn.length === rest.length
         ? resolve(fn.apply(this, rest)) // may need to handle panic with try-catch
-        : reject(new Error(`[insufficient arguments]: expect ${fn.length} but got ${rest.length}`));
+        : reject(new Error(`expect ${fn.length} arguments but got ${rest.length}`));
     });
   };
 };
