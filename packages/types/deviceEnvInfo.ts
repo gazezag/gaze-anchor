@@ -1,18 +1,18 @@
 export enum OSType {
-  Windows,
-  MacOS,
-  Linux,
-  Unknown
+  Windows = 'Windows',
+  MacOS = 'MacOs',
+  Linux = 'Linux',
+  Unknown = 'Unknow'
 }
 
 export enum BrowserType {
-  Chrome,
-  Safari,
-  Edge,
-  IE,
-  Firefox,
-  Opera,
-  Unknown
+  Chrome = 'Chrome',
+  Safari = 'Safari',
+  Edge = 'Edge',
+  IE = 'IE',
+  Firefox = 'Firefox',
+  Opera = 'Opera',
+  Unknown = 'Unknown'
 }
 
 export interface MetaInfo<T> {
