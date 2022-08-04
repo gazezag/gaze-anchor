@@ -23,7 +23,7 @@ export enum PerformanceInfoType {
   FCP = 'first-contentful-paint',
   LCP = 'largest-contentful-paint',
   FID = 'first-input-delay',
-  RL = 'resource-flow',
+  RF = 'resource-flow',
 
   // info
   DI = 'device-info'
@@ -34,3 +34,25 @@ export const uploadTarget = {
   errInfo: '',
   userBehavior: ''
 };
+
+export enum ErrorType {
+  JS = 'js',
+  RS = 'resource',
+  UJ = 'unhandledrejection',
+  HP = 'http',
+  CS = 'cors'
+}
+
+export enum BehaviorType {
+  PI = 'page-information',
+  OI = 'origin-information',
+  RCR = 'router-change-record',
+  CBR = 'click-behavior-record',
+  CDR = 'custom-define-record',
+  HT = 'http-record'
+}
+
+export enum EventType {
+  error = 'error',
+  unhandledrejection = 'unhandledrejection'
+}
