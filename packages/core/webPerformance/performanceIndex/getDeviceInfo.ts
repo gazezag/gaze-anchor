@@ -1,9 +1,10 @@
-import { BrowserType, DeviceEnvInfo, OSType } from 'types/deviceEnvInfo';
+import { DeviceEnvInfo } from 'types/deviceEnvInfo';
 import { PerformanceInfoUploader } from 'types/uploader';
 import { isNavigatorSupported, isPerformanceSupported } from 'utils/compatible';
 import { getMatched, getTestStrFn } from 'utils/index';
-import { PerformanceInfoType } from 'core/common/static';
+import { BrowserType, OSType, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
+import { PerformanceInfo } from 'types/performanceIndex';
 
 type BrowserInfoEnum = Array<{
   type: BrowserType;
@@ -47,19 +48,16 @@ const getBrowser: GetMetaInfoFn<BrowserType> = ua => {
     }
   ];
 
-  typeEnum.map(v => {
+  const res = { type: BrowserType.Unknown, version: '' };
+
+  typeEnum.forEach(v => {
     if (v.flag) {
-      return {
-        type: v.type,
-        version: v.version
-      };
+      res.type = v.type;
+      res.version = v.version;
     }
   });
 
-  return {
-    type: BrowserType.Unknown,
-    version: ''
-  };
+  return res;
 };
 
 const getOS: GetMetaInfoFn<OSType> = ua => {
@@ -106,7 +104,7 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
 };
 
 export const initDeviceInfo = (
-  store: Store,
+  store: Store<PerformanceInfoType, PerformanceInfo>,
   upload: PerformanceInfoUploader,
   immediately = true
 ) => {

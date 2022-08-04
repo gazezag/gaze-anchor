@@ -1,4 +1,4 @@
-import { ResourceFlowTiming } from 'types/performanceIndex';
+import { PerformanceInfo, ResourceFlowTiming } from 'types/performanceIndex';
 import { PerformanceInfoUploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
@@ -6,13 +6,22 @@ import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 
-const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
+const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> | undefined => {
   if (!isPerformanceSupported()) {
     console.warn('Performance API not support');
     return;
   }
+  if (!isPerformanceObserverSupported()) {
+    console.warn('Performance Observer not support');
+    return;
+  }
 
-  const resolveResourceFlow = (entry: PerformanceResourceTiming, resolve: (value: any) => void) => {
+  const resourceFlow: Array<ResourceFlowTiming> = [];
+
+  const calcResourceFlow = (
+    entry: PerformanceResourceTiming,
+    resourceFlow: Array<ResourceFlowTiming>
+  ) => {
     const {
       name,
       transferSize,
@@ -28,12 +37,12 @@ const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
       requestStart
     } = entry;
 
-    resolve({
+    resourceFlow.push({
       name,
       transferSize,
       initiatorType,
-      startTime,
-      responseEnd,
+      startTime: roundOff(startTime),
+      responseEnd: roundOff(responseEnd),
       DNS: roundOff(domainLookupEnd - domainLookupStart),
       initialConnect: roundOff(connectEnd - connectStart),
       SSL: roundOff(connectEnd - secureConnectionStart),
@@ -54,12 +63,14 @@ const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
         if (entry.entryType === EntryTypes.resource) {
           resourceObserver && disconnect(resourceObserver);
 
-          resolveResourceFlow(entry, resolve);
+          calcResourceFlow(entry, resourceFlow);
+
+          resolve(resourceFlow);
         }
       };
 
       const resourceObserver = observe(
-        [EntryTypes.resource],
+        EntryTypes.resource,
         // must be asserted
         // maybe bug here
         callback as ObserveHandler
@@ -69,7 +80,7 @@ const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
 };
 
 export const initResourceFlowTiming = (
-  store: Store,
+  store: Store<PerformanceInfoType, PerformanceInfo>,
   upload: PerformanceInfoUploader,
   immediately = true
 ) => {
@@ -78,11 +89,11 @@ export const initResourceFlowTiming = (
     // resourceFlow sounds like a Array....
     ?.then(resourceFlow => {
       const indexValue = {
-        type: PerformanceInfoType.FP,
+        type: PerformanceInfoType.RF,
         value: resourceFlow
       };
 
-      store.set(PerformanceInfoType.FP, indexValue);
+      store.set(PerformanceInfoType.RF, indexValue);
 
       immediately && upload(indexValue);
     })

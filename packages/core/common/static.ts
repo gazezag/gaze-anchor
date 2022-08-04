@@ -23,10 +23,27 @@ export enum PerformanceInfoType {
   FCP = 'first-contentful-paint',
   LCP = 'largest-contentful-paint',
   FID = 'first-input-delay',
-  RL = 'resource-flow',
+  RF = 'resource-flow',
 
   // info
   DI = 'device-info'
+}
+
+export enum OSType {
+  Windows = 'Windows',
+  MacOS = 'MacOs',
+  Linux = 'Linux',
+  Unknown = 'Unknow'
+}
+
+export enum BrowserType {
+  Chrome = 'Chrome',
+  Safari = 'Safari',
+  Edge = 'Edge',
+  IE = 'IE',
+  Firefox = 'Firefox',
+  Opera = 'Opera',
+  Unknown = 'Unknown'
 }
 
 export const uploadTarget = {
@@ -34,3 +51,25 @@ export const uploadTarget = {
   errInfo: '',
   userBehavior: ''
 };
+
+export enum ErrorType {
+  JS = 'js',
+  RS = 'resource',
+  UJ = 'unhandledrejection',
+  HP = 'http',
+  CS = 'cors'
+}
+
+export enum BehaviorType {
+  PI = 'page-information',
+  OI = 'origin-information',
+  RCR = 'router-change-record',
+  CBR = 'click-behavior-record',
+  CDR = 'custom-define-record',
+  HT = 'http-record'
+}
+
+export enum EventType {
+  error = 'error',
+  unhandledrejection = 'unhandledrejection'
+}

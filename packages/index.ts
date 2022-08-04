@@ -11,6 +11,7 @@ const mergeConfig = (userConfig: GazeConfig): GazeConfig =>
     },
     {
       target: 'http://localhost:9000',
+      stackLimit: 10,
       logErrors: false,
       release: ''
     }

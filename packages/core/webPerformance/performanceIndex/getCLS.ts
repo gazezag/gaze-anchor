@@ -1,9 +1,10 @@
 import { PerformanceInfoUploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
+import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
+import { PerformanceInfo } from 'types/performanceIndex';
 
 interface LayoutShift extends PerformanceEntry {
   value: number;
@@ -20,7 +21,6 @@ const getCLS = (): Promise<PerformanceEntry> | undefined =>
         reject(new Error('browser has no lcp'));
       }
     } else {
-      const clsObserver = getObserveFn([EntryTypes.CLS]);
       const callback: ObserveHandler = entry => {
         if (entry.entryType === EntryTypes.CLS) {
           // if the observer already exists
@@ -31,11 +31,15 @@ const getCLS = (): Promise<PerformanceEntry> | undefined =>
         }
       };
 
-      const observer = clsObserver(callback);
+      const observer = observe(EntryTypes.CLS, callback);
     }
   });
 
-export const initCLS = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
+export const initCLS = (
+  store: Store<PerformanceInfoType, PerformanceInfo>,
+  upload: PerformanceInfoUploader,
+  immediately = true
+) => {
   getCLS()
     ?.then(entry => {
       const indexValue = {
