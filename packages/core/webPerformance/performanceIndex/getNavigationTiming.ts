@@ -1,4 +1,4 @@
-import { PerformanceNavigationIndex } from 'types/performanceIndex';
+import { PerformanceInfo, PerformanceNavigationIndex } from 'types/performanceIndex';
 import { PerformanceInfoUploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
@@ -62,7 +62,7 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined 
       };
 
       const navigationObserver = observe(
-        [EntryTypes.navigation],
+        EntryTypes.navigation,
         // must be asserted
         // maybe bug here
         callback as ObserveHandler
@@ -79,7 +79,7 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined 
 };
 
 export const initNavigationTiming = (
-  store: Store,
+  store: Store<PerformanceInfoType, PerformanceInfo>,
   upload: PerformanceInfoUploader,
   immediately = true
 ) => {

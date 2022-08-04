@@ -1,4 +1,5 @@
-import { createStore, createPerformanceUploader, Store } from 'core/common';
+import { createPerformanceUploader, Store, PerformanceInfoType } from 'core/common';
+import { PerformanceInfo } from 'types/performanceIndex';
 import { PerformanceInfoUploader } from 'types/uploader';
 import { afterLoad } from 'utils/pageHook';
 import {
@@ -12,12 +13,12 @@ import {
 } from './performanceIndex';
 
 export class WebPerformanceObserver {
-  private store: Store;
+  private store: Store<PerformanceInfoType, PerformanceInfo>;
   private uploader: PerformanceInfoUploader;
 
   // TODO
   constructor(config: any) {
-    this.store = createStore();
+    this.store = new Store();
     this.uploader = createPerformanceUploader(config);
   }
 

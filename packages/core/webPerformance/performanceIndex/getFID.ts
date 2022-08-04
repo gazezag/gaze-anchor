@@ -1,9 +1,10 @@
 import { PerformanceInfoUploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, getObserveFn } from 'core/common/observe';
+import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
+import { PerformanceInfo } from 'types/performanceIndex';
 
 // First Input Delay
 const getFID = (): Promise<PerformanceEventTiming> | undefined =>
@@ -15,7 +16,6 @@ const getFID = (): Promise<PerformanceEventTiming> | undefined =>
         reject(new Error('browser has no lcp'));
       }
     } else {
-      const fidObserver = getObserveFn([EntryTypes.FID]);
       const callback = (entry: PerformanceEventTiming) => {
         if (entry.entryType === EntryTypes.FID) {
           // if the observer already exists
@@ -26,11 +26,15 @@ const getFID = (): Promise<PerformanceEventTiming> | undefined =>
         }
       };
 
-      const observer = fidObserver(callback);
+      const observer = observe(EntryTypes.FID, callback as ObserveHandler);
     }
   });
 
-export const initFID = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
+export const initFID = (
+  store: Store<PerformanceInfoType, PerformanceInfo>,
+  upload: PerformanceInfoUploader,
+  immediately = true
+) => {
   getFID()
     ?.then((entry: PerformanceEventTiming) => {
       const indexValue = {

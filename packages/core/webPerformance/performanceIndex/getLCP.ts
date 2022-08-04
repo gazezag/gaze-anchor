@@ -1,26 +1,18 @@
 import { PerformanceInfoUploader } from 'types/uploader';
-import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
+import { isPerformanceObserverSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
-import { EntryNames, EntryTypes, PerformanceInfoType } from 'core/common/static';
+import { disconnect, observe, ObserveHandler } from 'core/common/observe';
+import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
+import { PerformanceInfo } from 'types/performanceIndex';
 
 const getLCP = (): Promise<PerformanceEntry> | undefined =>
   new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
-      if (!isPerformanceSupported()) {
-        reject(new Error('browser do not support performance api'));
-      } else {
-        const [entry] = window.performance.getEntriesByName(EntryNames.LCP);
-
-        entry && resolve(entry);
-
-        reject(new Error('browser has no lcp'));
-      }
+      reject(new Error('browser not support performance observer'));
     } else {
-      const lcpObserver = getObserveFn([EntryTypes.LCP]);
       const callback: ObserveHandler = entry => {
-        if (entry.name === EntryNames.LCP) {
+        if (entry.entryType === EntryTypes.LCP) {
           // if the observer already exists
           // prevent performance watchers from continuing to observe
           observer && disconnect(observer);
@@ -29,11 +21,15 @@ const getLCP = (): Promise<PerformanceEntry> | undefined =>
         }
       };
 
-      const observer = lcpObserver(callback);
+      const observer = observe(EntryTypes.LCP, callback);
     }
   });
 
-export const initLCP = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
+export const initLCP = (
+  store: Store<PerformanceInfoType, PerformanceInfo>,
+  upload: PerformanceInfoUploader,
+  immediately = true
+) => {
   getLCP()
     ?.then(entry => {
       const indexValue = {
