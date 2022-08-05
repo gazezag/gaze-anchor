@@ -1,4 +1,5 @@
-import { BehaviorType, ErrorType } from 'core/common';
+import { ErrorType } from 'core/common';
+import { BehaviorItem } from './userBehavior';
 
 export interface ErrorStep {
   filename: string;
@@ -37,14 +38,6 @@ export interface CorsErrorDetail {
   target: string;
 }
 
-export interface BehaviorStack {
-  name: BehaviorType;
-  page: string;
-  timestamp: DOMHighResTimeStamp;
-  //! 暂时不知道 value 的具体类型, 但最好明确
-  value: Object;
-}
-
 export type uid = string;
 
 // 格式化的错误信息
@@ -64,7 +57,7 @@ export interface ErrorInfo {
     | HttpErrorDetail
     | CorsErrorDetail;
   // 跟踪用户操作
-  breadcrumbs: Array<BehaviorStack>;
+  breadcrumbs: Array<BehaviorItem>;
 }
 
 // 错误类型
