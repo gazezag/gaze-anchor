@@ -7,7 +7,15 @@ interface Option {
   once: boolean;
 }
 
-const createlistener = (eventType: EventType) => {
+export const createlistener = (eventType: EventType | Array<EventType>) => {
+  if (Array.isArray(eventType)) {
+    return (eventHandler: EventHandler, option: Option | boolean = true) => {
+      eventType.forEach(type => {
+        window.addEventListener(type, eventHandler, option);
+      });
+    };
+  }
+
   return (eventHandler: EventHandler, option: Option | boolean = true) => {
     window.addEventListener(eventType, eventHandler, option);
   };
@@ -15,3 +23,7 @@ const createlistener = (eventType: EventType) => {
 
 export const errorListener = createlistener(EventType.error);
 export const unhandleRejectionListener = createlistener(EventType.unhandledrejection);
+
+export const dispatchEvent = (event: Event): void => {
+  window.dispatchEvent(event);
+};
