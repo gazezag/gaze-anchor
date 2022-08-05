@@ -61,27 +61,36 @@ export enum ErrorType {
 }
 
 export enum BehaviorType {
-  PI = 'page-information',
-  OI = 'origin-information',
-  RC = 'router-change',
-  C = 'click',
-  CD = 'custom-define',
-  HT = 'http'
+  routerChange = 'router-change',
+  operation = 'operation',
+  request = 'request',
+  customDefine = 'custom-define'
 }
 
 export enum EventType {
+  // Error
   error = 'error',
   unhandledrejection = 'unhandledrejection',
 
+  // User Operation
   click = 'click',
   keydown = 'keydown',
-
   // I still don't know why one is lower-camel-case and the other one is lowercase....
   pushState = 'pushState',
   popState = 'popstate',
-
   replaceState = 'replacestate',
   hashChange = 'hashchange',
 
+  // Page
+  load = 'load',
   visibilitychange = 'visibilitychange'
+}
+
+export enum RequestType {
+  get = 'GET',
+  post = 'POST',
+  put = 'PUT',
+  del = 'DELETE',
+  options = 'OPTIONS',
+  head = 'HEAD'
 }
