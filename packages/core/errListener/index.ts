@@ -2,7 +2,8 @@ import { createErrInfoUploader, ErrorType, Store } from 'core/common';
 import { ErrorInfo, uid } from 'types/errorInfo';
 import { GazeConfig } from 'types/gaze';
 import { ErrorInfoUploader } from 'types/uploader';
-import { errorListener, EventHandler } from 'utils/eventListener';
+import { errorListener, EventHandler } from 'utils/eventHandler';
+import { getTimestamp } from 'utils/timestampHandler';
 import { getStackParser } from './errStackHandler';
 
 export class ErrorObserver {
@@ -45,7 +46,7 @@ export class ErrorObserver {
         // 错误的标识码
         errorUid,
         // 错误发生的时间
-        time: performance.now(),
+        time: getTimestamp(),
         // 错误信息
         message: event.message,
         // 详细信息
