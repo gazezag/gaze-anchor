@@ -1,8 +1,8 @@
-import { createErrInfoUploader, ErrorType, Store } from 'core/common';
+import { createErrInfoUploader, ErrorType, EventType, Store } from 'core/common';
 import { ErrorInfo, uid } from 'types/errorInfo';
 import { GazeConfig } from 'types/gaze';
 import { ErrorInfoUploader } from 'types/uploader';
-import { errorListener, EventHandler } from 'utils/eventHandler';
+import { createlistener, EventHandler } from 'utils/eventHandler';
 import { getTimestamp } from 'utils/timestampHandler';
 import { getStackParser } from './errStackHandler';
 
@@ -68,7 +68,7 @@ export class ErrorObserver {
       this.store.set(errorUid, info);
     };
 
-    errorListener(handler as EventHandler);
+    createlistener(EventType.error)(handler as EventHandler);
   }
 
   private initPromiseReject() {
