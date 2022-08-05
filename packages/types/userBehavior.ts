@@ -15,8 +15,11 @@ export interface RouterChangeDetail {
   hash?: string;
 }
 
-export interface ClickDetail {
-  // TODO
+export interface OperationDetail {
+  id: string;
+  classList: Array<string>;
+  tagName: string;
+  text: string;
 }
 
 export interface CustomDefineDetail {
@@ -24,7 +27,17 @@ export interface CustomDefineDetail {
 }
 
 export interface HttpDetail {
-  // TODO
+  method: string;
+  url: string | URL;
+  status: number;
+  statusText: string;
+  headers: {
+    [header: string]: string;
+  };
+  body: Document | XMLHttpRequestBodyInit | string | ReadableStream;
+  requestTime: DOMHighResTimeStamp;
+  responseTime: DOMHighResTimeStamp;
+  response: any;
 }
 
 export interface BehaviorItem {
@@ -35,9 +48,15 @@ export interface BehaviorItem {
     | PageInfoDetail
     | OriginInfoDetail
     | RouterChangeDetail
-    | ClickDetail
+    | OperationDetail
     | CustomDefineDetail
     | HttpDetail;
+}
+
+export interface VisitInfo {
+  time: DOMHighResTimeStamp;
+  // TODO
+  origin: string;
 }
 
 // TODO to be replenished
