@@ -22,8 +22,19 @@ export const createlistener = (eventType: EventType | Array<EventType>) => {
   };
 };
 
-export const errorListener = createlistener(EventType.error);
-export const unhandleRejectionListener = createlistener(EventType.unhandledrejection);
+export const removeListener = (
+  eventType: EventType | Array<EventType>,
+  eventHandler: EventHandler,
+  option: Option | boolean = true
+) => {
+  if (Array.isArray(eventType)) {
+    eventType.forEach(type => {
+      window.removeEventListener(type, eventHandler, option);
+    });
+  } else {
+    window.removeEventListener(eventType, eventHandler, option);
+  }
+};
 
 export const dispatchEvent = (event: Event): void => {
   window.dispatchEvent(event);
