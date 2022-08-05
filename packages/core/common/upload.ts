@@ -6,7 +6,7 @@ import {
   PerformanceInfoUploader,
   RequestData
 } from 'types/uploader';
-import { UserBehaviorInfo } from 'types/userBehavior';
+import { UserBehavior, VisitInfo } from 'types/userBehavior';
 import { isBeaconSupported } from 'utils/compatible';
 import { uploadTarget } from './static';
 
@@ -80,5 +80,5 @@ export const createErrInfoUploader =
 
 export const createBehaviorInfoUploader =
   (config?: any): BehaviorInfoUploader =>
-  (data: UserBehaviorInfo) =>
+  (data: UserBehavior | VisitInfo) =>
     upload(uploadTarget.userBehavior, getRequestData(data));

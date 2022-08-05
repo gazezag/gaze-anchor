@@ -1,12 +1,12 @@
 import { PerformanceInfo, PerformanceNavigationIndex } from './performanceIndex';
-import { UserBehavior } from './userBehavior';
+import { UserBehavior, VisitInfo } from './userBehavior';
 import { ErrorInfo } from './errorInfo';
 
 export type UploadHandler<T> = (data: T) => void;
 
 export type PerformanceInfoUploader = UploadHandler<PerformanceInfo>;
 export type ErrorInfoUploader = UploadHandler<ErrorInfo>;
-export type BehaviorInfoUploader = UploadHandler<UserBehavior>;
+export type BehaviorInfoUploader = UploadHandler<UserBehavior | VisitInfo>;
 
 export interface RequestData<T> {
   sendTime: DOMHighResTimeStamp;
