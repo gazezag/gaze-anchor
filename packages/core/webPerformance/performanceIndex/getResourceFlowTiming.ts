@@ -6,16 +6,7 @@ import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 
-const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> | undefined => {
-  if (!isPerformanceSupported()) {
-    console.warn('Performance API not support');
-    return;
-  }
-  if (!isPerformanceObserverSupported()) {
-    console.warn('Performance Observer not support');
-    return;
-  }
-
+const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> => {
   const resourceFlow: Array<ResourceFlowTiming> = [];
 
   const calcResourceFlow = (
@@ -56,7 +47,9 @@ const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> | undefined
   // TODO added cache-hit-rate
   // TODO cache-hit: duration == 0 && transferSize !== 0
   return new Promise((resolve, reject) => {
-    if (!isPerformanceObserverSupported()) {
+    if (!isPerformanceSupported()) {
+      reject(new Error('browser does not support the performance API'));
+    } else if (!isPerformanceObserverSupported()) {
       reject(new Error('browser does not support the PerformanceObserver'));
     } else {
       const callback = (entry: PerformanceResourceTiming) => {
@@ -84,16 +77,16 @@ export const initResourceFlowTiming = (
   upload: PerformanceInfoUploader,
   immediately = true
 ) => {
+  const { RF } = PerformanceInfoType;
+
   getResourceFlowTiming()
-    // maybe bug here
-    // resourceFlow sounds like a Array....
-    ?.then(resourceFlow => {
+    .then(resourceFlow => {
       const indexValue = {
-        type: PerformanceInfoType.RF,
+        type: RF,
         value: resourceFlow
       };
 
-      store.set(PerformanceInfoType.RF, indexValue);
+      store.set(RF, indexValue);
 
       immediately && upload(indexValue);
     })

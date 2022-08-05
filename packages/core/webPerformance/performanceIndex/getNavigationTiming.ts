@@ -6,12 +6,7 @@ import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 
-const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined => {
-  if (!isPerformanceSupported()) {
-    console.warn('Performance API not support');
-    return;
-  }
-
+const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {
   const resolveNavigation = (
     navigation: PerformanceNavigationTiming,
     resolve: (value: any) => void
@@ -51,7 +46,11 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined 
     });
   };
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
+    if (!isPerformanceSupported()) {
+      reject(new Error('browser not support performance API'));
+    }
+
     if (isPerformanceObserverSupported()) {
       const callback = (navigation: PerformanceNavigationTiming) => {
         if (navigation.entryType === EntryTypes.navigation) {
@@ -83,14 +82,16 @@ export const initNavigationTiming = (
   upload: PerformanceInfoUploader,
   immediately = true
 ) => {
+  const { NT } = PerformanceInfoType;
+
   getNavigationTiming()
-    ?.then(navigation => {
+    .then(navigation => {
       const indexValue = {
-        type: PerformanceInfoType.NT,
+        type: NT,
         value: navigation
       };
 
-      store.set(PerformanceInfoType.NT, indexValue);
+      store.set(NT, indexValue);
 
       immediately && upload(indexValue);
     })

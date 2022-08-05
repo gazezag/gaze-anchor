@@ -73,10 +73,15 @@ export enum EventType {
   error = 'error',
   unhandledrejection = 'unhandledrejection',
 
+  click = 'click',
+  keydown = 'keydown',
+
   // I still don't know why one is lower-camel-case and the other one is lowercase....
   pushState = 'pushState',
   popState = 'popstate',
 
   replaceState = 'replacestate',
-  hashChange = 'hashchange'
+  hashChange = 'hashchange',
+
+  visibilitychange = 'visibilitychange'
 }
