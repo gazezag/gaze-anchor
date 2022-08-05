@@ -1,8 +1,8 @@
 import { GazeConfig } from 'types/gaze';
-import { BehaviorItem } from 'types/userBehavior';
+import { UserBehavior } from 'types/userBehavior';
 
 export class UserBehaviorInfo {
-  private breadcrumbs: Array<BehaviorItem>;
+  private breadcrumbs: UserBehavior;
 
   constructor(config: GazeConfig) {
     this.breadcrumbs = [];
