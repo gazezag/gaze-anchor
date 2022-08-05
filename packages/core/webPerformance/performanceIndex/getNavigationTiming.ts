@@ -26,13 +26,18 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {
       domContentLoadedEventStart,
       domContentLoadedEventEnd,
       loadEventStart,
+      loadEventEnd,
       fetchStart
     } = navigation;
 
     resolve({
+      // may be a mistake here
       redirect: roundOff(redirectEnd - redirectStart),
+      // may be a mistake here
       DNS: roundOff(domainLookupEnd - domainLookupStart),
+      // may be a mistake here
       TCP: roundOff(connectEnd - connectStart),
+      // may be a mistake here
       // SSL exists only in https
       SSL: secureConnectionStart ? roundOff(connectEnd - secureConnectionStart) : 0,
       TTFB: roundOff(responseStart - requestStart),
@@ -40,9 +45,11 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {
       domParse: roundOff(domInteractive - responseEnd),
       deferExecuteDuration: roundOff(domContentLoadedEventStart - domInteractive),
       domContentLoadedCallback: roundOff(domContentLoadedEventEnd - domContentLoadedEventStart),
-      resourceLoad: roundOff(loadEventStart - domContentLoadedEventEnd),
+      // may be a mistake here
+      resourceLoad: roundOff(responseEnd - redirectStart),
       domReady: roundOff(domContentLoadedEventEnd - fetchStart),
-      L: roundOff(loadEventStart - fetchStart)
+      // may be a mistake here
+      L: roundOff(loadEventEnd - loadEventStart)
     });
   };
 
