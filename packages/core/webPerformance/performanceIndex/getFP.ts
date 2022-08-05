@@ -6,7 +6,7 @@ import { EntryNames, EntryTypes, PerformanceInfoType } from 'core/common/static'
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
 
-const getFP = (): Promise<PerformanceEntry> | undefined =>
+const getFP = (): Promise<PerformanceEntry> =>
   new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
@@ -39,13 +39,15 @@ export const initFP = (
   immediately = true
 ) => {
   getFP()
-    ?.then(entry => {
+    .then(entry => {
+      const { FP } = PerformanceInfoType;
+
       const indexValue = {
-        type: PerformanceInfoType.FP,
+        type: FP,
         value: roundOff(entry.startTime)
       };
 
-      store.set(PerformanceInfoType.FP, indexValue);
+      store.set(FP, indexValue);
 
       immediately && upload(indexValue);
     })

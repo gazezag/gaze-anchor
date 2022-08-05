@@ -1,4 +1,5 @@
 import { EventType } from 'core/common';
+import { onHidden } from './pageHook';
 
 export type EventHandler = (e: ErrorEvent | Event) => void;
 
@@ -26,4 +27,13 @@ export const unhandleRejectionListener = createlistener(EventType.unhandledrejec
 
 export const dispatchEvent = (event: Event): void => {
   window.dispatchEvent(event);
+};
+
+let firstHiddenTime = document.visibilityState === 'hidden' ? 0 : Infinity;
+export const getFirstHiddenTime = (): number => {
+  onHidden(e => {
+    firstHiddenTime = Math.min(firstHiddenTime, e.timeStamp);
+  });
+
+  return firstHiddenTime;
 };

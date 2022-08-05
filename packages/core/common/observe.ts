@@ -41,5 +41,5 @@ export const disconnect = (observer: PerformanceObserver) => {
   observer.disconnect();
 };
 
-export const takeRecord = (observer: PerformanceObserver): Array<PerformanceEntry> =>
+export const takeRecords = (observer: PerformanceObserver): Array<PerformanceEntry> =>
   observer.takeRecords();

@@ -99,7 +99,7 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
     browser: getBrowser(nvg.userAgent),
 
     language: nvg.language,
-    network: nvg.connection.type // problem here
+    network: nvg.connection.type //! problem here
   };
 };
 
@@ -108,14 +108,16 @@ export const initDeviceInfo = (
   upload: PerformanceInfoUploader,
   immediately = true
 ) => {
+  const { DI } = PerformanceInfoType;
+
   const deviceInfo = getDeviceInfo();
   if (deviceInfo) {
     const value = {
-      type: PerformanceInfoType.DI,
+      type: DI,
       value: deviceInfo
     };
 
-    store.set(PerformanceInfoType.DI, value);
+    store.set(DI, value);
 
     immediately && upload(value);
   }
