@@ -1,7 +1,7 @@
 import { DeviceEnvInfo } from 'types/deviceEnvInfo';
 import { PerformanceInfoUploader } from 'types/uploader';
 import { isNavigatorSupported, isPerformanceSupported } from 'utils/compatible';
-import { getMatched, getTestStrFn } from 'utils/index';
+import { getMatched, getTestStrFn } from 'utils/stringHandler';
 import { BrowserType, OSType, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
