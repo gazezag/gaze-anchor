@@ -1,7 +1,12 @@
 import { PerformanceInfoUploader } from 'types/uploader';
 import { isPerformanceObserverSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, observe, ObserveHandler, takeRecords } from 'core/common/observe';
+import {
+  disconnect,
+  observe,
+  ObserveHandler,
+  takeRecords
+} from 'core/common/observe';
 import { EntryTypes, EventType, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
@@ -20,7 +25,10 @@ const getLCP = (lcp: LCPCache): Promise<PerformanceObserver> =>
       const firstHiddenTime = getFirstHiddenTime();
 
       const callback: ObserveHandler = entry => {
-        if (entry.entryType === EntryTypes.LCP && entry.startTime < firstHiddenTime) {
+        if (
+          entry.entryType === EntryTypes.LCP &&
+          entry.startTime < firstHiddenTime
+        ) {
           lcp.entry = entry;
           resolve(observer);
         }
@@ -33,7 +41,7 @@ const getLCP = (lcp: LCPCache): Promise<PerformanceObserver> =>
 export const initLCP = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
   upload: PerformanceInfoUploader,
-  immediately = true
+  immediately: boolean
 ) => {
   const lcp: LCPCache = { entry: {} as PerformanceEntry };
 
@@ -61,7 +69,10 @@ export const initLCP = (
       // listene to the hidden, click, keydown event
       // only upload the data while these event triggered
       onHidden(clearListener);
-      createlistener([click, keydown])(clearListener, { once: true, capture: true });
+      createlistener([click, keydown])(clearListener, {
+        once: true,
+        capture: true
+      });
     })
     .catch(err => console.error(err));
 };

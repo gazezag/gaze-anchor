@@ -1,0 +1,124 @@
+{
+  "router-change": [
+    {
+      "type": "router-change",
+      "page": "http://localhost:3000/#/page2",
+      "time": 1611.5,
+      "detail": {
+        "method": "Hash",
+        "href": "http://localhost:3000/#/page2",
+        "hash": "#/page2"
+      }
+    },
+    {
+      "type": "router-change",
+      "page": "http://localhost:3000/#/page1",
+      "time": 2331.6999999284744,
+      "detail": {
+        "method": "Hash",
+        "href": "http://localhost:3000/#/page1",
+        "hash": "#/page1"
+      }
+    },
+    {
+      "type": "router-change",
+      "page": "http://localhost:3000/page1",
+      "time": 1310.6999999284744,
+      "detail": {
+        "method": "History",
+        "href": "http://localhost:3000/page1",
+        "pathname": "/page1"
+      }
+    },
+    {
+      "type": "router-change",
+      "page": "http://localhost:3000/page2",
+      "time": 1937.7999999523163,
+      "detail": {
+        "method": "History",
+        "href": "http://localhost:3000/page2",
+        "pathname": "/page2"
+      }
+    }
+  ],
+  "http": [
+    {
+      "type": "request",
+      "page": "",
+      "time": 76.39999997615814,
+      "detail": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/get-name",
+        "headers": {
+          "Accept": "application/json, text/plain, */*"
+        },
+        "body": "",
+        "status": 0,
+        "statusText": "",
+        "requestTime": 72.19999992847443,
+        "responseTime": 76.39999997615814,
+        "response": ""
+      }
+    },
+    {
+      "type": "request",
+      "page": "",
+      "time": 78.39999997615814,
+      "detail": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/fetch-get",
+        "headers": {},
+        "body": "",
+        "status": 0,
+        "statusText": "",
+        "requestTime": 72.60000002384186,
+        "responseTime": 0,
+        "response": ""
+      }
+    }
+  ],
+  "operation": [
+    {
+      "type": "operation",
+      "page": "",
+      "time": 2118.8000000715256,
+      "detail": {
+        "type": "click",
+        "target": {},
+        "count": 1,
+        "id": "ipt",
+        "classList": [],
+        "tagName": "input",
+        "innerText": ""
+      }
+    },
+    {
+      "type": "operation",
+      "page": "",
+      "time": 5905.800000071526,
+      "detail": {
+        "type": "keydown",
+        "target": {},
+        "count": 13,
+        "id": "ipt",
+        "classList": [],
+        "tagName": "input",
+        "innerText": " [Shift] Hello  [Shift] World"
+      }
+    },
+    {
+      "type": "operation",
+      "page": "",
+      "time": 84084,
+      "detail": {
+        "type": "click",
+        "target": {},
+        "count": 7,
+        "id": "btn",
+        "classList": ["hello", "world", "this", "is", "a", "className"],
+        "tagName": "button",
+        "innerText": " button click click"
+      }
+    }
+  ]
+}

@@ -106,7 +106,7 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
 export const initDeviceInfo = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
   upload: PerformanceInfoUploader,
-  immediately = true
+  immediately: boolean
 ) => {
   const { DI } = PerformanceInfoType;
 

@@ -17,7 +17,7 @@ export const beforeUnload = (callback: beforeUnloadListenerHandler) => {
   window.addEventListener('beforeunload', callback);
 };
 
-export const unload = (callback: unloadListenerHandler) => {
+export const onUnload = (callback: unloadListenerHandler) => {
   window.addEventListener('unload', callback);
 };
 

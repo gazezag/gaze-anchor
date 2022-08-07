@@ -34,7 +34,7 @@ export const proxyForwardAndBackward = (types: Array<EventType>, handler: EventH
 export const initRouterProxy = (
   store: Store<BehaviorType, UserBehavior>,
   upload: BehaviorInfoUploader,
-  immediately = true
+  immediately: boolean
 ) => {
   const { routerChange } = BehaviorType;
 

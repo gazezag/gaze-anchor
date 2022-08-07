@@ -1,7 +1,15 @@
 import { PerformanceInfoUploader } from 'types/uploader';
-import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
+import {
+  isPerformanceObserverSupported,
+  isPerformanceSupported
+} from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, observe, ObserveHandler, takeRecords } from 'core/common/observe';
+import {
+  disconnect,
+  observe,
+  ObserveHandler,
+  takeRecords
+} from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
@@ -20,7 +28,10 @@ const getFID = (): Promise<PerformanceEventTiming> =>
       const firstHiddenTime = getFirstHiddenTime();
 
       const callback = (entry: PerformanceEventTiming) => {
-        if (entry.entryType === EntryTypes.FID && entry.startTime < firstHiddenTime) {
+        if (
+          entry.entryType === EntryTypes.FID &&
+          entry.startTime < firstHiddenTime
+        ) {
           resolve(entry);
         }
       };
@@ -39,7 +50,7 @@ const getFID = (): Promise<PerformanceEventTiming> =>
 export const initFID = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
   upload: PerformanceInfoUploader,
-  immediately = true
+  immediately: boolean
 ) => {
   getFID()
     .then((entry: PerformanceEventTiming) => {

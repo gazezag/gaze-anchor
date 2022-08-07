@@ -1,16 +1,22 @@
 import { BehaviorType, Store } from 'core/common';
-import { BehaviorItem, HttpDetail } from 'types/userBehavior';
+import { BehaviorInfoUploader } from 'types/uploader';
+import { BehaviorItem, HttpDetail, UserBehavior } from 'types/userBehavior';
 import { has, set } from 'utils/reflect';
 import { getTimestamp } from 'utils/timestampHandler';
 
-const proxyXhr = (store: Store<BehaviorType, Array<BehaviorItem>>) => {
+const proxyXhr = (
+  store: Store<BehaviorType, UserBehavior>,
+  upload: BehaviorInfoUploader,
+  immediately: boolean
+) => {
   if (has(window, 'XMLHttpRequest')) {
     const nativeXhr = window.XMLHttpRequest;
 
     // mount native XHR for internal business
     has(window, 'nativeXhr') || set(window, 'nativeXhr', nativeXhr);
 
-    const getProxyXhr = (): XMLHttpRequest => {
+    // can not use arrow function because it should be used as a constructor
+    const getProxyXhr = function (): XMLHttpRequest {
       const xhr = new nativeXhr();
       const { open, setRequestHeader, send } = xhr;
 
@@ -78,6 +84,9 @@ const proxyXhr = (store: Store<BehaviorType, Array<BehaviorItem>>) => {
         } else {
           store.set(request, [behaviorItem]);
         }
+
+        // store can be asserted that must contains 'request' at this time
+        immediately && upload(store.get(request)!);
       });
 
       return xhr;
@@ -88,15 +97,20 @@ const proxyXhr = (store: Store<BehaviorType, Array<BehaviorItem>>) => {
   }
 };
 
-const proxyFetch = (store: Store<BehaviorType, Array<BehaviorItem>>) => {
+const proxyFetch = (
+  store: Store<BehaviorType, UserBehavior>,
+  upload: BehaviorInfoUploader,
+  immediately: boolean
+) => {
   if (has(window, 'fetch')) {
     const nativeFetch = window.fetch;
 
     has(window, 'nativeFetch') || set(window, 'nativeFetch', nativeFetch);
 
-    const getProxyFetch = (input: string | RequestInfo, init?: RequestInit): Promise<Response> => {
-      // TODO
-
+    const getProxyFetch = async (
+      input: string | RequestInfo,
+      init?: RequestInit
+    ): Promise<Response> => {
       const fetchDetail: HttpDetail = {
         method: '',
         url: '',
@@ -132,35 +146,50 @@ const proxyFetch = (store: Store<BehaviorType, Array<BehaviorItem>>) => {
       fetchDetail.requestTime = getTimestamp();
 
       // convert the returned value to Promsie with async-await
-      return nativeFetch.call(window, input, init).then(async resposne => {
-        const { request } = BehaviorType;
+      return (
+        nativeFetch
+          .call(window, input, init)
+          // fetch will only reject at panic
+          // so just handle the resolved data
+          .then(async resposne => {
+            const { request } = BehaviorType;
 
-        fetchDetail.status = resposne.status;
-        fetchDetail.statusText = resposne.statusText;
-        fetchDetail.responseTime = getTimestamp();
-        fetchDetail.response = resposne;
+            fetchDetail.status = resposne.status;
+            fetchDetail.statusText = resposne.statusText;
+            fetchDetail.responseTime = getTimestamp();
+            fetchDetail.response = resposne;
 
-        const behaviorItem: BehaviorItem = {
-          type: request,
-          page: '', // TODO
-          time: getTimestamp(),
-          detail: fetchDetail
-        };
+            const behaviorItem: BehaviorItem = {
+              type: request,
+              page: '', // TODO
+              time: getTimestamp(),
+              detail: fetchDetail
+            };
 
-        if (store.has(request)) {
-          store.get(request)!.push(behaviorItem);
-        } else {
-          store.set(request, [behaviorItem]);
-        }
+            if (store.has(request)) {
+              store.get(request)!.push(behaviorItem);
+            } else {
+              store.set(request, [behaviorItem]);
+            }
 
-        return resposne;
-      });
+            // store can be asserted that must contains 'request' at this time
+            immediately && upload(store.get(request)!);
+
+            return resposne;
+          })
+      );
     };
+
+    // bypass the type checking with reflecting...
+    set(window, 'fetch', getProxyFetch);
   }
 };
 
-export const initHttpProxy = (store: Store<BehaviorType, Array<BehaviorItem>>) => {
-  // TODO
-  proxyXhr(store);
-  proxyFetch(store);
+export const initHttpProxy = (
+  store: Store<BehaviorType, UserBehavior>,
+  upload: BehaviorInfoUploader,
+  immediately: boolean
+) => {
+  proxyXhr(store, upload, immediately);
+  proxyFetch(store, upload, immediately);
 };

@@ -1,4 +1,7 @@
-// store some static datas
+/**
+ * @file store some static datas
+ **/
+
 export const EntryNames = {
   FP: 'first-paint',
   FCP: 'first-contentful-paint',
@@ -46,7 +49,7 @@ export enum BrowserType {
   Unknown = 'Unknown'
 }
 
-export const uploadTarget = {
+export const UploadTarget = {
   proformance: '',
   errInfo: '',
   userBehavior: ''
@@ -63,8 +66,7 @@ export enum ErrorType {
 export enum BehaviorType {
   routerChange = 'router-change',
   operation = 'operation',
-  request = 'request',
-  customDefine = 'custom-define'
+  request = 'request'
 }
 
 export enum EventType {
@@ -74,6 +76,7 @@ export enum EventType {
 
   // User Operation
   click = 'click',
+  dblClick = 'dblclick',
   keydown = 'keydown',
   // I still don't know why one is lower-camel-case and the other one is lowercase....
   pushState = 'pushState',
@@ -82,7 +85,9 @@ export enum EventType {
   hashChange = 'hashchange',
 
   // Page
+  pageshow = 'pageshow',
   load = 'load',
+  beforeunload = 'beforeunload',
   visibilitychange = 'visibilitychange'
 }
 

@@ -1,29 +1,10 @@
 import { BehaviorType } from 'core/common';
 
-export interface PageInfoDetail {
-  // TODO
-}
-
-export interface OriginInfoDetail {
-  // TODO
-}
-
 export interface RouterChangeDetail {
   method: 'History' | 'Hash';
   href: string;
   pathname?: string;
   hash?: string;
-}
-
-export interface OperationDetail {
-  id: string;
-  classList: Array<string>;
-  tagName: string;
-  text: string;
-}
-
-export interface CustomDefineDetail {
-  // TODO
 }
 
 export interface HttpDetail {
@@ -40,24 +21,27 @@ export interface HttpDetail {
   response: any;
 }
 
+export interface OperationDetail {
+  type: string;
+  target: any;
+  count: number;
+  id: string;
+  classList: Array<string>;
+  tagName: string;
+  innerText: string;
+}
+
 export interface BehaviorItem {
   type: BehaviorType;
   page: string;
   time: DOMHighResTimeStamp;
-  detail:
-    | PageInfoDetail
-    | OriginInfoDetail
-    | RouterChangeDetail
-    | OperationDetail
-    | CustomDefineDetail
-    | HttpDetail;
+  detail: RouterChangeDetail | HttpDetail | OperationDetail;
 }
 
 export interface VisitInfo {
   time: DOMHighResTimeStamp;
-  // TODO
   origin: string;
+  type: string;
 }
 
-// TODO to be replenished
 export type UserBehavior = Array<BehaviorItem>;

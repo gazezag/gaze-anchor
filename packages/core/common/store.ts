@@ -1,11 +1,5 @@
 import { set } from 'utils/reflect';
 
-//! 此处为了灵活性, 将 Store 中所有字段设为泛型
-//! K 为 map 的键值类型
-//! V 为 map 中存储的值的类型
-//! 使用时需指定
-//! e.g
-//!     const store = new Store<string, number>()
 export class Store<K extends PropertyKey, V> {
   private status: Map<K, V>;
 
@@ -30,10 +24,14 @@ export class Store<K extends PropertyKey, V> {
   }
 
   getAll(): { [name: string]: V } {
-    return Array.from(this.status).reduce((o, [k, v]) => {
+    const res = Array.from(this.status).reduce((o, [k, v]) => {
       // use reflect because it panics with o[k] = v
       set(o, k, v);
       return o;
     }, {});
+
+    this.clear();
+
+    return res;
   }
 }

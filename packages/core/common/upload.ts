@@ -1,4 +1,4 @@
-import { ErrorInfo } from 'types/errorInfo';
+import { ErrorInfo, uid } from 'types/errorInfo';
 import { PerformanceInfo } from 'types/performanceIndex';
 import {
   BehaviorInfoUploader,
@@ -8,8 +8,11 @@ import {
 } from 'types/uploader';
 import { UserBehavior, VisitInfo } from 'types/userBehavior';
 import { isBeaconSupported } from 'utils/compatible';
-import { uploadTarget } from './static';
+import { get, has } from 'utils/reflect';
+import { BehaviorType, PerformanceInfoType, UploadTarget } from './static';
+import { Store } from './store';
 
+// TODO
 const imgRequest = (url: string, data: any) => {
   if (!url || !data) return;
 
@@ -39,13 +42,16 @@ const beaconRequest = (url: string, data: any) => {
 const ajaxRequest = (url: string, data: any) => {
   if (!url || !data) return;
 
-  const client = new XMLHttpRequest();
+  // send ajax request with native XMLHttpRequest
+  const xhr = has(window, 'nativeXhr') ? get(window, 'nativeXhr') : get(window, 'XMLHttpRequest');
+
+  const client = xhr();
   client.open('POST', url, false);
   client.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
   client.send(JSON.stringify(data));
 };
 
-const upload = (url: string, data: any) => {
+const createUploader = (url: string) => (data: any) => {
   const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`
     .length;
 
@@ -68,17 +74,43 @@ const getRequestData = <T>(data: T): RequestData<T> => ({
   data
 });
 
-export const createPerformanceUploader =
-  (config?: any): PerformanceInfoUploader =>
-  (data: PerformanceInfo) =>
-    upload(uploadTarget.proformance, getRequestData(data));
+export const createPerformanceUploader = (
+  store: Store<PerformanceInfoType, PerformanceInfo>,
+  duration: number
+): PerformanceInfoUploader => {
+  const upload = createUploader(UploadTarget.proformance);
 
-export const createErrInfoUploader =
-  (config?: any): ErrorInfoUploader =>
-  (data: ErrorInfo) =>
-    upload(uploadTarget.errInfo, getRequestData(data));
+  setInterval(() => {
+    upload(getRequestData(store.getAll()));
+  }, duration);
 
-export const createBehaviorInfoUploader =
-  (config?: any): BehaviorInfoUploader =>
-  (data: UserBehavior | VisitInfo) =>
-    upload(uploadTarget.userBehavior, getRequestData(data));
+  return (data: PerformanceInfo) => {
+    upload(getRequestData(data));
+  };
+};
+
+export const createErrInfoUploader = (
+  store: Store<uid, ErrorInfo>,
+  duration: number
+): ErrorInfoUploader => {
+  const upload = createUploader(UploadTarget.errInfo);
+
+  setInterval(() => {
+    upload(getRequestData(store.getAll()));
+  }, duration);
+
+  return (data: ErrorInfo) => upload(getRequestData(data));
+};
+
+export const createBehaviorInfoUploader = (
+  store: Store<BehaviorType, UserBehavior>,
+  duration: number
+): BehaviorInfoUploader => {
+  const upload = createUploader(UploadTarget.userBehavior);
+
+  setInterval(() => {
+    upload(getRequestData(store.getAll()));
+  }, duration);
+
+  return (data: UserBehavior | VisitInfo) => upload(getRequestData(data));
+};
