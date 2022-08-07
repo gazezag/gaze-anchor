@@ -4,8 +4,11 @@ import { VisitInfo } from 'types/userBehavior';
 import { createlistener, removeListener } from 'utils/eventHandler';
 import { getTimestamp } from 'utils/timestampHandler';
 
+const { load } = EventType;
+
 export const initPV = (upload: BehaviorInfoUploader) => {
   const getVisitType = () => {
+    // TODO no alternative has been found for the time being
     const nvg = window.performance.navigation;
     if (nvg) {
       const { type, TYPE_NAVIGATE, TYPE_RELOAD, TYPE_BACK_FORWARD } = nvg;
@@ -34,8 +37,8 @@ export const initPV = (upload: BehaviorInfoUploader) => {
     upload(visitInfo);
 
     // remove this event listener while visit information has uplaoded
-    removeListener(EventType.error, handler, { once: true, capture: true });
+    removeListener(load, handler, { once: true, capture: true });
   };
 
-  createlistener(EventType.load)(handler, { once: true, capture: true });
+  createlistener(load)(handler, { once: true, capture: true });
 };

@@ -4,6 +4,9 @@ import { BehaviorItem, HttpDetail, UserBehavior } from 'types/userBehavior';
 import { has, set } from 'utils/reflect';
 import { getTimestamp } from 'utils/timestampHandler';
 
+/**
+ * @description rewrite the global object 'XMLHttpRequest' to proxy the ajax request
+ */
 const proxyXhr = (
   store: Store<BehaviorType, UserBehavior>,
   upload: BehaviorInfoUploader,
@@ -72,7 +75,7 @@ const proxyXhr = (
 
         const behaviorItem: BehaviorItem = {
           type: request,
-          page: '', // TODO
+          page: window.location.pathname,
           time: getTimestamp(),
           detail: xhrDetail
         };
@@ -92,11 +95,14 @@ const proxyXhr = (
       return xhr;
     };
 
-    // bypass the type checking with reflecting...
+    // bypass the type checking with reflect...
     set(window, 'XMLHttpRequest', getProxyXhr());
   }
 };
 
+/**
+ * @description rewrite the global function 'fetch' to proxy the fetch request
+ */
 const proxyFetch = (
   store: Store<BehaviorType, UserBehavior>,
   upload: BehaviorInfoUploader,
@@ -105,6 +111,7 @@ const proxyFetch = (
   if (has(window, 'fetch')) {
     const nativeFetch = window.fetch;
 
+    // mount native fetch function for internal business
     has(window, 'nativeFetch') || set(window, 'nativeFetch', nativeFetch);
 
     const getProxyFetch = async (
@@ -123,6 +130,7 @@ const proxyFetch = (
         response: ''
       };
 
+      // process different types of request headers in object formated
       const getHeaders = (headerInit: Headers | string[][] | Record<string, string>) => {
         const headers = {};
 
@@ -161,7 +169,7 @@ const proxyFetch = (
 
             const behaviorItem: BehaviorItem = {
               type: request,
-              page: '', // TODO
+              page: window.location.pathname,
               time: getTimestamp(),
               detail: fetchDetail
             };

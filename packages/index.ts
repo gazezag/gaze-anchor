@@ -2,24 +2,33 @@ import { GazeConfig } from 'types/gaze';
 import { get, getKeys, has, set } from 'utils/reflect';
 import { WebPerformanceObserver } from 'core/webPerformance';
 import { UserBehaviorObserver } from 'core/userBehavior';
-import { isObject } from './utils';
+import { isObject } from 'utils/typeJudgment';
 
+/**
+ * @description merge configurations recursively
+ */
 const mergeRecursive = (userConfig: any, initConfig: GazeConfig): GazeConfig =>
   getKeys(userConfig).reduce((prev, k) => {
+    // if this key in the user configuration exists in the default configuration
     if (has(prev, k)) {
       const configItem = get(initConfig, k);
       set(
         prev,
         k,
         isObject(configItem)
-          ? mergeRecursive(has(userConfig, k) ? get(userConfig, k) : {}, configItem)
-          : get(userConfig, k)
+          ? // process recursively  if this value is an object
+            mergeRecursive(has(userConfig, k) ? get(userConfig, k) : {}, configItem)
+          : // otherwise the value will be assigned directly
+            get(userConfig, k)
       );
     }
 
     return prev;
   }, initConfig);
 
+/**
+ * @description merge user configurations and default configurations
+ */
 const mergeConfig = (userConfig: any): GazeConfig =>
   mergeRecursive(
     userConfig,

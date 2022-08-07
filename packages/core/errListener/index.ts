@@ -1,29 +1,28 @@
 import { createErrInfoUploader, ErrorType, EventType, Store } from 'core/common';
 import { ErrorInfo, uid } from 'types/errorInfo';
-import { GazeConfig } from 'types/gaze';
+import { ErrorCaptureConfig } from 'types/gaze';
 import { ErrorInfoUploader } from 'types/uploader';
 import { createlistener, EventHandler } from 'utils/eventHandler';
 import { getTimestamp } from 'utils/timestampHandler';
 import { getStackParser } from './errStackHandler';
 
 export class ErrorObserver {
-  //! 此处指定 Store 的泛型类型
   private store: Store<uid, ErrorInfo>;
   private uploader: ErrorInfoUploader;
-  //! 此处使用 Set 记录已经上报过的错误数据
-  //! 因为 Set 天然不重复, 且底层是 RBTree 查找性能极佳
   private submitedErrorUids: Set<uid>;
   private stackParser: Function;
   private logError: boolean;
+  private immediately: boolean;
 
-  //! config 的类型未完全确定
-  constructor(config: GazeConfig) {
+  constructor(config: ErrorCaptureConfig) {
+    const { uploadImmediately, duration, logErrors, stackLimit } = config;
+
     this.store = new Store();
-    this.uploader = createErrInfoUploader(config);
+    this.uploader = createErrInfoUploader(this.store, duration!);
     this.submitedErrorUids = new Set();
-    //! 此处使用 config.stackLimit! 来断言该变量必定存在
-    this.stackParser = getStackParser(config.stackLimit!);
-    this.logError = config.logErrors!;
+    this.stackParser = getStackParser(stackLimit!);
+    this.logError = logErrors!;
+    this.immediately = uploadImmediately!;
   }
 
   init() {

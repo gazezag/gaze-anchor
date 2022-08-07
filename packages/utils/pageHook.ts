@@ -31,3 +31,14 @@ export const onHidden = (callback: EventHandler, once = true) => {
 
   createlistener(EventType.visibilitychange)(hiddenHandler, true);
 };
+
+export const onPageShow = (callback: EventHandler, once = true) => {
+  const showHandler: EventHandler = (event: Event) => {
+    if (document.visibilityState === 'hidden') {
+      callback(event);
+      once && window.removeEventListener(EventType.pageshow, showHandler, true);
+    }
+  };
+
+  createlistener(EventType.pageshow)(e => showHandler(e), { once: true, capture: true });
+};

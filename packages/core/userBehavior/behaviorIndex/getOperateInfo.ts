@@ -16,6 +16,14 @@ interface EventCache {
   detail: { value: OperationDetail };
 }
 
+/**
+ * @description create a collector to cache event data,
+ *              data will only be collected and collated here,
+ *              not upload
+ * @param { Element } target event object triggered continuously
+ * @param { EventType } type event type which triggered continuously
+ * @return return a object contains 'track' method and 'operationDetail'
+ */
 const createTracker = (target: Element | null, type: EventType) => {
   const operationDetail: OperationDetail = {
     type,
@@ -58,6 +66,13 @@ const createTracker = (target: Element | null, type: EventType) => {
   };
 };
 
+/**
+ * @description cooperate with track, data will be cached and uploaded here
+ * @param { OperationDetail } detail data collected by track
+ * @param { Store<BehaviorType, UserBehavior> } store target of cache
+ * @param { BehaviorInfoUploader } upload function used to upload data
+ * @param { boolean } immediately upload the data immediately or not
+ */
 const trigger = (
   detail: OperationDetail,
   store: Store<BehaviorType, UserBehavior>,
@@ -93,10 +108,9 @@ export const initOperationListener = (
     detail: null
   } as unknown as EventCache; // bypass type checking......
 
+  // listen to click, keydown and dblClick events
   [click, keydown, dblClick].forEach(type => {
-    const listen = createlistener(type);
-
-    listen((e: MouseEvent | KeyboardEvent | any) => {
+    createlistener(type)((e: MouseEvent | KeyboardEvent | any) => {
       if (type !== prevEvent.type) {
         // trigger
         if (prevEvent.e && prevEvent.type) {

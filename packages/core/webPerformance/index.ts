@@ -1,9 +1,8 @@
-import { createPerformanceUploader, Store, PerformanceInfoType, EventType } from 'core/common';
+import { createPerformanceUploader, Store, PerformanceInfoType } from 'core/common';
 import { PerformanceCaptureConfig } from 'types/gaze';
 import { PerformanceInfo } from 'types/performanceIndex';
 import { PerformanceInfoUploader } from 'types/uploader';
-import { createlistener } from 'utils/eventHandler';
-import { afterLoad } from 'utils/pageHook';
+import { afterLoad, onPageShow } from 'utils/pageHook';
 import {
   initCLS,
   initDeviceInfo,
@@ -35,20 +34,15 @@ export class WebPerformanceObserver {
     initLCP(this.store, this.uploader, this.immediately);
 
     // monitor FP and FCP while page had shown
-    createlistener(EventType.pageshow)(
-      () => {
-        initFP(this.store, this.uploader, this.immediately);
-        initFCP(this.store, this.uploader, this.immediately);
-      },
-      { once: true, capture: true }
-    );
+    onPageShow(() => {
+      initFP(this.store, this.uploader, this.immediately);
+      initFCP(this.store, this.uploader, this.immediately);
+    });
 
     afterLoad(() => {
       initNavigationTiming(this.store, this.uploader, this.immediately);
       initResourceFlowTiming(this.store, this.uploader, this.immediately);
       initFID(this.store, this.uploader, this.immediately);
     });
-
-    // TODO upload the data while pages unloaded
   }
 }
