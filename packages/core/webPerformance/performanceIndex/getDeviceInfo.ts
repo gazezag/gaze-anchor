@@ -99,7 +99,7 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
     browser: getBrowser(nvg.userAgent),
 
     language: nvg.language,
-    network: nvg.connection.type //! problem here
+    network: nvg?.connection?.type //! problem here
   };
 };
 
