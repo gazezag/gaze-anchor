@@ -2,14 +2,14 @@ lockfileVersion: 5.4
 
 specifiers:
   '@vitejs/plugin-vue': ^3.0.0
-  gaze-anchor: ^0.0.2
+  gaze-anchor: ^0.0.3
   typescript: ^4.6.4
   vite: ^3.0.0
   vue: ^3.2.37
   vue-tsc: ^0.38.4
 
 dependencies:
-  gaze-anchor: 0.0.2
+  gaze-anchor: 0.0.3
   vue: registry.npmmirror.com/vue/3.2.37
 
 devDependencies:
@@ -208,8 +208,8 @@ packages:
     dev: true
     optional: true
 
-  /gaze-anchor/0.0.2:
-    resolution: {integrity: sha512-+GX2jsSTrA6gI6IAscfeldimUbXKcBPAsPTrh+PHljUnGpsDaCOK9pLmC+r7mNUuX1EfvzvesSfgLI2PSpWLhQ==}
+  /gaze-anchor/0.0.3:
+    resolution: {integrity: sha512-PdRIuWi7pWSe0F+pxFarYVLHW3a/DbdihS8abHZS+ozJObeYT7BUs9/4Q02a5Jqf3eeyBNTJtCGJaLn1SZRJ3A==}
     dev: false
 
   registry.npmmirror.com/@babel/helper-validator-identifier/7.18.6:

@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "gaze-anchor": "^0.0.2",
+    "gaze-anchor": "^0.0.3",
     "vue": "^3.2.37"
   },
   "devDependencies": {
