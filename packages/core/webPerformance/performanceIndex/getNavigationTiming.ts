@@ -1,12 +1,6 @@
-import {
-  PerformanceInfo,
-  PerformanceNavigationIndex
-} from 'types/performanceIndex';
+import { PerformanceInfo, PerformanceNavigationIndex } from 'types/performanceIndex';
 import { PerformanceInfoUploader } from 'types/uploader';
-import {
-  isPerformanceObserverSupported,
-  isPerformanceSupported
-} from 'utils/compatible';
+import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
@@ -45,18 +39,12 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {
       TCP: roundOff(connectEnd - connectStart),
       // may be a mistake here
       // SSL exists only in https
-      SSL: secureConnectionStart
-        ? roundOff(connectEnd - secureConnectionStart)
-        : 0,
+      SSL: secureConnectionStart ? roundOff(connectEnd - secureConnectionStart) : 0,
       TTFB: roundOff(responseStart - requestStart),
       transmit: roundOff(responseEnd - responseStart),
       domParse: roundOff(domInteractive - responseEnd),
-      deferExecuteDuration: roundOff(
-        domContentLoadedEventStart - domInteractive
-      ),
-      domContentLoadedCallback: roundOff(
-        domContentLoadedEventEnd - domContentLoadedEventStart
-      ),
+      deferExecuteDuration: roundOff(domContentLoadedEventStart - domInteractive),
+      domContentLoadedCallback: roundOff(domContentLoadedEventEnd - domContentLoadedEventStart),
       // may be a mistake here
       resourceLoad: roundOff(responseEnd - redirectStart),
       domReady: roundOff(domContentLoadedEventEnd - fetchStart),

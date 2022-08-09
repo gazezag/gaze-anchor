@@ -1,15 +1,7 @@
 import { PerformanceInfoUploader } from 'types/uploader';
-import {
-  isPerformanceObserverSupported,
-  isPerformanceSupported
-} from 'utils/compatible';
+import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import {
-  disconnect,
-  observe,
-  ObserveHandler,
-  takeRecords
-} from 'core/common/observe';
+import { disconnect, observe, ObserveHandler, takeRecords } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';

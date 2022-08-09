@@ -1,9 +1,6 @@
 import { PerformanceInfo, ResourceFlowTiming } from 'types/performanceIndex';
 import { PerformanceInfoUploader } from 'types/uploader';
-import {
-  isPerformanceObserverSupported,
-  isPerformanceSupported
-} from 'utils/compatible';
+import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';

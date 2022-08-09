@@ -1,12 +1,7 @@
 import { PerformanceInfoUploader } from 'types/uploader';
 import { isPerformanceObserverSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import {
-  disconnect,
-  observe,
-  ObserveHandler,
-  takeRecords
-} from 'core/common/observe';
+import { disconnect, observe, ObserveHandler, takeRecords } from 'core/common/observe';
 import { EntryTypes, EventType, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
@@ -25,10 +20,7 @@ const getLCP = (lcp: LCPCache): Promise<PerformanceObserver> =>
       const firstHiddenTime = getFirstHiddenTime();
 
       const callback: ObserveHandler = entry => {
-        if (
-          entry.entryType === EntryTypes.LCP &&
-          entry.startTime < firstHiddenTime
-        ) {
+        if (entry.entryType === EntryTypes.LCP && entry.startTime < firstHiddenTime) {
           lcp.entry = entry;
           resolve(observer);
         }

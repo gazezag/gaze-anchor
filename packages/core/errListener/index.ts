@@ -4,7 +4,7 @@ import { ErrorCaptureConfig } from 'types/gaze';
 import { ErrorInfoUploader } from 'types/uploader';
 import { createlistener, EventHandler, unhandleRejectionListener } from 'utils/eventHandler';
 import { getTimestamp } from 'utils/timestampHandler';
-import { proxyXmlHttp, proxyFetch } from 'utils/httpCapture';
+import { proxyXmlHttp, proxyFetch, httpType } from 'utils/httpCapture';
 import { getStackParser } from './errStackHandler';
 
 export class ErrorObserver {
@@ -19,7 +19,7 @@ export class ErrorObserver {
     const { uploadImmediately, duration, logErrors, stackLimit } = config;
 
     this.store = new Store();
-    this.uploader = createErrInfoUploader(config);
+    this.uploader = createErrInfoUploader(this.store, duration!);
     this.submitedErrorUids = new Set();
     this.stackParser = getStackParser(stackLimit!);
     this.logError = logErrors!;
@@ -75,11 +75,11 @@ export class ErrorObserver {
   }
 
   private initPromiseReject() {
-    const handler = (event: ErrorEvent) => {
+    const handler = (event: PromiseRejectionEvent) => {
       // 阻止向上抛出控制台报错
       this.logError || event.preventDefault();
 
-      const value = event.reason as PromiseRejectDetail;
+      const value = event.reason;
       const type = event.reason.name || 'UnKnowun';
       const errorUid = this.getUid(`${ErrorType.UJ}-${value}-${type}`);
 
@@ -91,7 +91,7 @@ export class ErrorObserver {
         // 错误发生的时间
         time: performance.now(),
         // 错误信息
-        message: event.message,
+        message: 'event.message',
         // 详细信息
         detail: {
           type: event.reason || 'Unknwon',
@@ -136,7 +136,7 @@ export class ErrorObserver {
           type: event.error?.name || 'Unknwon',
           src: target.src,
           outerHTML: target.outerHTML,
-          tagName: target.tagName,
+          tagName: target.tagName
         },
         // 追踪用户操作
         breadcrumbs: []
@@ -151,12 +151,13 @@ export class ErrorObserver {
       this.store.set(errorUid, info);
     };
 
-    errorListener(handler as EventHandler);
+    // TODO
+    // errorListener(handler as EventHandler);
   }
 
   private initHttpError() {
-    const handler = (event: ErrorEvent) => {
-      if (event.status < 400) return
+    const handler = (event: httpType) => {
+      if (event.status < 400) return;
       const errorUid = this.getUid(`${ErrorType.RS}-${event.response}-${event.statusText}`);
 
       const info: ErrorInfo = {
@@ -170,9 +171,9 @@ export class ErrorObserver {
         message: event.response,
         // 详细信息
         detail: {
-          status: event.status;
-          response: event.response;
-          statusText: event.statusText;
+          status: event.status,
+          response: event.response,
+          statusText: event.statusText
         },
         // 追踪用户操作
         breadcrumbs: []
@@ -209,7 +210,7 @@ export class ErrorObserver {
         message: event.message,
         // 详细信息
         detail: {
-          tagName: '',
+          tagName: ''
         },
         // 追踪用户操作
         breadcrumbs: []
@@ -224,11 +225,12 @@ export class ErrorObserver {
       this.store.set(errorUid, info);
     };
 
-    errorListener(handler as EventHandler);
+    // TODO
+    // errorListener(handler as EventHandler);
   }
 
   private getUid(input: string): uid {
-    return window.btoa(encodeURIComponent(input))
+    return window.btoa(encodeURIComponent(input));
   }
 
   private getErrorKey(event: ErrorEvent | Event): string {
