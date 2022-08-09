@@ -1,4 +1,5 @@
 import { WebPerformanceObserver } from 'core/webPerformance';
+import { ErrorObserver } from 'core/errListener';
 import { GazeConfig } from 'types/gaze';
 import { get, getKeys, has, set } from 'utils/reflect';
 
@@ -22,6 +23,9 @@ export class Gaze {
     const mergedConfig = mergeConfig(config);
 
     new WebPerformanceObserver(mergedConfig).init();
+    new ErrorObserver(mergedConfig).init();
+
     // TODO
   }
 }
+
