@@ -1,18 +1,21 @@
-import { ResourceFlowTiming } from 'types/performanceIndex';
+import { PerformanceInfo, ResourceFlowTiming } from 'types/performanceIndex';
 import { PerformanceInfoUploader } from 'types/uploader';
-import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
+import {
+  isPerformanceObserverSupported,
+  isPerformanceSupported
+} from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 
-const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
-  if (!isPerformanceSupported()) {
-    console.warn('Performance API not support');
-    return;
-  }
+const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> => {
+  const resourceFlow: Array<ResourceFlowTiming> = [];
 
-  const resolveResourceFlow = (entry: PerformanceResourceTiming, resolve: (value: any) => void) => {
+  const calcResourceFlow = (
+    entry: PerformanceResourceTiming,
+    resourceFlow: Array<ResourceFlowTiming>
+  ) => {
     const {
       name,
       transferSize,
@@ -28,12 +31,12 @@ const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
       requestStart
     } = entry;
 
-    resolve({
+    resourceFlow.push({
       name,
       transferSize,
       initiatorType,
-      startTime,
-      responseEnd,
+      startTime: roundOff(startTime),
+      responseEnd: roundOff(responseEnd),
       DNS: roundOff(domainLookupEnd - domainLookupStart),
       initialConnect: roundOff(connectEnd - connectStart),
       SSL: roundOff(connectEnd - secureConnectionStart),
@@ -47,19 +50,23 @@ const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
   // TODO added cache-hit-rate
   // TODO cache-hit: duration == 0 && transferSize !== 0
   return new Promise((resolve, reject) => {
-    if (!isPerformanceObserverSupported()) {
+    if (!isPerformanceSupported()) {
+      reject(new Error('browser does not support the performance API'));
+    } else if (!isPerformanceObserverSupported()) {
       reject(new Error('browser does not support the PerformanceObserver'));
     } else {
       const callback = (entry: PerformanceResourceTiming) => {
         if (entry.entryType === EntryTypes.resource) {
           resourceObserver && disconnect(resourceObserver);
 
-          resolveResourceFlow(entry, resolve);
+          calcResourceFlow(entry, resourceFlow);
+
+          resolve(resourceFlow);
         }
       };
 
       const resourceObserver = observe(
-        [EntryTypes.resource],
+        EntryTypes.resource,
         // must be asserted
         // maybe bug here
         callback as ObserveHandler
@@ -69,20 +76,20 @@ const getResourceFlowTiming = (): Promise<ResourceFlowTiming> | undefined => {
 };
 
 export const initResourceFlowTiming = (
-  store: Store,
+  store: Store<PerformanceInfoType, PerformanceInfo>,
   upload: PerformanceInfoUploader,
-  immediately = true
+  immediately: boolean
 ) => {
+  const { RF } = PerformanceInfoType;
+
   getResourceFlowTiming()
-    // maybe bug here
-    // resourceFlow sounds like a Array....
-    ?.then(resourceFlow => {
+    .then(resourceFlow => {
       const indexValue = {
-        type: PerformanceInfoType.FP,
+        type: RF,
         value: resourceFlow
       };
 
-      store.set(PerformanceInfoType.FP, indexValue);
+      store.set(RF, indexValue);
 
       immediately && upload(indexValue);
     })

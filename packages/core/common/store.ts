@@ -1,36 +1,37 @@
-import { PerformanceInfo, PerformanceInfoObj } from 'types/performanceIndex';
-import { PerformanceInfoType } from './static';
+import { set } from 'utils/reflect';
 
-export class Store {
-  private status: Map<PerformanceInfoType, PerformanceInfo>;
+export class Store<K extends PropertyKey, V> {
+  private status: Map<K, V>;
 
   constructor() {
     this.status = new Map();
   }
 
-  has(name: PerformanceInfoType): boolean {
+  has(name: K): boolean {
     return this.status.has(name);
   }
 
-  set(name: PerformanceInfoType, value: PerformanceInfo) {
+  set(name: K, value: V) {
     this.status.set(name, value);
   }
 
-  get(name: PerformanceInfoType): PerformanceInfo | null {
-    return this.has(name) ? (this.status.get(name) as PerformanceInfo) : null;
+  get(name: K): V | null {
+    return this.has(name) ? (this.status.get(name) as V) : null;
   }
 
   clear() {
     this.status.clear();
   }
 
-  getAll(): PerformanceInfoObj {
-    return Array.from(this.status).reduce((o, [k, v]) => {
+  getAll(): { [name: string]: V } {
+    const res = Array.from(this.status).reduce((o, [k, v]) => {
       // use reflect because it panics with o[k] = v
-      Reflect.set(o, k, v);
+      set(o, k, v);
       return o;
     }, {});
+
+    this.clear();
+
+    return res;
   }
 }
-
-export const createStore = (): Store => new Store();

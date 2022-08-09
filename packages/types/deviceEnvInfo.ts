@@ -1,19 +1,4 @@
-export enum OSType {
-  Windows,
-  MacOS,
-  Linux,
-  Unknown
-}
-
-export enum BrowserType {
-  Chrome,
-  Safari,
-  Edge,
-  IE,
-  Firefox,
-  Opera,
-  Unknown
-}
+import { BrowserType, OSType } from 'core/common';
 
 export interface MetaInfo<T> {
   type: T;

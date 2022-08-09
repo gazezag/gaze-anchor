@@ -1,17 +1,18 @@
-import { PerformanceNavigationIndex } from 'types/performanceIndex';
+import {
+  PerformanceInfo,
+  PerformanceNavigationIndex
+} from 'types/performanceIndex';
 import { PerformanceInfoUploader } from 'types/uploader';
-import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
+import {
+  isPerformanceObserverSupported,
+  isPerformanceSupported
+} from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 
-const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined => {
-  if (!isPerformanceSupported()) {
-    console.warn('Performance API not support');
-    return;
-  }
-
+const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {
   const resolveNavigation = (
     navigation: PerformanceNavigationTiming,
     resolve: (value: any) => void
@@ -31,27 +32,44 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined 
       domContentLoadedEventStart,
       domContentLoadedEventEnd,
       loadEventStart,
+      loadEventEnd,
       fetchStart
     } = navigation;
 
     resolve({
+      // may be a mistake here
       redirect: roundOff(redirectEnd - redirectStart),
+      // may be a mistake here
       DNS: roundOff(domainLookupEnd - domainLookupStart),
+      // may be a mistake here
       TCP: roundOff(connectEnd - connectStart),
+      // may be a mistake here
       // SSL exists only in https
-      SSL: secureConnectionStart ? roundOff(connectEnd - secureConnectionStart) : 0,
+      SSL: secureConnectionStart
+        ? roundOff(connectEnd - secureConnectionStart)
+        : 0,
       TTFB: roundOff(responseStart - requestStart),
       transmit: roundOff(responseEnd - responseStart),
       domParse: roundOff(domInteractive - responseEnd),
-      deferExecuteDuration: roundOff(domContentLoadedEventStart - domInteractive),
-      domContentLoadedCallback: roundOff(domContentLoadedEventEnd - domContentLoadedEventStart),
-      resourceLoad: roundOff(loadEventStart - domContentLoadedEventEnd),
+      deferExecuteDuration: roundOff(
+        domContentLoadedEventStart - domInteractive
+      ),
+      domContentLoadedCallback: roundOff(
+        domContentLoadedEventEnd - domContentLoadedEventStart
+      ),
+      // may be a mistake here
+      resourceLoad: roundOff(responseEnd - redirectStart),
       domReady: roundOff(domContentLoadedEventEnd - fetchStart),
-      L: roundOff(loadEventStart - fetchStart)
+      // may be a mistake here
+      L: roundOff(loadEventEnd - loadEventStart)
     });
   };
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
+    if (!isPerformanceSupported()) {
+      reject(new Error('browser not support performance API'));
+    }
+
     if (isPerformanceObserverSupported()) {
       const callback = (navigation: PerformanceNavigationTiming) => {
         if (navigation.entryType === EntryTypes.navigation) {
@@ -62,7 +80,7 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined 
       };
 
       const navigationObserver = observe(
-        [EntryTypes.navigation],
+        EntryTypes.navigation,
         // must be asserted
         // maybe bug here
         callback as ObserveHandler
@@ -79,18 +97,20 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> | undefined 
 };
 
 export const initNavigationTiming = (
-  store: Store,
+  store: Store<PerformanceInfoType, PerformanceInfo>,
   upload: PerformanceInfoUploader,
-  immediately = true
+  immediately: boolean
 ) => {
+  const { NT } = PerformanceInfoType;
+
   getNavigationTiming()
-    ?.then(navigation => {
+    .then(navigation => {
       const indexValue = {
-        type: PerformanceInfoType.NT,
+        type: NT,
         value: navigation
       };
 
-      store.set(PerformanceInfoType.NT, indexValue);
+      store.set(NT, indexValue);
 
       immediately && upload(indexValue);
     })

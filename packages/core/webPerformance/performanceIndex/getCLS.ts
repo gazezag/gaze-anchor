@@ -1,9 +1,19 @@
 import { PerformanceInfoUploader } from 'types/uploader';
-import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
+import {
+  isPerformanceObserverSupported,
+  isPerformanceSupported
+} from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
+import {
+  disconnect,
+  observe,
+  ObserveHandler,
+  takeRecords
+} from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
+import { PerformanceInfo } from 'types/performanceIndex';
+import { onHidden } from 'utils/pageHook';
 
 interface LayoutShift extends PerformanceEntry {
   value: number;
@@ -11,41 +21,58 @@ interface LayoutShift extends PerformanceEntry {
 }
 
 // Cumulative Layout Shift
-const getCLS = (): Promise<PerformanceEntry> | undefined =>
+const getCLS = (cls: { value: number }): Promise<PerformanceObserver> =>
   new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
         reject(new Error('browser do not support performance api'));
       } else {
-        reject(new Error('browser has no lcp'));
+        reject(new Error('browser do not support performance observer'));
       }
     } else {
-      const clsObserver = getObserveFn([EntryTypes.CLS]);
-      const callback: ObserveHandler = entry => {
-        if (entry.entryType === EntryTypes.CLS) {
-          // if the observer already exists
-          // prevent performance watchers from continuing to observe
-          observer && disconnect(observer);
-
-          resolve(entry);
+      const callback = (entry: LayoutShift) => {
+        if (!entry.hadRecentInput) {
+          cls.value += entry.value;
         }
       };
 
-      const observer = clsObserver(callback);
+      resolve(observe(EntryTypes.CLS, callback as ObserveHandler));
     }
   });
 
-export const initCLS = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
-  getCLS()
-    ?.then(entry => {
-      const indexValue = {
-        type: PerformanceInfoType.CLS,
-        value: roundOff(entry.startTime)
+export const initCLS = (
+  store: Store<PerformanceInfoType, PerformanceInfo>,
+  upload: PerformanceInfoUploader,
+  immediately: boolean
+) => {
+  const { CLS } = PerformanceInfoType;
+  const cls = { value: 0 };
+
+  getCLS(cls)
+    .then(observer => {
+      const clearListener = () => {
+        takeRecords(observer).forEach(entry => {
+          // have to make type assertions here.... ts sucks
+          if (!(entry as LayoutShift).hadRecentInput) {
+            // accumulate cls
+            cls.value += (entry as LayoutShift).value;
+          }
+        });
+
+        disconnect(observer);
+
+        const indexValue = {
+          type: CLS,
+          value: roundOff(cls.value)
+        };
+
+        store.set(CLS, indexValue);
+
+        immediately && upload(indexValue);
       };
 
-      store.set(PerformanceInfoType.CLS, indexValue);
-
-      immediately && upload(indexValue);
+      // report while the page is hidden
+      onHidden(clearListener);
     })
     .catch(err => console.error(err));
 };

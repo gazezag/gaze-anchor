@@ -3,7 +3,7 @@ import { curry } from 'utils/functional';
 export type ObserveHandler = (entry: PerformanceEntry) => void;
 
 export const observe = (
-  entryTypes: Array<string>,
+  entryTypes: Array<string> | string,
   callback: ObserveHandler
 ): PerformanceObserver => {
   const observer = new PerformanceObserver(
@@ -13,7 +13,9 @@ export const observe = (
         .map(callback) // traverse the entry list and call the handler function with arugment entry
   );
 
-  observer.observe({ entryTypes });
+  Array.isArray(entryTypes)
+    ? observer.observe({ entryTypes })
+    : observer.observe({ type: entryTypes, buffered: true });
 
   // return the whole observer object
   return observer;
@@ -39,5 +41,5 @@ export const disconnect = (observer: PerformanceObserver) => {
   observer.disconnect();
 };
 
-export const takeRecord = (observer: PerformanceObserver): Array<PerformanceEntry> =>
+export const takeRecords = (observer: PerformanceObserver): Array<PerformanceEntry> =>
   observer.takeRecords();

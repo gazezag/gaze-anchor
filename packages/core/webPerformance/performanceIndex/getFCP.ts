@@ -1,11 +1,19 @@
 import { PerformanceInfoUploader } from 'types/uploader';
-import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
+import {
+  isPerformanceObserverSupported,
+  isPerformanceSupported
+} from 'utils/compatible';
 import { roundOff } from 'utils/math';
-import { disconnect, getObserveFn, ObserveHandler } from 'core/common/observe';
-import { EntryNames, EntryTypes, PerformanceInfoType } from 'core/common/static';
+import { disconnect, observe, ObserveHandler } from 'core/common/observe';
+import {
+  EntryNames,
+  EntryTypes,
+  PerformanceInfoType
+} from 'core/common/static';
 import { Store } from 'core/common/store';
+import { PerformanceInfo } from 'types/performanceIndex';
 
-const getFCP = (): Promise<PerformanceEntry> | undefined =>
+const getFCP = (): Promise<PerformanceEntry> =>
   new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
       if (!isPerformanceSupported()) {
@@ -18,7 +26,6 @@ const getFCP = (): Promise<PerformanceEntry> | undefined =>
         reject(new Error('browser has no fcp'));
       }
     } else {
-      const fcpObserver = getObserveFn([EntryTypes.paint]);
       const callback: ObserveHandler = entry => {
         if (entry.name === EntryNames.FCP) {
           // if the observer already exists
@@ -29,19 +36,25 @@ const getFCP = (): Promise<PerformanceEntry> | undefined =>
         }
       };
 
-      const observer = fcpObserver(callback);
+      const observer = observe(EntryTypes.paint, callback);
     }
   });
 
-export const initFCP = (store: Store, upload: PerformanceInfoUploader, immediately = true) => {
+export const initFCP = (
+  store: Store<PerformanceInfoType, PerformanceInfo>,
+  upload: PerformanceInfoUploader,
+  immediately: boolean
+) => {
   getFCP()
-    ?.then(entry => {
+    .then(entry => {
+      const { FCP } = PerformanceInfoType;
+
       const indexValue = {
-        type: PerformanceInfoType.FCP,
+        type: FCP,
         value: roundOff(entry.startTime)
       };
 
-      store.set(PerformanceInfoType.FCP, indexValue);
+      store.set(FCP, indexValue);
 
       immediately && upload(indexValue);
     })
