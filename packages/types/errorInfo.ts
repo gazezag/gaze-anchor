@@ -7,7 +7,6 @@ export interface ErrorStep {
   line: number;
   col: number;
 }
-
 // JS
 export interface JsErrorDetail {
   type: string;
@@ -18,13 +17,15 @@ export interface JsErrorDetail {
 export interface PromiseRejectDetail {
   type: string;
   stackTrace: Array<ErrorStep>;
+  reason: string;
 }
 
 // Resource Error
 export interface ResourceErrorDetail {
-  src: string;
-  type: string;
-  outerHTML: string;
+  src?: string;
+  type?: string;
+  outerHTML?: string;
+  tagName?: string;
 }
 
 // HTTP Error
