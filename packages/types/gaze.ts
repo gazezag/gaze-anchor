@@ -4,7 +4,6 @@ export interface PerformanceCaptureConfig {
 }
 
 export interface ErrorCaptureConfig {
-  uploadImmediately?: boolean;
   duration?: number;
   logErrors?: boolean;
   stackLimit?: number;

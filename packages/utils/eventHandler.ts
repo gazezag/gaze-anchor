@@ -48,7 +48,3 @@ export const getFirstHiddenTime = (): number => {
 
   return firstHiddenTime;
 };
-
-export const unhandleRejectionListener = (handler: EventHandler) => {
-  // TODO
-};

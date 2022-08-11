@@ -3,6 +3,7 @@ import { get, getKeys, has, set } from 'utils/reflect';
 import { WebPerformanceObserver } from 'core/webPerformance';
 import { UserBehaviorObserver } from 'core/userBehavior';
 import { isObject } from 'utils/typeJudgment';
+import { ErrorObserver } from 'core/errListener';
 
 /**
  * @description merge configurations recursively
@@ -61,6 +62,6 @@ export class Gaze {
 
     new WebPerformanceObserver(performance!).init();
     new UserBehaviorObserver(behavior!).init();
-    // TODO
+    new ErrorObserver(error!).init();
   }
 }
