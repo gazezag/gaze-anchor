@@ -148,9 +148,10 @@ export class ErrorObserver {
       this.store.set(errorUid, info);
     };
 
-    createlistener(EventType.error)(handler as EventHandler);
+    createlistener(EventType.error)(handler as EventHandler, true);
   }
 
+  // TODO
   private initHttpError() {
     const handler = (event: httpType) => {
       if (event.status < 400) return;
