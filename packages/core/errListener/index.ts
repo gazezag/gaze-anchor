@@ -1,5 +1,5 @@
 import { createErrInfoUploader, ErrorType, EventType, Store } from 'core/common';
-import { ErrorInfo, uid, ResourceErrorDetail, PromiseRejectDetail } from 'types/errorInfo';
+import { ErrorInfo, uid, ResourceErrorDetail } from 'types/errorInfo';
 import { ErrorCaptureConfig } from 'types/gaze';
 import { ErrorInfoUploader } from 'types/uploader';
 import { createlistener, EventHandler } from 'utils/eventHandler';
@@ -219,8 +219,6 @@ export class ErrorObserver {
 
       // 若需要暂存
       this.store.set(errorUid, info);
-      console.log(info);
-      console.log(this.store.get(errorUid));
     };
 
     createlistener(EventType.error)(handler as EventHandler);
