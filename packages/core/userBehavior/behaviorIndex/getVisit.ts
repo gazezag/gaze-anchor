@@ -2,7 +2,7 @@ import { EventType } from 'core/common';
 import { BehaviorInfoUploader } from 'types/uploader';
 import { VisitInfo } from 'types/userBehavior';
 import { createlistener, removeListener } from 'utils/eventHandler';
-import { getTimestamp } from 'utils/timestampHandler';
+import { getNow } from 'utils/timestampHandler';
 
 const { load } = EventType;
 
@@ -28,7 +28,7 @@ export const initPV = (upload: BehaviorInfoUploader) => {
 
   const handler = () => {
     const visitInfo: VisitInfo = {
-      time: getTimestamp(),
+      time: getNow(),
       origin: document.referrer,
       type: getVisitType()
     };

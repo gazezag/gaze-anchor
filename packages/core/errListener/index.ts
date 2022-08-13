@@ -3,7 +3,7 @@ import { ErrorInfo, uid, ResourceErrorDetail } from 'types/errorInfo';
 import { ErrorCaptureConfig } from 'types/gaze';
 import { ErrorInfoUploader } from 'types/uploader';
 import { createlistener, EventHandler } from 'utils/eventHandler';
-import { getTimestamp } from 'utils/timestampHandler';
+import { getNow, getTimestamp } from 'utils/timestampHandler';
 import { proxyXmlHttp, proxyFetch, httpType } from 'utils/httpCapture';
 import { getStackParser } from './errStackHandler';
 
@@ -47,7 +47,7 @@ export class ErrorObserver {
         // 错误的标识码
         errorUid,
         // 错误发生的时间
-        time: getTimestamp(),
+        time: getNow(),
         // 错误信息
         message: event.message,
         // 详细信息
@@ -86,7 +86,7 @@ export class ErrorObserver {
         // 错误的标识码
         errorUid,
         // 错误发生的时间
-        time: performance.now(),
+        time: getNow(),
         // 错误信息
         message: value,
         // 详细信息
@@ -125,7 +125,7 @@ export class ErrorObserver {
         // 错误的标识码
         errorUid,
         // 错误发生的时间
-        time: performance.now(),
+        time: getNow(),
         // 错误信息
         message: '',
         // 详细信息
@@ -163,7 +163,7 @@ export class ErrorObserver {
         // 错误的标识码
         errorUid,
         // 错误发生的时间
-        time: performance.now(),
+        time: getNow(),
         // 错误信息
         message: event.response,
         // 详细信息
@@ -202,7 +202,7 @@ export class ErrorObserver {
         // 错误的标识码
         errorUid,
         // 错误发生的时间
-        time: performance.now(),
+        time: getNow(),
         // 错误信息
         message: event.message,
         // 详细信息

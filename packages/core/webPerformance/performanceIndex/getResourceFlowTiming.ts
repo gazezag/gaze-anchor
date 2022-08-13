@@ -5,6 +5,7 @@ import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
+import { getNow } from 'utils/timestampHandler';
 
 const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> => {
   const resourceFlow: Array<ResourceFlowTiming> = [];
@@ -29,6 +30,7 @@ const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> => {
     } = entry;
 
     resourceFlow.push({
+      time: getNow(),
       name,
       transferSize,
       initiatorType,
@@ -83,6 +85,7 @@ export const initResourceFlowTiming = (
     .then(resourceFlow => {
       const indexValue = {
         type: RF,
+        time: getNow(),
         value: resourceFlow
       };
 

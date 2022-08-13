@@ -6,6 +6,7 @@ import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
 import { onHidden } from 'utils/pageHook';
+import { getNow } from 'utils/timestampHandler';
 
 interface LayoutShift extends PerformanceEntry {
   value: number;
@@ -55,6 +56,7 @@ export const initCLS = (
 
         const indexValue = {
           type: CLS,
+          time: getNow(),
           value: roundOff(cls.value)
         };
 

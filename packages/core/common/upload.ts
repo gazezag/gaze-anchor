@@ -8,22 +8,18 @@ import {
 } from 'types/uploader';
 import { UserBehavior, VisitInfo } from 'types/userBehavior';
 import { isBeaconSupported } from 'utils/compatible';
-import { get, has } from 'utils/reflect';
+import { get, has, set } from 'utils/reflect';
+import { getNow } from 'utils/timestampHandler';
 import { BehaviorType, PerformanceInfoType, UploadTarget } from './static';
 import { Store } from './store';
 
-// TODO
 const imgRequest = (url: string, data: any) => {
   if (!url || !data) return;
 
   const img = new Image();
 
-  img.onload = () => {
-    console.log('loaded...');
-  };
-
   img.onerror = () => {
-    console.log('error....');
+    ajaxRequest(url, data);
   };
 
   img.src = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`;
@@ -32,11 +28,12 @@ const imgRequest = (url: string, data: any) => {
 const beaconRequest = (url: string, data: any) => {
   if (!url || !data) return;
 
-  const headers = {
-    type: 'application/x-www-form-urlencoded'
-  };
-
-  navigator.sendBeacon(url, new Blob([JSON.stringify(data)], headers));
+  navigator.sendBeacon(
+    url,
+    new Blob([JSON.stringify(data)], {
+      type: 'application/x-www-form-urlencoded'
+    })
+  );
 };
 
 const ajaxRequest = (url: string, data: any) => {
@@ -55,6 +52,8 @@ const createUploader = (url: string) => (data: any) => {
   const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`
     .length;
 
+  has(data, 'time') || set(data, 'time', getNow());
+
   // 2083 compatible with ie browser
   // chrome 8182
   // safari 80000
@@ -70,7 +69,7 @@ const createUploader = (url: string) => (data: any) => {
 };
 
 const getRequestData = <T>(data: T): RequestData<T> => ({
-  sendTime: performance.now(),
+  sendTime: getNow(),
   data
 });
 

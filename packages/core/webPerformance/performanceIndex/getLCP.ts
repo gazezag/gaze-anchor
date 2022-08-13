@@ -7,6 +7,7 @@ import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
 import { createlistener, getFirstHiddenTime } from 'utils/eventHandler';
 import { onHidden } from 'utils/pageHook';
+import { getNow } from 'utils/timestampHandler';
 
 interface LCPCache {
   entry: PerformanceEntry;
@@ -50,6 +51,7 @@ export const initLCP = (
 
         const indexValue = {
           type: LCP,
+          time: getNow(),
           value: roundOff(lcp.entry.startTime)
         };
 

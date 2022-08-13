@@ -2,7 +2,7 @@ import { BehaviorInfoUploader } from 'types/uploader';
 import { BehaviorItem, RouterChangeDetail, UserBehavior } from 'types/userBehavior';
 import { createlistener, dispatchEvent, EventHandler } from 'utils/eventHandler';
 import { get, set } from 'utils/reflect';
-import { getTimestamp } from 'utils/timestampHandler';
+import { getNow } from 'utils/timestampHandler';
 import { BehaviorType, EventType } from 'core/common/static';
 import { Store } from 'core/common/store';
 
@@ -50,7 +50,7 @@ export const initRouterProxy = (
     const behaviorItem: BehaviorItem = {
       type: routerChange,
       page: href,
-      time: getTimestamp(),
+      time: getNow(),
       detail
     };
 

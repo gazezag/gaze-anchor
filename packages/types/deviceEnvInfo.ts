@@ -6,6 +6,7 @@ export interface MetaInfo<T> {
 }
 
 export interface DeviceEnvInfo {
+  time: number;
   origin: string;
   url: string;
   title: string;

@@ -5,6 +5,7 @@ import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
+import { getNow } from 'utils/timestampHandler';
 
 const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {
   const resolveNavigation = (
@@ -95,6 +96,7 @@ export const initNavigationTiming = (
     .then(navigation => {
       const indexValue = {
         type: NT,
+        time: getNow(),
         value: navigation
       };
 

@@ -1,6 +1,7 @@
 import { PerformanceInfoType } from 'core/common';
 
 export interface PerformanceNavigationIndex {
+  time: number;
   // redirectEnd - redirectStart
   redirect: number;
   // domainLookupEnd - domainLookupStart
@@ -28,6 +29,7 @@ export interface PerformanceNavigationIndex {
 }
 
 export interface ResourceFlowTiming {
+  time: number;
   name: string;
   initiatorType: string;
   transferSize: number;
@@ -52,6 +54,7 @@ export interface ResourceFlowTiming {
 
 export interface PerformanceInfo {
   type: PerformanceInfoType;
+  time: number;
   value: any;
 }
 

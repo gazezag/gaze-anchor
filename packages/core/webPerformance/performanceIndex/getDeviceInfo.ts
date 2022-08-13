@@ -5,6 +5,7 @@ import { getMatched, getTestStrFn } from 'utils/stringHandler';
 import { BrowserType, OSType, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
+import { getNow } from 'utils/timestampHandler';
 
 type BrowserInfoEnum = Array<{
   type: BrowserType;
@@ -90,6 +91,7 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
   const { navigator: nvg, location: loc, document: doc } = window;
 
   return {
+    time: getNow(),
     origin: loc.origin,
     url: loc.href,
     title: doc.title,

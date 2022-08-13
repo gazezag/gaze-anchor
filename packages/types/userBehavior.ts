@@ -34,12 +34,12 @@ export interface OperationDetail {
 export interface BehaviorItem {
   type: BehaviorType;
   page: string;
-  time: DOMHighResTimeStamp;
+  time: number;
   detail: RouterChangeDetail | HttpDetail | OperationDetail;
 }
 
 export interface VisitInfo {
-  time: DOMHighResTimeStamp;
+  time: number;
   origin: string;
   type: string;
 }

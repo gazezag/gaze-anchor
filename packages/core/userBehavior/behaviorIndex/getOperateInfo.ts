@@ -3,7 +3,7 @@ import { BehaviorInfoUploader } from 'types/uploader';
 import { BehaviorItem, OperationDetail, UserBehavior } from 'types/userBehavior';
 import { createlistener } from 'utils/eventHandler';
 import { beforeUnload } from 'utils/pageHook';
-import { getTimestamp } from 'utils/timestampHandler';
+import { getNow } from 'utils/timestampHandler';
 
 const { operation } = BehaviorType;
 const { click, dblClick, keydown } = EventType;
@@ -82,7 +82,7 @@ const trigger = (
   const behaviorItem: BehaviorItem = {
     type: operation,
     page: '',
-    time: getTimestamp(),
+    time: getNow(),
     detail
   };
 

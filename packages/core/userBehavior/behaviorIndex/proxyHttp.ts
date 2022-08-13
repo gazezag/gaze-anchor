@@ -2,7 +2,7 @@ import { BehaviorType, Store } from 'core/common';
 import { BehaviorInfoUploader } from 'types/uploader';
 import { BehaviorItem, HttpDetail, UserBehavior } from 'types/userBehavior';
 import { has, set } from 'utils/reflect';
-import { getTimestamp } from 'utils/timestampHandler';
+import { getNow } from 'utils/timestampHandler';
 
 /**
  * @description rewrite the global object 'XMLHttpRequest' to proxy the ajax request
@@ -58,7 +58,7 @@ const proxyXhr = (
 
       xhr.send = (body: Document | XMLHttpRequestBodyInit | null | undefined) => {
         xhrDetail.body = body || '';
-        xhrDetail.requestTime = getTimestamp();
+        xhrDetail.requestTime = getNow();
 
         send.call(xhr, body);
       };
@@ -71,12 +71,12 @@ const proxyXhr = (
         xhrDetail.status = status;
         xhrDetail.statusText = statusText;
         xhrDetail.response = response || '';
-        xhrDetail.responseTime = getTimestamp();
+        xhrDetail.responseTime = getNow();
 
         const behaviorItem: BehaviorItem = {
           type: request,
           page: window.location.pathname,
-          time: getTimestamp(),
+          time: getNow(),
           detail: xhrDetail
         };
 
@@ -151,7 +151,7 @@ const proxyFetch = (
       fetchDetail.url = typeof input === 'string' ? input : input.url;
       fetchDetail.headers = init?.headers ? getHeaders(init!.headers) : {};
       fetchDetail.body = init?.body || '';
-      fetchDetail.requestTime = getTimestamp();
+      fetchDetail.requestTime = getNow();
 
       // convert the returned value to Promsie with async-await
       return (
@@ -164,13 +164,13 @@ const proxyFetch = (
 
             fetchDetail.status = resposne.status;
             fetchDetail.statusText = resposne.statusText;
-            fetchDetail.responseTime = getTimestamp();
+            fetchDetail.responseTime = getNow();
             fetchDetail.response = resposne;
 
             const behaviorItem: BehaviorItem = {
               type: request,
               page: window.location.pathname,
-              time: getTimestamp(),
+              time: getNow(),
               detail: fetchDetail
             };
 

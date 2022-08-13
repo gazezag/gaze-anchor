@@ -43,7 +43,6 @@ const mergeConfig = (userConfig: any): GazeConfig =>
         duration: 5000
       },
       error: {
-        uploadImmediately: true,
         duration: 5000,
         logErrors: false,
         stackLimit: 10

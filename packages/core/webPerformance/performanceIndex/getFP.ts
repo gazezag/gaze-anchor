@@ -5,6 +5,7 @@ import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryNames, EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
+import { getNow } from 'utils/timestampHandler';
 
 const getFP = (): Promise<PerformanceEntry> =>
   new Promise((resolve, reject) => {
@@ -44,6 +45,7 @@ export const initFP = (
 
       const indexValue = {
         type: FP,
+        time: getNow(),
         value: roundOff(entry.startTime)
       };
 

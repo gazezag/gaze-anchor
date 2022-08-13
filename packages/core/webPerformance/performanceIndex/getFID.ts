@@ -7,6 +7,7 @@ import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
 import { getFirstHiddenTime } from 'utils/eventHandler';
 import { onHidden } from 'utils/pageHook';
+import { getNow } from 'utils/timestampHandler';
 
 const getFID = (): Promise<PerformanceEventTiming> =>
   new Promise((resolve, reject) => {
@@ -47,6 +48,7 @@ export const initFID = (
 
       const indexValue = {
         type: FID,
+        time: getNow(),
         value: {
           eventName: entry.name,
           // to be determined
