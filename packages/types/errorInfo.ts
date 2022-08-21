@@ -1,5 +1,4 @@
 import { ErrorType } from 'core/common';
-import { BehaviorItem } from './userBehavior';
 
 export interface ErrorStep {
   filename: string;
@@ -47,7 +46,7 @@ export interface ErrorInfo {
   // 唯一标识
   errorUid: uid;
   // 错误发生的时间
-  time: DOMHighResTimeStamp;
+  time: number;
   // 原生报错信息
   message: string;
   // 报错细节
@@ -57,6 +56,4 @@ export interface ErrorInfo {
     | ResourceErrorDetail
     | HttpErrorDetail
     | CorsErrorDetail;
-  // 跟踪用户操作
-  breadcrumbs: Array<BehaviorItem>;
 }

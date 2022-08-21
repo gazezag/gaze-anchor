@@ -44,4 +44,7 @@ export interface VisitInfo {
   type: string;
 }
 
-export type UserBehavior = Array<BehaviorItem>;
+export interface UserBehavior {
+  time: number;
+  value: Array<BehaviorItem>;
+}
