@@ -55,9 +55,12 @@ export const initRouterProxy = (
     };
 
     if (store.has(routerChange)) {
-      store.get(routerChange)!.push(behaviorItem);
+      store.get(routerChange)!.value.push(behaviorItem);
     } else {
-      store.set(routerChange, [behaviorItem]);
+      store.set(routerChange, {
+        time: Date.now(),
+        value: [behaviorItem]
+      });
     }
 
     // store can be asserted that must contains 'router-change' at this time

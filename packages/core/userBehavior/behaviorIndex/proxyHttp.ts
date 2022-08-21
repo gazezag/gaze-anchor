@@ -2,7 +2,7 @@ import { BehaviorType, Store } from 'core/common';
 import { BehaviorInfoUploader } from 'types/uploader';
 import { BehaviorItem, HttpDetail, UserBehavior } from 'types/userBehavior';
 import { has, set } from 'utils/reflect';
-import { getNow } from 'utils/timestampHandler';
+import { getNow, getTimestamp } from 'utils/timestampHandler';
 
 /**
  * @description rewrite the global object 'XMLHttpRequest' to proxy the ajax request
@@ -58,7 +58,7 @@ const proxyXhr = (
 
       xhr.send = (body: Document | XMLHttpRequestBodyInit | null | undefined) => {
         xhrDetail.body = body || '';
-        xhrDetail.requestTime = getNow();
+        xhrDetail.requestTime = getTimestamp();
 
         send.call(xhr, body);
       };
@@ -71,7 +71,7 @@ const proxyXhr = (
         xhrDetail.status = status;
         xhrDetail.statusText = statusText;
         xhrDetail.response = response || '';
-        xhrDetail.responseTime = getNow();
+        xhrDetail.responseTime = getTimestamp();
 
         const behaviorItem: BehaviorItem = {
           type: request,
@@ -83,9 +83,12 @@ const proxyXhr = (
         // there is no need to report it immediately
         // just store it
         if (store.has(request)) {
-          store.get(request)!.push(behaviorItem);
+          store.get(request)!.value.push(behaviorItem);
         } else {
-          store.set(request, [behaviorItem]);
+          store.set(request, {
+            time: getNow(),
+            value: [behaviorItem]
+          });
         }
 
         // store can be asserted that must contains 'request' at this time
@@ -151,7 +154,7 @@ const proxyFetch = (
       fetchDetail.url = typeof input === 'string' ? input : input.url;
       fetchDetail.headers = init?.headers ? getHeaders(init!.headers) : {};
       fetchDetail.body = init?.body || '';
-      fetchDetail.requestTime = getNow();
+      fetchDetail.requestTime = getTimestamp();
 
       // convert the returned value to Promsie with async-await
       return (
@@ -164,7 +167,7 @@ const proxyFetch = (
 
             fetchDetail.status = resposne.status;
             fetchDetail.statusText = resposne.statusText;
-            fetchDetail.responseTime = getNow();
+            fetchDetail.responseTime = getTimestamp();
             fetchDetail.response = resposne;
 
             const behaviorItem: BehaviorItem = {
@@ -175,9 +178,12 @@ const proxyFetch = (
             };
 
             if (store.has(request)) {
-              store.get(request)!.push(behaviorItem);
+              store.get(request)!.value.push(behaviorItem);
             } else {
-              store.set(request, [behaviorItem]);
+              store.set(request, {
+                time: getNow(),
+                value: [behaviorItem]
+              });
             }
 
             // store can be asserted that must contains 'request' at this time
