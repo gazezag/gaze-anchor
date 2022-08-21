@@ -68,6 +68,7 @@ const createUploader = (url: string) => (data: any) => {
   }
 };
 
+// TODO
 const getRequestData = <T>(data: T): RequestData<T> => ({
   sendTime: getNow(),
   data
