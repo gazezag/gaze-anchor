@@ -115,6 +115,7 @@ export const initDeviceInfo = (
   const deviceInfo = getDeviceInfo();
   if (deviceInfo) {
     const value = {
+      time: getNow(),
       type: DI,
       value: deviceInfo
     };

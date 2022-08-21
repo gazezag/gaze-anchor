@@ -87,9 +87,9 @@ const trigger = (
   };
 
   if (store.has(operation)) {
-    store.get(operation)!.push(behaviorItem);
+    store.get(operation)!.value.push(behaviorItem);
   } else {
-    store.set(operation, [behaviorItem]);
+    store.set(operation, { time: getNow(), value: [behaviorItem] });
   }
 
   immediately && upload(store.get(operation)!);
