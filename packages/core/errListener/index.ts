@@ -54,9 +54,7 @@ export class ErrorObserver {
         detail: {
           type: event.error?.name || 'Unknwon',
           stackTrace: this.stackParser(event.error)
-        },
-        // 追踪用户操作
-        breadcrumbs: []
+        }
       };
       // 若当前错误未上报过则上报, 并记录其 uid
       if (!this.submitedErrorUids.has(errorUid)) {
@@ -93,9 +91,7 @@ export class ErrorObserver {
         detail: {
           type: event.reason || 'Unknwon',
           stackTrace: this.stackParser(event.reason)
-        },
-        // 追踪用户操作
-        breadcrumbs: []
+        }
       };
 
       // 若当前错误未上报过则上报, 并记录其 uid
@@ -134,9 +130,7 @@ export class ErrorObserver {
           src: target.src,
           outerHTML: target.outerHTML,
           tagName: target.tagName
-        },
-        // 追踪用户操作
-        breadcrumbs: []
+        }
       };
       // 若当前错误未上报过则上报, 并记录其 uid
       if (!this.submitedErrorUids.has(errorUid)) {
@@ -171,9 +165,7 @@ export class ErrorObserver {
           status: event.status,
           response: event.response,
           statusText: event.statusText
-        },
-        // 追踪用户操作
-        breadcrumbs: []
+        }
       };
       // 若当前错误未上报过则上报, 并记录其 uid
       if (!this.submitedErrorUids.has(errorUid)) {
@@ -208,9 +200,7 @@ export class ErrorObserver {
         // 详细信息
         detail: {
           tagName: ''
-        },
-        // 追踪用户操作
-        breadcrumbs: []
+        }
       };
       // 若当前错误未上报过则上报, 并记录其 uid
       if (!this.submitedErrorUids.has(errorUid)) {
