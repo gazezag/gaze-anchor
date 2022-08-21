@@ -19,6 +19,8 @@ coverage
 # dev
 local_demo
 DEV_DOCS.md
+pnpm-lock.yaml
+package-lock.json
 
 # Editor directories and files
 .vscode/*
