@@ -50,9 +50,13 @@ export enum BrowserType {
 }
 
 export const UploadTarget = {
-  proformance: '',
-  errInfo: '',
-  userBehavior: ''
+  erorrInfoTarget: 'error-info',
+  navigationTimingTarget: 'navigation-timing',
+  performanceTimingTarget: 'performance-timing',
+  deviceInfoTarget: 'platform-info',
+  resourceFlowTarget: 'resource-flow',
+  userBehaviorTarget: 'user-behavior',
+  visitInfoTarget: 'visit-info'
 };
 
 export enum ErrorType {
