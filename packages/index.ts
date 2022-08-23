@@ -35,7 +35,7 @@ const mergeConfig = (userConfig: any): GazeConfig =>
     userConfig,
     // default config
     {
-      target: 'http://localhost:9000',
+      target: 'http://localhost:3001',
       token: '',
       release: '',
       performance: {
@@ -57,10 +57,10 @@ const mergeConfig = (userConfig: any): GazeConfig =>
 export class Gaze {
   static init(config: GazeConfig) {
     const mergedConfig = mergeConfig(config);
-    const { performance, error, behavior } = mergedConfig;
+    const { target, performance, error, behavior } = mergedConfig;
 
-    new WebPerformanceObserver(performance!).init();
-    new UserBehaviorObserver(behavior!).init();
-    new ErrorObserver(error!).init();
+    new WebPerformanceObserver(target, performance!).init();
+    new UserBehaviorObserver(target, behavior!).init();
+    new ErrorObserver(target, error!).init();
   }
 }
