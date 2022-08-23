@@ -1,11 +1,13 @@
 import { DeviceEnvInfo } from 'types/deviceEnvInfo';
-import { PerformanceInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { isNavigatorSupported, isPerformanceSupported } from 'utils/compatible';
 import { getMatched, getTestStrFn } from 'utils/stringHandler';
 import { BrowserType, OSType, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
 import { getNow } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { deviceInfoTarget } = UploadTarget;
 
 type BrowserInfoEnum = Array<{
   type: BrowserType;
@@ -107,7 +109,7 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
 
 export const initDeviceInfo = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
-  upload: PerformanceInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   const { DI } = PerformanceInfoType;
@@ -122,6 +124,6 @@ export const initDeviceInfo = (
 
     store.set(DI, value);
 
-    immediately && upload(value);
+    immediately && upload(deviceInfoTarget, value);
   }
 };

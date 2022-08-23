@@ -1,10 +1,12 @@
-import { BehaviorInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { BehaviorItem, RouterChangeDetail, UserBehavior } from 'types/userBehavior';
 import { createlistener, dispatchEvent, EventHandler } from 'utils/eventHandler';
 import { get, set } from 'utils/reflect';
 import { getNow } from 'utils/timestampHandler';
 import { BehaviorType, EventType } from 'core/common/static';
 import { Store } from 'core/common/store';
+import { UploadTarget } from 'core/common';
+const { userBehaviorTarget } = UploadTarget;
 
 export const proxyRouterLink = (types: Array<EventType>, handler: EventHandler): void => {
   // rewrite the native event handlers
@@ -33,7 +35,7 @@ export const proxyForwardAndBackward = (types: Array<EventType>, handler: EventH
 
 export const initRouterProxy = (
   store: Store<BehaviorType, UserBehavior>,
-  upload: BehaviorInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   const { routerChange } = BehaviorType;
@@ -64,7 +66,7 @@ export const initRouterProxy = (
     }
 
     // store can be asserted that must contains 'router-change' at this time
-    immediately && upload(store.get(routerChange)!);
+    immediately && upload(userBehaviorTarget, store.get(routerChange)!);
   };
 
   // called when routing is switched

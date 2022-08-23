@@ -1,24 +1,26 @@
-import { createErrInfoUploader, ErrorType, EventType, Store } from 'core/common';
+import { ErrorType, EventType, Store, createUploader } from 'core/common';
 import { ErrorInfo, uid, ResourceErrorDetail } from 'types/errorInfo';
 import { ErrorCaptureConfig } from 'types/gaze';
-import { ErrorInfoUploader } from 'types/uploader';
 import { createlistener, EventHandler } from 'utils/eventHandler';
-import { getNow, getTimestamp } from 'utils/timestampHandler';
+import { getNow } from 'utils/timestampHandler';
 import { proxyXmlHttp, proxyFetch, httpType } from 'utils/httpCapture';
 import { getStackParser } from './errStackHandler';
+import { UploadTarget } from 'core/common';
+import { Uploader } from 'types/uploader';
+const { erorrInfoTarget } = UploadTarget;
 
 export class ErrorObserver {
   private store: Store<uid, ErrorInfo>;
-  private uploader: ErrorInfoUploader;
+  private uploader: Uploader;
   private submitedErrorUids: Set<uid>;
   private stackParser: Function;
   private logError: boolean;
 
-  constructor(config: ErrorCaptureConfig) {
+  constructor(baseURL: string, config: ErrorCaptureConfig) {
     const { duration, logErrors, stackLimit } = config;
 
     this.store = new Store();
-    this.uploader = createErrInfoUploader(this.store, duration!);
+    this.uploader = createUploader(baseURL);
     this.submitedErrorUids = new Set();
     this.stackParser = getStackParser(stackLimit!);
     this.logError = logErrors!;
@@ -58,7 +60,7 @@ export class ErrorObserver {
       };
       // 若当前错误未上报过则上报, 并记录其 uid
       if (!this.submitedErrorUids.has(errorUid)) {
-        this.uploader(info);
+        this.uploader(erorrInfoTarget, info);
         this.submitedErrorUids.add(errorUid);
       }
 
@@ -96,7 +98,7 @@ export class ErrorObserver {
 
       // 若当前错误未上报过则上报, 并记录其 uid
       if (!this.submitedErrorUids.has(errorUid)) {
-        this.uploader(info);
+        this.uploader(erorrInfoTarget, info);
         this.submitedErrorUids.add(errorUid);
       }
 
@@ -134,7 +136,7 @@ export class ErrorObserver {
       };
       // 若当前错误未上报过则上报, 并记录其 uid
       if (!this.submitedErrorUids.has(errorUid)) {
-        this.uploader(info);
+        this.uploader(erorrInfoTarget, info);
         this.submitedErrorUids.add(errorUid);
       }
 
@@ -169,7 +171,7 @@ export class ErrorObserver {
       };
       // 若当前错误未上报过则上报, 并记录其 uid
       if (!this.submitedErrorUids.has(errorUid)) {
-        this.uploader(info);
+        this.uploader(erorrInfoTarget, info);
         this.submitedErrorUids.add(errorUid);
       }
 
@@ -204,7 +206,7 @@ export class ErrorObserver {
       };
       // 若当前错误未上报过则上报, 并记录其 uid
       if (!this.submitedErrorUids.has(errorUid)) {
-        this.uploader(info);
+        this.uploader(erorrInfoTarget, info);
         this.submitedErrorUids.add(errorUid);
       }
 

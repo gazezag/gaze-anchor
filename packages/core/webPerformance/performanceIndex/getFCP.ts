@@ -1,4 +1,4 @@
-import { PerformanceInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
@@ -6,6 +6,8 @@ import { EntryNames, EntryTypes, PerformanceInfoType } from 'core/common/static'
 import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
 import { getNow } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { performanceTimingTarget } = UploadTarget;
 
 const getFCP = (): Promise<PerformanceEntry> =>
   new Promise((resolve, reject) => {
@@ -36,7 +38,7 @@ const getFCP = (): Promise<PerformanceEntry> =>
 
 export const initFCP = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
-  upload: PerformanceInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   getFCP()
@@ -51,7 +53,7 @@ export const initFCP = (
 
       store.set(FCP, indexValue);
 
-      immediately && upload(indexValue);
+      immediately && upload(performanceTimingTarget, indexValue);
     })
     .catch(err => console.error(err));
 };

@@ -1,17 +1,6 @@
-import { ErrorInfo, uid } from 'types/errorInfo';
-import { PerformanceInfo } from 'types/performanceIndex';
-import {
-  BehaviorInfoUploader,
-  ErrorInfoUploader,
-  PerformanceInfoUploader,
-  RequestData
-} from 'types/uploader';
-import { UserBehavior, VisitInfo } from 'types/userBehavior';
-import { isBeaconSupported } from 'utils/compatible';
+import { Uploader } from 'types/uploader';
 import { get, has, set } from 'utils/reflect';
 import { getNow } from 'utils/timestampHandler';
-import { BehaviorType, PerformanceInfoType, UploadTarget } from './static';
-import { Store } from './store';
 
 const imgRequest = (url: string, data: any) => {
   if (!url || !data) return;
@@ -42,75 +31,45 @@ const ajaxRequest = (url: string, data: any) => {
   // send ajax request with native XMLHttpRequest
   const xhr = has(window, 'nativeXhr') ? get(window, 'nativeXhr') : get(window, 'XMLHttpRequest');
 
-  const client = xhr();
-  client.open('POST', url, false);
+  const client = new xhr();
+  client.open('POST', url, true);
   client.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
   client.send(JSON.stringify(data));
 };
 
-const createUploader = (url: string) => (data: any) => {
-  const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`
-    .length;
-
-  has(data, 'time') || set(data, 'time', getNow());
-
-  // 2083 compatible with ie browser
-  // chrome 8182
-  // safari 80000
-  // firefox 65536
-  // opera 190000
-  if (len < 2083) {
-    imgRequest(url, data);
-  } else if (isBeaconSupported()) {
-    beaconRequest(url, data);
+const join = (p1: string, p2: string) => {
+  if (p1.at(-1) === '/' && p2.at(0) === '/') {
+    return `${p1}${p2.slice(1)}`;
+  } else if (p1.at(-1) === '/' || p2.at(0) === '/') {
+    return `${p1}${p2}`;
   } else {
-    ajaxRequest(url, data);
+    return `${p1}/${p2}`;
   }
 };
 
-// TODO
-const getRequestData = <T>(data: T): RequestData<T> => ({
-  sendTime: getNow(),
-  data
-});
+export const createUploader =
+  (baseUrl: string): Uploader =>
+  (path: string, data: any) => {
+    const base = join(baseUrl, path);
+    let url = join(base, 'empty.gif');
 
-export const createPerformanceUploader = (
-  store: Store<PerformanceInfoType, PerformanceInfo>,
-  duration: number
-): PerformanceInfoUploader => {
-  const upload = createUploader(UploadTarget.proformance);
+    const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(
+      JSON.stringify(data)
+    )}`.length;
 
-  setInterval(() => {
-    upload(getRequestData(store.getAll()));
-  }, duration);
+    has(data, 'time') || set(data, 'time', getNow());
 
-  return (data: PerformanceInfo) => {
-    upload(getRequestData(data));
+    // 2083 compatible with ie browser
+    // chrome 8182
+    // safari 80000
+    // firefox 65536
+    // opera 190000
+    if (len < 2083) {
+      imgRequest(url, data);
+      // TODO bug here
+      // } else if (isBeaconSupported()) {
+      //   beaconRequest(join(base, 'add'), data);
+    } else {
+      ajaxRequest(join(base, 'add'), data);
+    }
   };
-};
-
-export const createErrInfoUploader = (
-  store: Store<uid, ErrorInfo>,
-  duration: number
-): ErrorInfoUploader => {
-  const upload = createUploader(UploadTarget.errInfo);
-
-  setInterval(() => {
-    upload(getRequestData(store.getAll()));
-  }, duration);
-
-  return (data: ErrorInfo) => upload(getRequestData(data));
-};
-
-export const createBehaviorInfoUploader = (
-  store: Store<BehaviorType, UserBehavior>,
-  duration: number
-): BehaviorInfoUploader => {
-  const upload = createUploader(UploadTarget.userBehavior);
-
-  setInterval(() => {
-    upload(getRequestData(store.getAll()));
-  }, duration);
-
-  return (data: UserBehavior | VisitInfo) => upload(getRequestData(data));
-};

@@ -1,11 +1,13 @@
 import { PerformanceInfo, PerformanceNavigationIndex } from 'types/performanceIndex';
-import { PerformanceInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { getNow } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { navigationTimingTarget } = UploadTarget;
 
 const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {
   const resolveNavigation = (
@@ -87,7 +89,7 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {
 
 export const initNavigationTiming = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
-  upload: PerformanceInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   const { NT } = PerformanceInfoType;
@@ -102,7 +104,7 @@ export const initNavigationTiming = (
 
       store.set(NT, indexValue);
 
-      immediately && upload(indexValue);
+      immediately && upload(navigationTimingTarget, indexValue);
     })
     .catch(err => console.error(err));
 };

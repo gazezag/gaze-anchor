@@ -1,4 +1,4 @@
-import { PerformanceInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { isPerformanceObserverSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler, takeRecords } from 'core/common/observe';
@@ -8,6 +8,8 @@ import { PerformanceInfo } from 'types/performanceIndex';
 import { createlistener, getFirstHiddenTime } from 'utils/eventHandler';
 import { onHidden } from 'utils/pageHook';
 import { getNow } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { performanceTimingTarget } = UploadTarget;
 
 interface LCPCache {
   entry: PerformanceEntry;
@@ -33,7 +35,7 @@ const getLCP = (lcp: LCPCache): Promise<PerformanceObserver> =>
 
 export const initLCP = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
-  upload: PerformanceInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   const lcp: LCPCache = { entry: {} as PerformanceEntry };
@@ -57,7 +59,7 @@ export const initLCP = (
 
         store.set(LCP, indexValue);
 
-        immediately && upload(indexValue);
+        immediately && upload(performanceTimingTarget, indexValue);
       };
 
       // listene to the hidden, click, keydown event

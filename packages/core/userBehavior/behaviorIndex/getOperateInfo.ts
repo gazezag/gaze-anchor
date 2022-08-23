@@ -1,9 +1,11 @@
 import { BehaviorType, EventType, Store } from 'core/common';
-import { BehaviorInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { BehaviorItem, OperationDetail, UserBehavior } from 'types/userBehavior';
 import { createlistener } from 'utils/eventHandler';
 import { beforeUnload } from 'utils/pageHook';
 import { getNow } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { userBehaviorTarget } = UploadTarget;
 
 const { operation } = BehaviorType;
 const { click, dblClick, keydown } = EventType;
@@ -70,13 +72,13 @@ const createTracker = (target: Element | null, type: EventType) => {
  * @description cooperate with track, data will be cached and uploaded here
  * @param { OperationDetail } detail data collected by track
  * @param { Store<BehaviorType, UserBehavior> } store target of cache
- * @param { BehaviorInfoUploader } upload function used to upload data
+ * @param { Uploader } upload function used to upload data
  * @param { boolean } immediately upload the data immediately or not
  */
 const trigger = (
   detail: OperationDetail,
   store: Store<BehaviorType, UserBehavior>,
-  upload: BehaviorInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   const behaviorItem: BehaviorItem = {
@@ -92,12 +94,12 @@ const trigger = (
     store.set(operation, { time: getNow(), value: [behaviorItem] });
   }
 
-  immediately && upload(store.get(operation)!);
+  immediately && upload(userBehaviorTarget, store.get(operation)!);
 };
 
 export const initOperationListener = (
   store: Store<BehaviorType, UserBehavior>,
-  upload: BehaviorInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   const prevEvent = {

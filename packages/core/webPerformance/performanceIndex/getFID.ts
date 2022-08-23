@@ -1,4 +1,4 @@
-import { PerformanceInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler, takeRecords } from 'core/common/observe';
@@ -8,6 +8,8 @@ import { PerformanceInfo } from 'types/performanceIndex';
 import { getFirstHiddenTime } from 'utils/eventHandler';
 import { onHidden } from 'utils/pageHook';
 import { getNow } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { performanceTimingTarget } = UploadTarget;
 
 const getFID = (): Promise<PerformanceEventTiming> =>
   new Promise((resolve, reject) => {
@@ -39,7 +41,7 @@ const getFID = (): Promise<PerformanceEventTiming> =>
 
 export const initFID = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
-  upload: PerformanceInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   getFID()
@@ -61,7 +63,7 @@ export const initFID = (
 
       store.set(FID, indexValue);
 
-      immediately && upload(indexValue);
+      immediately && upload(performanceTimingTarget, indexValue);
     })
     .catch(err => console.error(err));
 };

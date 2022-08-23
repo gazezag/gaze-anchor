@@ -1,4 +1,4 @@
-import { PerformanceInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler, takeRecords } from 'core/common/observe';
@@ -7,6 +7,8 @@ import { Store } from 'core/common/store';
 import { PerformanceInfo } from 'types/performanceIndex';
 import { onHidden } from 'utils/pageHook';
 import { getNow } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { navigationTimingTarget } = UploadTarget;
 
 interface LayoutShift extends PerformanceEntry {
   value: number;
@@ -35,7 +37,7 @@ const getCLS = (cls: { value: number }): Promise<PerformanceObserver> =>
 
 export const initCLS = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
-  upload: PerformanceInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   const { CLS } = PerformanceInfoType;
@@ -62,7 +64,7 @@ export const initCLS = (
 
         store.set(CLS, indexValue);
 
-        immediately && upload(indexValue);
+        immediately && upload(navigationTimingTarget, indexValue);
       };
 
       // report while the page is hidden

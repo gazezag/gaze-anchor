@@ -1,15 +1,17 @@
 import { BehaviorType, Store } from 'core/common';
-import { BehaviorInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { BehaviorItem, HttpDetail, UserBehavior } from 'types/userBehavior';
 import { has, set } from 'utils/reflect';
 import { getNow, getTimestamp } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { userBehaviorTarget } = UploadTarget;
 
 /**
  * @description rewrite the global object 'XMLHttpRequest' to proxy the ajax request
  */
 const proxyXhr = (
   store: Store<BehaviorType, UserBehavior>,
-  upload: BehaviorInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   if (has(window, 'XMLHttpRequest')) {
@@ -92,7 +94,7 @@ const proxyXhr = (
         }
 
         // store can be asserted that must contains 'request' at this time
-        immediately && upload(store.get(request)!);
+        immediately && upload(userBehaviorTarget, store.get(request)!);
       });
 
       return xhr;
@@ -108,7 +110,7 @@ const proxyXhr = (
  */
 const proxyFetch = (
   store: Store<BehaviorType, UserBehavior>,
-  upload: BehaviorInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   if (has(window, 'fetch')) {
@@ -187,7 +189,7 @@ const proxyFetch = (
             }
 
             // store can be asserted that must contains 'request' at this time
-            immediately && upload(store.get(request)!);
+            immediately && upload(userBehaviorTarget, store.get(request)!);
 
             return resposne;
           })
@@ -201,7 +203,7 @@ const proxyFetch = (
 
 export const initHttpProxy = (
   store: Store<BehaviorType, UserBehavior>,
-  upload: BehaviorInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   proxyXhr(store, upload, immediately);

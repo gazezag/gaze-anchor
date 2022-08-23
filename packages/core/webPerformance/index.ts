@@ -1,7 +1,7 @@
-import { createPerformanceUploader, Store, PerformanceInfoType } from 'core/common';
+import { Store, PerformanceInfoType, createUploader } from 'core/common';
 import { PerformanceCaptureConfig } from 'types/gaze';
 import { PerformanceInfo } from 'types/performanceIndex';
-import { PerformanceInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { afterLoad, onPageShow } from 'utils/pageHook';
 import {
   initCLS,
@@ -16,14 +16,14 @@ import {
 
 export class WebPerformanceObserver {
   private store: Store<PerformanceInfoType, PerformanceInfo>;
-  private uploader: PerformanceInfoUploader;
+  private uploader: Uploader;
   private immediately: boolean;
 
-  constructor(config: PerformanceCaptureConfig) {
+  constructor(baseURL: string, config: PerformanceCaptureConfig) {
     const { uploadImmediately, duration } = config;
 
     this.store = new Store();
-    this.uploader = createPerformanceUploader(this.store, duration!);
+    this.uploader = createUploader(baseURL);
     this.immediately = uploadImmediately!;
   }
 

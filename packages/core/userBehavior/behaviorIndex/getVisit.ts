@@ -1,12 +1,14 @@
 import { EventType } from 'core/common';
-import { BehaviorInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { VisitInfo } from 'types/userBehavior';
 import { createlistener, removeListener } from 'utils/eventHandler';
 import { getNow } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { visitInfoTarget } = UploadTarget;
 
 const { load } = EventType;
 
-export const initPV = (upload: BehaviorInfoUploader) => {
+export const initPV = (upload: Uploader) => {
   const getVisitType = () => {
     // TODO no alternative has been found for the time being
     const nvg = window.performance.navigation;
@@ -34,7 +36,7 @@ export const initPV = (upload: BehaviorInfoUploader) => {
     };
 
     // upload the visit information immediately
-    upload(visitInfo);
+    upload(visitInfoTarget, visitInfo);
 
     // remove this event listener while visit information has uplaoded
     removeListener(load, handler, { once: true, capture: true });

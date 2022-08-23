@@ -1,11 +1,13 @@
 import { PerformanceInfo, ResourceFlowTiming } from 'types/performanceIndex';
-import { PerformanceInfoUploader } from 'types/uploader';
+import { Uploader } from 'types/uploader';
 import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
 import { roundOff } from 'utils/math';
 import { disconnect, observe, ObserveHandler } from 'core/common/observe';
 import { EntryTypes, PerformanceInfoType } from 'core/common/static';
 import { Store } from 'core/common/store';
 import { getNow } from 'utils/timestampHandler';
+import { UploadTarget } from 'core/common';
+const { resourceFlowTarget } = UploadTarget;
 
 const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> => {
   const resourceFlow: Array<ResourceFlowTiming> = [];
@@ -76,7 +78,7 @@ const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> => {
 
 export const initResourceFlowTiming = (
   store: Store<PerformanceInfoType, PerformanceInfo>,
-  upload: PerformanceInfoUploader,
+  upload: Uploader,
   immediately: boolean
 ) => {
   const { RF } = PerformanceInfoType;
@@ -91,7 +93,7 @@ export const initResourceFlowTiming = (
 
       store.set(RF, indexValue);
 
-      immediately && upload(indexValue);
+      immediately && upload(resourceFlowTarget, indexValue);
     })
     .catch(err => console.error(err));
 };
