@@ -34,7 +34,7 @@ export const onHidden = (callback: EventHandler, once = true) => {
 
 export const onPageShow = (callback: EventHandler, once = true) => {
   const showHandler: EventHandler = (event: Event) => {
-    if (document.visibilityState === 'hidden') {
+    if (document.visibilityState === 'visible') {
       callback(event);
       once && window.removeEventListener(EventType.pageshow, showHandler, true);
     }
