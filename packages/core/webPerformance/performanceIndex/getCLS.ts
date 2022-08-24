@@ -8,7 +8,7 @@ import { PerformanceInfo } from 'types/performanceIndex';
 import { onHidden } from 'utils/pageHook';
 import { getNow } from 'utils/timestampHandler';
 import { UploadTarget } from 'core/common';
-const { navigationTimingTarget } = UploadTarget;
+const { performanceTimingTarget } = UploadTarget;
 
 interface LayoutShift extends PerformanceEntry {
   value: number;
@@ -64,7 +64,7 @@ export const initCLS = (
 
         store.set(CLS, indexValue);
 
-        immediately && upload(navigationTimingTarget, indexValue);
+        immediately && upload(performanceTimingTarget, indexValue);
       };
 
       // report while the page is hidden
