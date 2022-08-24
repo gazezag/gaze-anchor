@@ -218,7 +218,7 @@ export class ErrorObserver {
   }
 
   private getUid(input: string): uid {
-    return window.btoa(encodeURIComponent(input));
+    return window.btoa(encodeURIComponent(input)).slice(0, 255);
   }
 
   private getErrorKey(event: ErrorEvent | Event): string {
