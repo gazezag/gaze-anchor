@@ -91,7 +91,7 @@ export class ErrorObserver {
         message: value,
         // 详细信息
         detail: {
-          type: event.reason || 'Unknwon',
+          type: event.reason === {} ? 'Unknwon' : event.reason,
           stackTrace: this.stackParser(event.reason)
         }
       };
