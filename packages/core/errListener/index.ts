@@ -88,7 +88,7 @@ export class ErrorObserver {
         // 错误发生的时间
         time: getNow(),
         // 错误信息
-        message: value,
+        message: value === {} ? '' : value,
         // 详细信息
         detail: {
           type: event.reason === {} ? 'Unknwon' : event.reason,
