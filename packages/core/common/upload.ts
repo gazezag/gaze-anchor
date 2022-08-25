@@ -29,7 +29,7 @@ const ajaxRequest = (url: string, data: any) => {
   if (!url || !data) return;
 
   // send ajax request with native XMLHttpRequest
-  const xhr = has(window, 'nativeXhr') ? get(window, 'nativeXhr') : get(window, 'XMLHttpRequest');
+  const xhr = get(window, has(window, 'nativeXhr') ? 'nativeXhr' : 'XMLHttpRequest');
 
   const client = new xhr();
   client.open('POST', url, true);

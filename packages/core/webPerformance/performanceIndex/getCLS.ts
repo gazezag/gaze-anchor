@@ -59,7 +59,7 @@ export const initCLS = (
         const indexValue = {
           type: CLS,
           time: getNow(),
-          value: roundOff(cls.value)
+          value: roundOff(cls.value * 1000)
         };
 
         store.set(CLS, indexValue);

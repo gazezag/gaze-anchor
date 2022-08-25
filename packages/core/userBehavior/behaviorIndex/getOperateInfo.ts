@@ -42,13 +42,9 @@ const createTracker = (target: Element | null, type: EventType) => {
   const handleDetail =
     type === keydown
       ? (e: KeyboardEvent) => {
-          if (e.key.length !== 1) {
-            // join a identification string while pressed a control key
-            operationDetail.innerText += ` [${e.key}] `;
-          } else {
-            // join the char while pressed the normal key
-            operationDetail.innerText += e.key;
-          }
+          // join a identification string while pressed a control key
+          // and join the char while pressed the normal key
+          operationDetail.innerText += e.key.length !== 1 ? ` [${e.key}] ` : e.key;
         }
       : (e: MouseEvent) => (operationDetail.innerText = (e.target as any).innerText);
 
