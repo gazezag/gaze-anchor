@@ -56,11 +56,13 @@ const mergeConfig = (userConfig: any): GazeConfig =>
 
 export class Gaze {
   static init(config: GazeConfig) {
-    const mergedConfig = mergeConfig(config);
-    const { target, performance, error, behavior } = mergedConfig;
+    setTimeout(() => {
+      const mergedConfig = mergeConfig(config);
+      const { target, performance, error, behavior } = mergedConfig;
 
-    new WebPerformanceObserver(target, performance!).init();
-    new UserBehaviorObserver(target, behavior!).init();
-    new ErrorObserver(target, error!).init();
+      new WebPerformanceObserver(target, performance!).init();
+      new UserBehaviorObserver(target, behavior!).init();
+      new ErrorObserver(target, error!).init();
+    });
   }
 }
