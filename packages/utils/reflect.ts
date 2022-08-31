@@ -12,3 +12,13 @@ export const get = (o: Object, k: PropertyKey): any => {
 
 // can clear the sdie-effect
 export const set = (o: Object, k: PropertyKey, v: any): boolean => Reflect.set(o, k, v);
+
+export const isEmpty = (data: any) => {
+  if (Array.isArray(data)) {
+    return data.length === 0;
+  } else if (data instanceof Object) {
+    return getKeys(data).length === 0;
+  } else {
+    return !!data;
+  }
+};

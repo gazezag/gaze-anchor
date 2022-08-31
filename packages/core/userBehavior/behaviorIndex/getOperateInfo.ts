@@ -90,7 +90,12 @@ const trigger = (
     store.set(operation, { time: getNow(), value: [behaviorItem] });
   }
 
-  immediately && upload(userBehaviorTarget, store.get(operation)!);
+  // TODO
+  immediately &&
+    upload(userBehaviorTarget, {
+      time: getNow(),
+      value: [behaviorItem]
+    });
 };
 
 export const initOperationListener = (

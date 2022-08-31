@@ -7,6 +7,7 @@ import { proxyXmlHttp, proxyFetch, httpType } from 'utils/httpCapture';
 import { getStackParser } from './errStackHandler';
 import { UploadTarget } from 'core/common';
 import { Uploader } from 'types/uploader';
+import { isEmpty } from 'utils/reflect';
 const { erorrInfoTarget } = UploadTarget;
 
 export class ErrorObserver {
@@ -88,10 +89,10 @@ export class ErrorObserver {
         // 错误发生的时间
         time: getNow(),
         // 错误信息
-        message: value === {} ? '' : value,
+        message: isEmpty(value) ? '' : value,
         // 详细信息
         detail: {
-          type: event.reason === {} ? 'Unknwon' : event.reason,
+          type: isEmpty(event.reason) ? 'Unknwon' : event.reason,
           stackTrace: this.stackParser(event.reason)
         }
       };
