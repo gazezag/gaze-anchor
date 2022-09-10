@@ -60,6 +60,7 @@ Gaze.init({});
 用来采集页面性能数据
 
 > 以下以获取 FP(First-Paint) 为例
+> 
 > packages/core/webPerformance/performacneIndex/getFP.ts
 
 ```typescript
@@ -196,10 +197,10 @@ export const initRouterProxy = (
 
 与上面的 `proxyRouter` 类似, 重写了 `XMLHttpRequest` 上面的 `open`, `setRequestHeader`, `send` 方法
 
+> // packages/core/userBehavior/behaviorIndex/proxyHttp.ts
 > 此处把原生的 `XMLHttpRequest` 对象命名为 `nativeXhr` 挂载到 `window` 供 SDK 内部逻辑使用
 > 
 > ```typescript
-> // packages/core/userBehavior/behaviorIndex/proxyHttp.ts
 > const nativeXhr = window.XMLHttpRequest;
 > has(window, 'nativeXhr') || set(window, 'nativeXhr', nativeXhr);
 > ```
@@ -207,7 +208,6 @@ export const initRouterProxy = (
 > `fetch` 也是一样的处理
 >
 > ```typescript
-> // packages/core/userBehavior/behaviorIndex/proxyHttp.ts
 > const nativeFetch = window.fetch;
 > has(window, 'nativeFetch') || set(window, 'nativeFetch', nativeFetch);
 > ```
