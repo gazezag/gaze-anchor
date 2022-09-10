@@ -197,7 +197,8 @@ export const initRouterProxy = (
 
 与上面的 `proxyRouter` 类似, 重写了 `XMLHttpRequest` 上面的 `open`, `setRequestHeader`, `send` 方法
 
-> // packages/core/userBehavior/behaviorIndex/proxyHttp.ts
+> packages/core/userBehavior/behaviorIndex/proxyHttp.ts
+> 
 > 此处把原生的 `XMLHttpRequest` 对象命名为 `nativeXhr` 挂载到 `window` 供 SDK 内部逻辑使用
 > 
 > ```typescript
@@ -214,13 +215,13 @@ export const initRouterProxy = (
 
 #### User Actions
 
-> packages/core/userBehavior/behaviorIndex/getOperationInfo.ts
-
 只需要直接监听对应的事件, 如 `click`、`keydown` 等
 
 不过此处为了降低上报频率, 进行了专门的处理
 
 最终效果是, 若在同一个目标上连续触发相同的事件, 则会对数据进行合并, 直到破坏任意条件, 即触发不同的事件或在不同的目标上触发, 此时会进行上报
+
+> packages/core/userBehavior/behaviorIndex/getOperationInfo.ts
 
 ##### init
 
@@ -342,9 +343,9 @@ const trigger = (
 
 ### Error Listener
 
-> packages/core/errListener/index.ts
-
 只需要监听对应的错误事件就可以了
+
+> packages/core/errListener/index.ts
 
 ```typescript
 private initJsError() {
