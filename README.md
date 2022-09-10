@@ -1,5 +1,7 @@
 # gaze-anchor
 
+[中文文档传送门](https://github.com/gazezag/gaze-anchor/blob/master/README-zh.md)
+
 A SDK for front-end performance monitoring
 
 ## Feature
