@@ -62,6 +62,8 @@ Gaze.init({});
 
 ## Implement
 
+![3231662826232_.pic](/Users/EthanTeng/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/5ab82589f0b30d323027b9c1daa55b59/Message/MessageTemp/4fde80e299ad1ab6717e977f8fb223b4/Image/3231662826232_.pic.jpg)
+
 ### Web Performance
 
 用来采集页面性能数据
