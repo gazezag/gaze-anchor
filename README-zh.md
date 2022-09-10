@@ -62,6 +62,8 @@ Gaze.init({});
 
 ## Implement
 
+![3231662826232_ pic](https://user-images.githubusercontent.com/76992456/189492158-baa3a72c-7eb6-4195-a21c-af7467d35961.jpg)
+
 ### Web Performance
 
 用来采集页面性能数据
