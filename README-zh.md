@@ -2,6 +2,7 @@
 
 一个前端性能监控 SDK
 
+
 ## Feature
 
 支持采集以下信息
@@ -13,22 +14,26 @@
 - 错误信息
 - 用户操作信息
 
+
 ## Todo
 
 ### bug
 
 1. Beacon API 上报数据
 
+
 ### feature
 
 1. Store 的上报
 2. 连接验证
+
 
 ### refactor
 
 1. 拆分模块为不同的包并单独打包发布
 2. 发布脚本
 3. 把导出的类型合并到一个文件? (index.d.ts?)
+
 
 ## Usage
 
@@ -44,6 +49,7 @@ yarn add gaze-anchor -S
 pnpm add gaze-anchor -S
 ```
 
+
 ### init
 
 ```typescript
@@ -52,6 +58,7 @@ import { Gaze } from 'gaze-anchor';
 
 Gaze.init({});
 ```
+
 
 ## Implement
 
@@ -107,6 +114,7 @@ export const initFP = (
     .catch(console.error);
 };
 ```
+
 
 ### User Behavior
 
@@ -193,6 +201,7 @@ export const initRouterProxy = (
 
 ```
 
+
 #### proxyHttp
 
 与上面的 `proxyRouter` 类似, 重写了 `XMLHttpRequest` 上面的 `open`, `setRequestHeader`, `send` 方法
@@ -212,6 +221,7 @@ export const initRouterProxy = (
 > const nativeFetch = window.fetch;
 > has(window, 'nativeFetch') || set(window, 'nativeFetch', nativeFetch);
 > ```
+
 
 #### User Actions
 
@@ -271,6 +281,7 @@ export const initOperationListener = (
 };
 ```
 
+
 ##### track
 
 ```typescript
@@ -311,6 +322,7 @@ const createTracker = (target: Element | null, type: EventType) => {
 };
 ```
 
+
 ##### trigger
 
 ```typescript
@@ -340,6 +352,7 @@ const trigger = (
     });
 };
 ```
+
 
 ### Error Listener
 
@@ -386,6 +399,7 @@ private initJsError() {
 }
 ```
 
+
 ### Reporter
 
 使用 ImageRequest、Beacon、Ajax 三种方式进行上报, 主要是为了解决以下问题
@@ -421,6 +435,7 @@ export const createUploader =
   };
 ```
 
+
 #### ImageRequest
 
 ```typescript
@@ -436,6 +451,7 @@ const imgRequest = (url: string, data: any) => {
 };
 ```
 
+
 #### Beacon API
 
 ```typescript
@@ -450,6 +466,7 @@ const beaconRequest = (url: string, data: any) => {
   );
 };
 ```
+
 
 #### Ajax
 
