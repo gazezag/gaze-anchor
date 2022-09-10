@@ -55,6 +55,8 @@ Gaze.init({});
 
 ## Implement
 
+![3231662826232_ pic](https://user-images.githubusercontent.com/76992456/189492130-45554cad-60d4-4b63-b3be-65f9c6a25d5b.jpg)
+
 ### Web Performance
 
 > Take getting the FP(First Paint) as an example
