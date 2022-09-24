@@ -7,28 +7,25 @@
     "name": "Ethan Teng"
   },
   "keywords": [],
-  "main": "./core/core/index.js",
+  "main": "dist/core/core/index.js",
   "exports": {
     ".": {
-      "import": "./core/core/index.js",
-      "require": "./core/core/index.js"
+      "import": "./dist/core/core/index.js",
+      "require": "./dist/core/core/index.js"
     },
     "./plugins": {
-      "import": "./plugins/plugins/index.js",
-      "require": "./plugins/plugins/index.js"
+      "import": "./dist/plugins/plugins/index.js",
+      "require": "./dist/plugins/plugins/index.js"
     },
     "./utils": {
-      "import": "./publicAPI/publicAPI/index.js",
-      "require": "./publicAPI/publicAPI/index.js"
+      "import": "./dist/publicAPI/publicAPI/index.js",
+      "require": "./dist/publicAPI/publicAPI/index.js"
     }
   },
-  "types": "types/index.d.ts",
-  "typings": "types/index.d.ts",
+  "types": "dist/types/index.d.ts",
+  "typings": "dist/types/index.d.ts",
   "files": [
-    "core",
-    "plugins",
-    "publicAPI",
-    "types"
+    "dist"
   ],
   "scripts": {
     "test": "jest",
