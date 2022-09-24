@@ -5,8 +5,10 @@ const path = require('path');
 
 const getRunner = cmdType => {
   return (cmd, args = [], cwd = '.') => {
-    return new Promise((resolve, reject) => {
-      const bin = `${cmdType} ${cmd} ${args.join(' ')}`;
+    return new Promise(resolve => {
+      const bin = `${cmdType ? cmdType + ' ' : ''}${cmd} ${
+        Array.isArray(args) ? args.join(' ') : args
+      }`;
       console.info(`> running ${bin}`);
       child_process.exec(
         bin,
@@ -14,7 +16,7 @@ const getRunner = cmdType => {
           cwd
         },
         (err, stdout, stderr) => {
-          if (err) reject([stderr, null, bin]);
+          if (err) resolve([stderr, null, bin]);
           else resolve([null, stdout, bin]);
         }
       );
@@ -22,6 +24,8 @@ const getRunner = cmdType => {
   };
 };
 
+const baseRunner = getRunner();
+const shRunner = getRunner('sh');
 const npmRunner = getRunner('npm');
 const gitRunner = getRunner('git');
 
@@ -29,9 +33,12 @@ const getRootPath = pkg => path.resolve(__dirname, '../packages/' + pkg);
 
 const getArgs = () => process.argv.slice(2);
 
-module.exports.utils = {
+module.exports = {
+  baseRunner,
+  shRunner,
   npmRunner,
   gitRunner,
+
   getRootPath,
   getArgs
 };

@@ -1,5 +1,5 @@
 import { EventType } from 'core/index';
-import { createlistener, EventHandler } from 'utils/eventHandler';
+import { createlistener, EventHandler } from 'utils/index';
 
 /**
  * @description accumulate the number of clicks on an DOM element

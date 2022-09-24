@@ -2,8 +2,7 @@ import { createApp } from 'vue';
 import './style.css';
 import App from './App.vue';
 
-import { Gaze } from 'gaze-anchor';
-
-Gaze.init({});
+import { createGaze } from 'gaze-anchor';
+import {} from 'gaze-anchor/plugins';
 
 createApp(App).mount('#app');

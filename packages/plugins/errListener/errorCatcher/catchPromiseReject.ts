@@ -1,9 +1,7 @@
 import { EventType } from 'core/static';
 import { ErrorType } from '../static';
 import { Uploader } from 'types/uploader';
-import { createlistener, EventHandler } from 'utils/eventHandler';
-import { isEmpty } from 'utils/reflect';
-import { getNow } from 'utils/timestampHandler';
+import { isEmpty, getNow, createlistener, EventHandler } from 'utils/index';
 import { getUid } from '../getUid';
 import { Config } from '../types/config';
 import { ErrorInfo, StackParser, uid } from '../types/errorInfo';

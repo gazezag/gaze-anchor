@@ -1,20 +1,9 @@
-export * from './static';
-
-export * from './errorHandler';
-
-// common methods
-export * from './observe';
-export * from './proxyHttp';
-export * from './proxyRouter';
-export * from './upload';
-
 import { GazeConfig } from 'types/gaze';
-import { get, getKeys, has, set } from 'utils/reflect';
-import { isObject } from 'utils/typeJudgment';
 import { Plugin } from 'types/plugin';
 import { createUploader } from './upload';
 import { errorHandler } from './errorHandler';
 import { Uploader } from 'types/uploader';
+import { get, getKeys, has, isObject, set } from 'utils/index';
 
 /**
  * @description merge configurations recursively
@@ -77,8 +66,6 @@ class Gaze {
   use(plugin: Plugin): this {
     // execute asynchronously to avoid blocking the main process
     nextTick(() => {
-      console.log('install!');
-
       if (!this.plugins.has(plugin)) {
         this.plugins.add(plugin);
         plugin.install(this.uploader);
@@ -92,3 +79,14 @@ class Gaze {
 export const createGaze = (config?: Record<string, any>) => {
   return new Gaze(config);
 };
+
+export * from './static';
+
+export * from './errorHandler';
+
+// common methods
+export * from './observe';
+export * from './proxyHttp';
+export * from './proxyRouter';
+export * from './upload';
+export * from './pageHook';

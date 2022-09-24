@@ -1,4 +1,4 @@
-import { ErrorStep, StackParser } from 'packages/plugins/errListener/types/errorInfo';
+import { ErrorStep, StackParser } from './types/errorInfo';
 
 /**
  * @descript parse single line error message

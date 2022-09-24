@@ -1,5 +1,5 @@
 import { CustomMeasure, MeasureOptions, Once } from 'types/measure';
-import { roundOff } from 'utils/math';
+import { roundOff } from 'utils/index';
 
 /**
  * @description the mark to start this measurement

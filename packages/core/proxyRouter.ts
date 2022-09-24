@@ -1,5 +1,4 @@
-import { createlistener, EventHandler } from 'utils/eventHandler';
-import { get, set } from 'utils/reflect';
+import { createlistener, EventHandler, get, set } from 'utils/index';
 import { EventType } from './static';
 
 // called when routing is switched

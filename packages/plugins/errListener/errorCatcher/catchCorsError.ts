@@ -2,11 +2,10 @@ import { EventType } from 'core/static';
 import { ErrorType } from '../static';
 import { ErrorInfo, uid } from '../types/errorInfo';
 import { Uploader } from 'types/uploader';
-import { getNow } from 'utils/timestampHandler';
+import { createlistener, EventHandler, getNow } from 'utils/index';
 import { getUid } from '../getUid';
 import { Config } from '../types/config';
 import { getErrorKey } from '../getErrorKey';
-import { createlistener, EventHandler } from 'utils/eventHandler';
 import { UploadTarget } from '../static';
 
 const { erorrInfoTarget } = UploadTarget;

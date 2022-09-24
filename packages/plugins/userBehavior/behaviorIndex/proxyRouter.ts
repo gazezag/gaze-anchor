@@ -1,10 +1,10 @@
 import { EventType } from 'core/static';
-import { UploadTarget, BehaviorType } from '../static';
 import { Uploader } from 'types/uploader';
-import { RouterChangeDetail, UserBehavior } from '../types/userBehavior';
-import { set } from 'utils/reflect';
-import { getNow } from 'utils/timestampHandler';
+import { set, getNow } from 'utils/index';
 import { proxyForwardAndBackward, proxyRouterLink } from 'core/proxyRouter';
+import { RouterChangeDetail, UserBehavior } from '../types/userBehavior';
+import { UploadTarget, BehaviorType } from '../static';
+
 const { userBehaviorTarget } = UploadTarget;
 
 export const initRouterProxy = (upload: Uploader) => {
