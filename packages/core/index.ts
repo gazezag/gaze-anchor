@@ -7,6 +7,3 @@ export * from './observe';
 export * from './proxyHttp';
 export * from './proxyRouter';
 export * from './upload';
-
-// public apis
-export * from './publicAPI';

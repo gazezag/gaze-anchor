@@ -6,7 +6,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "declaration": true,
-    "declarationDir": "./types",
+    "declarationDir": "dist/types",
     "declarationMap": false,
     "strict": true,
     "resolveJsonModule": true,

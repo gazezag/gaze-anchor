@@ -66,8 +66,6 @@ class Gaze {
   use(plugin: Plugin): this {
     // execute asynchronously to avoid blocking the main process
     nextTick(() => {
-      console.log('install!');
-
       if (!this.plugins.has(plugin)) {
         this.plugins.add(plugin);
         plugin.install(this.uploader);
@@ -81,3 +79,4 @@ class Gaze {
 export const createGaze = (config?: Record<string, any>) => {
   return new Gaze(config);
 };
+export * from './core';
