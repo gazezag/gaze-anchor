@@ -1,6 +1,6 @@
 {
   "name": "gaze-anchor",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "A SDK for front-end performance monitoring",
   "license": "MIT",
   "author": {
@@ -25,7 +25,10 @@
   "types": "types/index.d.ts",
   "typings": "types/index.d.ts",
   "files": [
-    "dist"
+    "core",
+    "plugins",
+    "publicAPI",
+    "types"
   ],
   "scripts": {
     "test": "jest",
