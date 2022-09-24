@@ -12,7 +12,6 @@
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "noEmit": false,
-    "emitDeclarationOnly": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "core/*": ["packages/core/*"],
