@@ -35,7 +35,10 @@
     "build": "rm -rf dist && rollup --config",
     "format": "prettier --write \"packages/**/*.ts?(x)\" && eslint --fix --ext .ts packages",
     "format:package": "prettier --write \"packages/**/package.json\"",
-    "merge-and-push": "node ./scripts/git.js"
+    "release": "node scripts/release.js --patch",
+    "release:patch": "node scripts/release.js --patch",
+    "release:minor": "node scripts/release.js --minor",
+    "release:major": "node scripts/release.js --major"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.2",
