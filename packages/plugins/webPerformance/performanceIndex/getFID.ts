@@ -1,12 +1,15 @@
-import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
+import { disconnect, observe, ObserveHandler, takeRecords, onHidden } from 'core/index';
 import { Uploader } from 'types/uploader';
-import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
-import { roundOff } from 'utils/math';
-import { disconnect, observe, ObserveHandler, takeRecords } from 'core/observe';
+import {
+  isPerformanceObserverSupported,
+  isPerformanceSupported,
+  roundOff,
+  getNow,
+  getFirstHiddenTime
+} from 'utils/index';
 import { PerformanceInfo } from '../types/performanceIndex';
-import { getFirstHiddenTime } from 'utils/eventHandler';
-import { onHidden } from 'core/pageHook';
-import { getNow } from 'utils/timestampHandler';
+import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
+
 const { performanceTimingTarget } = UploadTarget;
 
 const getFID = (): Promise<PerformanceEventTiming> =>

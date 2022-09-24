@@ -1,5 +1,5 @@
-import { PluginDefineFunction } from 'types/plugin';
 import { afterLoad, onPageShow } from 'core/pageHook';
+import { PluginDefineFunction } from 'types/plugin';
 import {
   initCLS,
   initDeviceInfo,
@@ -14,8 +14,6 @@ import {
 export const performanceIndexPlugin: PluginDefineFunction<null> = () => {
   return {
     install(uploader) {
-      console.log('install performance!');
-
       initDeviceInfo(uploader);
 
       initCLS(uploader);

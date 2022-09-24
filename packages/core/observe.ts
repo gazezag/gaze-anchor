@@ -1,4 +1,4 @@
-import { curry } from 'utils/functional';
+import { curry } from 'utils/index';
 
 export type ObserveHandler = (entry: PerformanceEntry) => void;
 

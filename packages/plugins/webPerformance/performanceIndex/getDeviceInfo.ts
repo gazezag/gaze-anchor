@@ -1,10 +1,15 @@
-import { BrowserType, OSType, PerformanceInfoType, UploadTarget } from '../static';
-import { DeviceEnvInfo } from 'packages/plugins/webPerformance/types/deviceEnvInfo';
 import { Uploader } from 'types/uploader';
-import { isNavigatorSupported, isPerformanceSupported } from 'utils/compatible';
-import { getMatched, getTestStrFn } from 'utils/stringHandler';
+import {
+  isNavigatorSupported,
+  isPerformanceSupported,
+  getMatched,
+  getTestStrFn,
+  getNow
+} from 'utils/index';
 import { PerformanceInfo } from '../types/performanceIndex';
-import { getNow } from 'utils/timestampHandler';
+import { BrowserType, OSType, PerformanceInfoType, UploadTarget } from '../static';
+import { DeviceEnvInfo } from '../types/deviceEnvInfo';
+
 const { deviceInfoTarget } = UploadTarget;
 
 type BrowserInfoEnum = Array<{

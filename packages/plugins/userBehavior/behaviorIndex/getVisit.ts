@@ -1,11 +1,10 @@
 import { EventType } from 'core/static';
 import { UploadTarget } from '../static';
 import { Uploader } from 'types/uploader';
-import { VisitInfo } from 'packages/plugins/userBehavior/types/userBehavior';
-import { createlistener, removeListener } from 'utils/eventHandler';
-import { getNow } from 'utils/timestampHandler';
-const { visitInfoTarget } = UploadTarget;
+import { VisitInfo } from '../types/userBehavior';
+import { createlistener, removeListener, getNow } from 'utils/index';
 
+const { visitInfoTarget } = UploadTarget;
 const { load } = EventType;
 
 export const initPV = (upload: Uploader) => {

@@ -1,13 +1,15 @@
-import { EventType } from 'core/static';
-import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
+import { disconnect, observe, ObserveHandler, takeRecords, EventType, onHidden } from 'core/index';
 import { Uploader } from 'types/uploader';
-import { isPerformanceObserverSupported } from 'utils/compatible';
-import { roundOff } from 'utils/math';
-import { disconnect, observe, ObserveHandler, takeRecords } from 'core/observe';
+import {
+  isPerformanceObserverSupported,
+  roundOff,
+  createlistener,
+  getFirstHiddenTime,
+  getNow
+} from 'utils/index';
 import { PerformanceInfo } from '../types/performanceIndex';
-import { createlistener, getFirstHiddenTime } from 'utils/eventHandler';
-import { onHidden } from 'core/pageHook';
-import { getNow } from 'utils/timestampHandler';
+import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
+
 const { performanceTimingTarget } = UploadTarget;
 
 interface LCPCache {

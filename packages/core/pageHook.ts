@@ -1,6 +1,6 @@
-import { EventType } from 'core/index';
-import { createlistener, EventHandler } from 'utils/eventHandler';
+import { EventType } from 'core/static';
 
+type EventHandler = (e: ErrorEvent | Event) => void;
 type afterLoadListenerHandler = (this: Window, ev: PageTransitionEvent) => any;
 type beforeUnloadListenerHandler = (this: Window, ev: BeforeUnloadEvent) => any;
 type unloadListenerHandler = (this: Window, ev: Event) => any;
@@ -29,7 +29,7 @@ export const onHidden = (callback: EventHandler, once = true) => {
     }
   };
 
-  createlistener(EventType.visibilitychange)(hiddenHandler, true);
+  window.addEventListener(EventType.visibilitychange, hiddenHandler, true);
 };
 
 export const onPageShow = (callback: EventHandler, once = true) => {
@@ -40,5 +40,5 @@ export const onPageShow = (callback: EventHandler, once = true) => {
     }
   };
 
-  createlistener(EventType.pageshow)(e => showHandler(e), { once: true, capture: true });
+  window.addEventListener(EventType.pageshow, showHandler, { once: true, capture: true });
 };

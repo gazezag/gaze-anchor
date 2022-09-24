@@ -1,10 +1,9 @@
 import { EventType } from 'core/static';
+import { beforeUnload } from 'core/pageHook';
 import { BehaviorType, UploadTarget } from '../static';
 import { Uploader } from 'types/uploader';
-import { OperationDetail, UserBehavior } from 'packages/plugins/userBehavior/types/userBehavior';
-import { createlistener } from 'utils/eventHandler';
-import { beforeUnload } from 'core/pageHook';
-import { getNow } from 'utils/timestampHandler';
+import { OperationDetail, UserBehavior } from '../types/userBehavior';
+import { createlistener, getNow } from 'utils/index';
 
 const { userBehaviorTarget } = UploadTarget;
 const { operation } = BehaviorType;

@@ -1,10 +1,14 @@
-import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
-import { PerformanceInfo, PerformanceNavigationIndex } from '../types/performanceIndex';
+import { disconnect, observe, ObserveHandler } from 'core/index';
 import { Uploader } from 'types/uploader';
-import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
-import { roundOff } from 'utils/math';
-import { disconnect, observe, ObserveHandler } from 'core/observe';
-import { getNow } from 'utils/timestampHandler';
+import {
+  isPerformanceObserverSupported,
+  isPerformanceSupported,
+  roundOff,
+  getNow
+} from 'utils/index';
+import { PerformanceInfo, PerformanceNavigationIndex } from '../types/performanceIndex';
+import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
+
 const { navigationTimingTarget } = UploadTarget;
 
 const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {

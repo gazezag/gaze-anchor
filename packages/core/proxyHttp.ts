@@ -1,7 +1,6 @@
 import { HttpDetail } from 'types/index';
 import { ProxyCallback } from 'types/proxyNative';
-import { has, set } from 'utils/reflect';
-import { getTimestamp } from 'utils/timestampHandler';
+import { getTimestamp, has, set } from 'utils/index';
 import { errorHandler } from './errorHandler';
 
 class ProxyHttpContext {

@@ -1,7 +1,5 @@
 import { Uploader } from 'types/uploader';
-import { join } from 'utils/join';
-import { get, has, set } from 'utils/reflect';
-import { getNow } from 'utils/timestampHandler';
+import { get, getNow, has, join, set } from 'utils/index';
 
 const imgRequest = (url: string, data: any) => {
   if (!url || !data) return;

@@ -5,21 +5,21 @@ import typescript from '@rollup/plugin-typescript';
 import dts from 'rollup-plugin-dts';
 import pkg from './package.json';
 
-const mainEntry = 'packages/index.ts';
+const coreEntry = 'packages/core/index.ts';
 const publicAPIEntry = 'packages/publicAPI/index.ts';
-const pluginEntries = () => {
-  // TODO
-};
+const pluginsEntries = 'packages/plugins/index.ts';
+
+const typeEntry = 'packages/index.ts';
 
 const commonPlugins = [resolve(), commonjs(), typescript(), externals({ devDeps: false })];
 
 export default () => {
   return [
     {
-      input: [mainEntry, publicAPIEntry],
+      input: [coreEntry],
       output: {
         name: pkg.name,
-        dir: 'dist',
+        dir: 'dist/core',
         format: 'es',
         exports: 'named',
         preserveModules: true,
@@ -28,12 +28,36 @@ export default () => {
       plugins: commonPlugins
     },
     {
-      input: [mainEntry, publicAPIEntry],
+      input: [publicAPIEntry],
+      output: {
+        name: pkg.name,
+        dir: 'dist/publicAPI',
+        format: 'es',
+        exports: 'named',
+        preserveModules: true,
+        preserveModulesRoot: 'packages'
+      },
+      plugins: commonPlugins
+    },
+    {
+      input: [pluginsEntries],
+      output: {
+        name: pkg.name,
+        dir: 'dist/plugins',
+        format: 'es',
+        exports: 'named',
+        preserveModules: true,
+        preserveModulesRoot: 'packages'
+      },
+      plugins: commonPlugins
+    },
+
+    {
+      input: [typeEntry],
       output: {
         name: pkg.name,
         dir: 'dist/types',
-        format: 'es',
-        exports: 'named'
+        format: 'es'
       },
       plugins: [...commonPlugins, dts()]
     }

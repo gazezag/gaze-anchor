@@ -1,7 +1,7 @@
 import { ErrorType } from '../static';
 import { ErrorInfo, uid } from '../types/errorInfo';
 import { Uploader } from 'types/uploader';
-import { getNow } from 'utils/timestampHandler';
+import { getNow } from 'utils/index';
 import { getUid } from '../getUid';
 import { UploadTarget } from '../static';
 import { proxyHttp } from 'core/proxyHttp';

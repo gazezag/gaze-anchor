@@ -1,7 +1,7 @@
-import { uid } from 'packages/plugins/errListener/types/errorInfo';
+import { uid } from './types/errorInfo';
+import { Config } from './types/config';
 import { getStackParser } from './getStackParser';
 import { PluginDefineFunction } from 'types/plugin';
-import { Config } from './types/config';
 import {
   initCorsError,
   initHttpError,
@@ -17,8 +17,6 @@ export const errorCatcherPlugin: PluginDefineFunction<Config> = options => {
 
   return {
     install(uploader) {
-      console.log('install errorcatcher!');
-
       initJsError(options, stackParser, submitedErrorUids, uploader);
       initPromiseReject(options, stackParser, submitedErrorUids, uploader);
       initResourceError(options, submitedErrorUids, uploader);

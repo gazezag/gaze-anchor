@@ -1,10 +1,14 @@
-import { EntryNames, EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
+import { disconnect, observe, ObserveHandler } from 'core/index';
 import { Uploader } from 'types/uploader';
-import { isPerformanceObserverSupported, isPerformanceSupported } from 'utils/compatible';
-import { roundOff } from 'utils/math';
-import { disconnect, observe, ObserveHandler } from 'core/observe';
+import {
+  isPerformanceObserverSupported,
+  isPerformanceSupported,
+  roundOff,
+  getNow
+} from 'utils/index';
 import { PerformanceInfo } from '../types/performanceIndex';
-import { getNow } from 'utils/timestampHandler';
+import { EntryNames, EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
+
 const { performanceTimingTarget } = UploadTarget;
 
 const getFP = (): Promise<PerformanceEntry> =>

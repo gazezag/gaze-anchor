@@ -1,9 +1,9 @@
-import { BehaviorType, UploadTarget } from '../static';
-import { Uploader } from 'types/uploader';
-import { UserBehavior } from '../types/userBehavior';
-import { getNow } from 'utils/timestampHandler';
-import { HttpDetail, ProxyCallback } from 'types/proxyNative';
 import { proxyHttp } from 'core/proxyHttp';
+import { Uploader } from 'types/uploader';
+import { HttpDetail, ProxyCallback } from 'types/proxyNative';
+import { getNow } from 'utils/index';
+import { UserBehavior } from '../types/userBehavior';
+import { BehaviorType, UploadTarget } from '../static';
 
 const { userBehaviorTarget } = UploadTarget;
 
