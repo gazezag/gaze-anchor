@@ -1,5 +1,5 @@
-import { EventType } from 'core/common';
-import { onHidden } from './pageHook';
+import { EventType } from 'core/index';
+import { onHidden } from 'core/pageHook';
 
 export type EventHandler = (e: ErrorEvent | Event) => void;
 
@@ -8,17 +8,20 @@ interface Option {
   once: boolean;
 }
 
-export const createlistener = (eventType: EventType | Array<EventType>) => {
+export const createlistener = (
+  eventType: EventType | Array<EventType>,
+  target: Element | Window = window
+) => {
   if (Array.isArray(eventType)) {
     return (eventHandler: EventHandler, option: Option | boolean = true) => {
       eventType.forEach(type => {
-        window.addEventListener(type, eventHandler, option);
+        target.addEventListener(type, eventHandler, option);
       });
     };
   }
 
   return (eventHandler: EventHandler, option: Option | boolean = true) => {
-    window.addEventListener(eventType, eventHandler, option);
+    target.addEventListener(eventType, eventHandler, option);
   };
 };
 
