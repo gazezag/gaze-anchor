@@ -1,4 +1,5 @@
 import { Uploader } from 'types/uploader';
+import { join } from 'utils/join';
 import { get, has, set } from 'utils/reflect';
 import { getNow } from 'utils/timestampHandler';
 
@@ -37,21 +38,11 @@ const ajaxRequest = (url: string, data: any) => {
   client.send(JSON.stringify(data));
 };
 
-const join = (p1: string, p2: string) => {
-  if (p1.at(-1) === '/' && p2.at(0) === '/') {
-    return `${p1}${p2.slice(1)}`;
-  } else if (p1.at(-1) === '/' || p2.at(0) === '/') {
-    return `${p1}${p2}`;
-  } else {
-    return `${p1}/${p2}`;
-  }
-};
-
 export const createUploader =
   (baseUrl: string): Uploader =>
   (path: string, data: any) => {
     const base = join(baseUrl, path);
-    let url = join(base, 'empty.gif');
+    const url = join(base, 'empty.gif');
 
     const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(
       JSON.stringify(data)
