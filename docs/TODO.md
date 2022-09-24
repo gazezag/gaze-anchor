@@ -15,3 +15,4 @@
 2. release script
 3. merge the exported types into one file? (index.d.ts?)
 4. refactor to plugin architecture (DONE)
+5. rollup?
