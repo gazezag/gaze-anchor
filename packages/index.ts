@@ -1,14 +1,14 @@
 import { GazeConfig } from 'types/gaze';
 import { get, getKeys, has, set } from 'utils/reflect';
-import { WebPerformanceObserver } from 'core/webPerformance';
-import { UserBehaviorObserver } from 'core/userBehavior';
 import { isObject } from 'utils/typeJudgment';
-import { ErrorObserver } from 'core/errListener';
+import { Plugin } from 'types/plugin';
+import { createUploader, errorHandler } from './core';
+import { Uploader } from 'types/uploader';
 
 /**
  * @description merge configurations recursively
  */
-const mergeRecursive = (userConfig: any, initConfig: GazeConfig): GazeConfig =>
+const mergeRecursive = (userConfig: Record<string, any>, initConfig: GazeConfig): GazeConfig =>
   getKeys(userConfig).reduce((prev, k) => {
     // if this key in the user configuration exists in the default configuration
     if (has(prev, k)) {
@@ -30,39 +30,54 @@ const mergeRecursive = (userConfig: any, initConfig: GazeConfig): GazeConfig =>
 /**
  * @description merge user configurations and default configurations
  */
-const mergeConfig = (userConfig: any): GazeConfig =>
-  mergeRecursive(
-    userConfig,
-    // default config
-    {
-      target: 'http://localhost:3001',
-      token: '',
-      release: '',
-      performance: {
-        uploadImmediately: true,
-        duration: 5000
-      },
-      error: {
-        duration: 5000,
-        logErrors: false,
-        stackLimit: 10
-      },
-      behavior: {
-        uploadImmediately: true,
-        duration: 5000
-      }
+const mergeConfig = (userConfig?: Record<string, any>): GazeConfig => {
+  const defaultConfig: GazeConfig = {
+    target: 'http://localhost:3001',
+    token: '',
+    release: ''
+  };
+
+  if (!userConfig) return defaultConfig;
+  else return mergeRecursive(userConfig, defaultConfig);
+};
+
+const nextTick = (fn: Function) => {
+  const timer = setTimeout(() => {
+    try {
+      fn();
+    } catch (e: any) {
+      errorHandler(e);
+    } finally {
+      clearTimeout(timer);
     }
-  );
+  });
+};
 
-export class Gaze {
-  static init(config: GazeConfig) {
-    setTimeout(() => {
-      const mergedConfig = mergeConfig(config);
-      const { target, performance, error, behavior } = mergedConfig;
+class Gaze {
+  private plugins: Set<Plugin>;
+  private uploader: Uploader;
 
-      new WebPerformanceObserver(target, performance!).init();
-      new UserBehaviorObserver(target, behavior!).init();
-      new ErrorObserver(target, error!).init();
+  constructor(config?: Record<string, any>) {
+    const { target } = mergeConfig(config);
+    this.plugins = new Set<Plugin>();
+    this.uploader = createUploader(target);
+  }
+
+  use(plugin: Plugin): this {
+    // execute asynchronously to avoid blocking the main process
+    nextTick(() => {
+      console.log('install!');
+
+      if (!this.plugins.has(plugin)) {
+        this.plugins.add(plugin);
+        plugin.install(this.uploader);
+      }
     });
+
+    return this;
   }
 }
+
+export const createGaze = (config?: Record<string, any>) => {
+  return new Gaze(config);
+};
