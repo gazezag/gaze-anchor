@@ -1,5 +1,5 @@
 import { disconnect, observe, ObserveHandler } from 'core/index';
-import { Uploader } from 'types/uploader';
+import { Uploader, ErrorHandler } from 'types/index';
 import {
   isPerformanceObserverSupported,
   isPerformanceSupported,
@@ -38,7 +38,7 @@ const getFCP = (): Promise<PerformanceEntry> =>
     }
   });
 
-export const initFCP = (upload: Uploader) => {
+export const initFCP = (upload: Uploader, errorHandler: ErrorHandler) => {
   getFCP()
     .then(entry => {
       const { FCP } = PerformanceInfoType;
@@ -51,5 +51,5 @@ export const initFCP = (upload: Uploader) => {
 
       upload(performanceTimingTarget, indexValue);
     })
-    .catch(err => console.error(err));
+    .catch(errorHandler);
 };

@@ -4,14 +4,23 @@
 
 A SDK for front-end performance monitoring
 
+
+
 ## Feature
 
-- Page performance
-- Platform information
-- Navigation performance
-- Resource flow
-- Error catching
-- User's actions collecting
+- Plugin architecture
+- Error isolation
+- Collection of common performance data
+  - Page performance
+  - Platform information
+  - Navigation performance
+  - Resource flow
+  - Error catching
+  - User's actions collecting
+
+- Data reporting strategy to avoid data loss as much as possible
+
+
 
 ## Todo
 
@@ -21,14 +30,14 @@ A SDK for front-end performance monitoring
 
 ### feature
 
-1. uploading function of the store
-2. connection verification (token?)
+1. connection verification (token?)
 
 ### refactor
 
-1. divide the core modules into different packages and released them separately
+1. refactor with monorepo
 2. release script
-3. merge the exported types into one file? (index.d.ts?)
+
+
 
 ## Usage
 
@@ -48,21 +57,228 @@ pnpm add gaze-anchor -S
 
 ```typescript
 // main.ts
-import { Gaze } from 'gaze-anchor';
+import { createGaze } from 'gaze-anchor/core';
+import { 
+  performanceIndexPlugin, 
+  userBehaviorObserverPlugin, 
+  errorCatcherPlugin 
+} from 'gaze-anchor/plugins'
 
-Gaze.init({});
+const gaze = createGaze({
+	target: 'http://localhost:8080/'  
+});
+
+// install plugins
+gaze
+  .use(performanceIndexPlugin())
+  .use(userBehaviorObserverPlugin())
+	.use(errorCatcherPlugin({
+  	stackLimit: 10
+	 }));
 ```
+
+
 
 ## Implement
 
 ![3231662826232_ pic](https://user-images.githubusercontent.com/76992456/189492130-45554cad-60d4-4b63-b3be-65f9c6a25d5b.jpg)
 
-### Web Performance
 
-> Take getting the FP(First Paint) as an example
+
+### Core
+
+The function of the core module is extremely simple
+
++ Basic uploader
++ Basic error handler
++ Mounting plugins
 
 ```typescript
-// packages/core/webPerformance/performacneIndex/getFP.ts
+// type interface of plugins
+interface Plugin {
+  install: (uploader: Uploader, errorHandler: ErrorHandler) => void;
+}
+```
+
+```typescript
+// core module
+class Gaze {
+  private plugins: Set<Plugin>;
+  private uploader: Uploader;
+  private errorHandler: ErrorHandler;
+
+  constructor(config?: Record<string, any>) {
+    const { target } = mergeConfig(config);
+    this.plugins = new Set<Plugin>();
+    this.uploader = createUploader(target);
+    this.errorHandler = errorHandler;
+  }
+
+  // mount plugin asynchronously
+  use(plugin: Plugin): this {
+    // execute asynchronously to avoid blocking the main process
+    nextTick(() => {
+      if (!this.plugins.has(plugin)) {
+        this.plugins.add(plugin);
+        plugin.install(this.uploader, this.errorHandler);
+      }
+    }, this.errorHandler);
+
+    return this;
+  }
+}
+
+const nextTick = (fn: Function, errorHandler: ErrorHandler) => {
+  const timer = setTimeout(() => {
+    try {
+      fn();
+    } catch (e: any) {
+      errorHandler(e);
+    } finally {
+      clearTimeout(timer);
+    }
+  });
+};
+```
+
+Therefore, gaze will treat any object with method "install" as a plugin, It's probably like this
+
+```typescript
+const customPlugin: PluginDefineFunction<SomeConfig> = (
+  options: SomeConfig
+): Plugin => {
+  const { someData } = options;
+
+  return {
+    install(upload, errorHandler) {
+      initSomething(someData, upload, errorHandler);
+      initOther(someData, upload, errorHandler);
+    }
+  };
+};
+```
+
+
+
+#### Reporter
+
+Three report methods are set here to solve CORS problems
+
+##### createUploader
+
+```typescript
+// packages/core/upload.ts
+export const createUploader =
+  (baseUrl: string): Uploader =>
+  (path: string, data: any) => {
+    const base = join(baseUrl, path);
+    const url = join(base, 'empty.gif');
+
+    const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(
+      JSON.stringify(data)
+    )}`.length;
+
+    has(data, 'time') || set(data, 'time', getNow());
+
+    // 2083 compatible with ie browser
+    // chrome 8182
+    // safari 80000
+    // firefox 65536
+    // opera 190000
+    if (len < 2083) {
+      imgRequest(url, data);
+		} else if (isBeaconSupported()) {
+      beaconRequest(join(base, 'add'), data);
+    } else {
+      ajaxRequest(join(base, 'add'), data);
+    }
+  };
+```
+
+##### ImageRequest
+
+```typescript
+const imgRequest = (url: string, data: any) => {
+  if (!url || !data) return;
+	const img = new Image();
+
+  img.onerror = () => {
+    ajaxRequest(url, data);
+  };
+
+  img.src = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`;
+};
+```
+
+##### Beacon API
+
+```typescript
+const beaconRequest = (url: string, data: any) => {
+  if (!url || !data) return;
+
+  navigator.sendBeacon(
+    url,
+    new Blob([JSON.stringify(data)], {
+      type: 'application/x-www-form-urlencoded'
+    })
+  );
+};
+```
+
+##### Ajax
+
+```typescript
+const ajaxRequest = (url: string, data: any) => {
+  if (!url || !data) return;
+
+  // send ajax request with native XMLHttpRequest
+  const xhr = get(window, has(window, 'nativeXhr') ? 'nativeXhr' : 'XMLHttpRequest');
+
+  const client = new xhr();
+  client.open('POST', url, true);
+  client.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+  client.send(JSON.stringify(data));
+};
+```
+
+
+
+
+
+### Web Performance
+
+Used to collect performance data
+
+```typescript
+// packages/plugins/webPerformance/index.ts
+export const performanceIndexPlugin: PluginDefineFunction<null> = () => {
+  return {
+    install(uploader, errorHandler) {
+      initDeviceInfo(uploader, errorHandler);
+
+      initCLS(uploader, errorHandler);
+      initLCP(uploader, errorHandler);
+
+      // monitor FP and FCP while page had shown
+      onPageShow(() => {
+        initFP(uploader, errorHandler);
+        initFCP(uploader, errorHandler);
+      });
+
+      afterLoad(() => {
+        initNavigationTiming(uploader, errorHandler);
+        initResourceFlowTiming(uploader, errorHandler);
+        initFID(uploader, errorHandler);
+      });
+    }
+  };
+};
+```
+
+Take getting the FP(First Paint) as an example
+
+```typescript
+// packages/plugins/webPerformance/performacneIndex/getFP.ts
 const getFP = (): Promise<PerformanceEntry> =>
   new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
@@ -82,38 +298,53 @@ const getFP = (): Promise<PerformanceEntry> =>
           resolve(entry);
         }
       };
-
       const observer = observe(EntryTypes.paint, callback);
     }
   });
 
-export const initFP = (
-  store: Store<PerformanceInfoType, PerformanceInfo>,
-  upload: Uploader,
-  immediately: boolean
-) => {
+export const initFP = (upload: Uploader, errorHandler: ErrorHandler) => {
   getFP()
     .then(entry => {
       const { FP } = PerformanceInfoType;
-      const indexValue = {
+      const indexValue: PerformanceInfo = {
         type: FP,
         time: getNow(),
         value: roundOff(entry.startTime)
       };
-
-      store.set(FP, indexValue);
-      immediately && upload(performanceTimingTarget, indexValue);
+      upload(performanceTimingTarget, indexValue);
     })
-    .catch(console.error);
+    .catch(errorHandler);
 };
 ```
 
+
+
 ### User Behavior
+
+Used to collect user behavior data
+
+```typescript
+// packages/plugins/userBehavior/index.ts
+export const userBehaviorObserverPlugin: PluginDefineFunction<null> = () => {
+  return {
+    install(uploader) {
+      initPV(uploader);
+      initRouterProxy(uploader);
+      initHttpProxy(uploader);
+      initOperationListener(uploader);
+    }
+  };
+};
+```
+
+
 
 #### proxyRouter
 
+Call the proxy method exposed by the core module to implement
+
 ```typescript
-// packages/core/userBehavior/behaviorIndex/proxyRouter.ts
+// packages/core/proxyRouter.ts
 export const proxyRouterLink = (
   types: Array<EventType>, 
   handler: EventHandler
@@ -134,22 +365,22 @@ export const proxyRouterLink = (
     set(history, type, rewriteHistory(type));
   });
 
-  // monitor all events and handle them uniformly
+  // monitor all events and handled them uniformly
   createlistener(types)(handler);
 };
 
+// called when click the forward and backward buttons
 export const proxyForwardAndBackward = (
   types: Array<EventType>, 
   handler: EventHandler
 ): void => {
   createlistener(types)(handler);
 };
+```
 
-export const initRouterProxy = (
-  store: Store<BehaviorType, UserBehavior>,
-  upload: Uploader,
-  immediately: boolean
-) => {
+```typescript
+// packages/core/userBehavior/behaviorIndex/proxyRouter.ts
+export const initRouterProxy = (upload: Uploader) => {
   const { routerChange } = BehaviorType;
 
   const handler = (e: Event) => {
@@ -160,25 +391,17 @@ export const initRouterProxy = (
       href
     };
     hash ? set(detail, 'hash', hash) : set(detail, 'pathname', pathname);
-
-    const behaviorItem: BehaviorItem = {
-      type: routerChange,
-      page: href,
+    const userBehavior: UserBehavior = {
       time: getNow(),
-      detail
+      value: {
+        type: routerChange,
+        page: href,
+        time: getNow(),
+        detail
+      }
     };
 
-    if (store.has(routerChange)) {
-      store.get(routerChange)!.value.push(behaviorItem);
-    } else {
-      store.set(routerChange, {
-        time: Date.now(),
-        value: [behaviorItem]
-      });
-    }
-
-    // store can be asserted that must contains 'router-change' at this time
-    immediately && upload(userBehaviorTarget, store.get(routerChange)!);
+    upload(userBehaviorTarget, userBehavior);
   };
 
   // called when routing is switched
@@ -186,30 +409,242 @@ export const initRouterProxy = (
   // called when click the forward and backward buttons
   proxyForwardAndBackward([EventType.popState], handler);
 };
-
 ```
+
+
 
 #### proxyHttp
 
-Similar to the above, rewrite the methods named `open`, `setRequestHeader`, `send`in the `XMLHttpRequest`
+Similar to the above, call the proxy method exposed by the core module
 
-> what's worth mentioning is that I mount the native `XMLHttpRequest` object on `window` for internal business
->
-> ```typescript
-> // packages/core/userBehavior/behaviorIndex/proxyHttp.ts
-> const nativeXhr = window.XMLHttpRequest;
-> // mount native XHR for internal business
-> has(window, 'nativeXhr') || set(window, 'nativeXhr', nativeXhr);
-> ```
->
-> Of course the `fetch` will be the same
->
-> ```typescript
-> // packages/core/userBehavior/behaviorIndex/proxyHttp.ts
-> const nativeFetch = window.fetch;
-> // mount native fetch function for internal business
-> has(window, 'nativeFetch') || set(window, 'nativeFetch', nativeFetch);
-> ```
++ XMLHttpRequest: Replace native objects with custom proxy class
++ Fetch: Rewrite the native function directly
+
+```typescript
+// packages/core/proxyHttp.ts
+
+// encapsulate a context object to manage the callbacks
+// using the publishing subscription mode
+class ProxyHttpContext {
+  // singleton mode
+  static instance: ProxyHttpContext;
+  private callbacks: Set<ProxyCallback<HttpDetail>>;
+
+  private constructor() {
+    this.callbacks = new Set();
+  }
+
+  static getInstance() {
+    if (!this.instance) {
+      this.instance = new ProxyHttpContext();
+    }
+    return this.instance;
+  }
+
+  // register callback
+  add(callback: ProxyCallback<HttpDetail>) {
+    this.callbacks.has(callback) || this.callbacks.add(callback);
+  }
+	
+  // execute all registered callbacks
+  walk(httpDetail: HttpDetail) {
+    this.callbacks.forEach(f => f(httpDetail));
+  }
+}
+```
+
+```typescript
+// packages/core/proxyHttp.ts
+const proxyXhr = (context: ProxyHttpContext) => {
+  if (!has(window, 'XMLHttpRequest')) {
+    errorHandler(new Error('there has no XMLHttpRequest...'));
+    return;
+  }
+
+  if (!has(window, 'nativeXhr')) {
+    const nativeXhr = window.XMLHttpRequest;
+
+    // mount native XHR for internal business
+    set(window, 'nativeXhr', nativeXhr);
+
+    class ProxiedXhr {
+      private xhr: XMLHttpRequest = new nativeXhr();
+      private xhrDetail: HttpDetail;
+
+      constructor() {
+        this.xhrDetail = {
+          method: '',
+          url: '',
+          headers: {},
+          body: '',
+          status: 0,
+          statusText: '',
+          requestTime: 0,
+          responseTime: 0,
+          response: ''
+        };
+        this.xhr.addEventListener('loadend', () => {
+          const { status, statusText, response } = this.xhr;
+
+          this.xhrDetail.status = status;
+          this.xhrDetail.statusText = statusText;
+          this.xhrDetail.response = response || '';
+          this.xhrDetail.responseTime = getTimestamp();
+
+          // execute all registered callback functions
+          context.walk(this.xhrDetail);
+        });
+      }
+
+      open(
+        method: string,
+        url: string,
+        async: boolean = true,
+        username?: string,
+        password?: string
+      ) {
+        // collect data
+        this.xhrDetail.method = method;
+        this.xhrDetail.url = url;
+        // call the native function
+        this.xhr.open(method, url, async, username, password);
+      }
+
+      setRequestHeader(header: string, value: string) {
+        set(this.xhrDetail.headers, header, value);
+        this.xhr.setRequestHeader(header, value);
+      }
+
+      send(body: Document | XMLHttpRequestBodyInit | null | undefined) {
+        this.xhrDetail.body = body || '';
+        this.xhrDetail.requestTime = getTimestamp();
+        this.xhr.send(body);
+      }
+
+      set onreadystatechange(handler: (e: Event) => void) {
+        this.xhr.onreadystatechange = handler;
+      }
+    }
+
+    // bypass the type checking with reflect...
+    set(window, 'XMLHttpRequest', ProxiedXhr);
+  }
+};
+```
+
+```typescript
+// packages/core/proxyHttp.ts
+const proxyFetch = (context: ProxyHttpContext) => {
+  if (!has(window, 'fetch')) {
+    errorHandler(new Error('there has no Fetch...'));
+    return;
+  }
+
+  const fetchDetail: HttpDetail = {
+    method: '',
+    url: '',
+    headers: {},
+    body: '',
+    status: 0,
+    statusText: '',
+    requestTime: 0,
+    responseTime: 0,
+    response: ''
+  };
+
+  if (!has(window, 'nativeFetch')) {
+    const nativeFetch = window.fetch;
+
+    // mount native fetch function for internal business
+    has(window, 'nativeFetch') || set(window, 'nativeFetch', nativeFetch);
+
+    const getProxyFetch = async (
+      input: string | RequestInfo,
+      init?: RequestInit
+    ): Promise<Response> => {
+      // process different types of request headers in object formated
+      const getHeaders = (
+        headerInit: Headers | string[][] | Record<string, string>
+      ) => {
+        const headers = {};
+        if (headerInit instanceof Headers) {
+          headerInit.forEach((value, header) => {
+            set(headers, header, value);
+          });
+        } else if (Array.isArray(headerInit)) {
+          headerInit.forEach((item: Array<string>) => {
+            set(headers, item[0], item[1]);
+          });
+        }
+
+        return headers;
+      };
+
+      fetchDetail.method = init?.method || '';
+      fetchDetail.url = typeof input === 'string' ? input : input.url;
+      fetchDetail.headers = init?.headers ? getHeaders(init!.headers) : {};
+      fetchDetail.body = init?.body || '';
+      fetchDetail.requestTime = getTimestamp();
+
+      // convert the returned value to Promsie with async-await
+      return (
+        nativeFetch
+          .call(window, input, init)
+          // fetch will only reject at panic
+          // so just handle the resolved data
+          .then(async resposne => {
+            fetchDetail.status = resposne.status;
+            fetchDetail.statusText = resposne.statusText;
+            fetchDetail.responseTime = getTimestamp();
+            fetchDetail.response = resposne;
+
+            context.walk(fetchDetail);
+
+            return resposne;
+          })
+      );
+    };
+
+    // bypass the type checking with reflecting...
+    set(window, 'fetch', getProxyFetch);
+  }
+};
+```
+
+```typescript
+export const proxyHttp = (proxyCallback: ProxyCallback<HttpDetail>) => {
+  const context = ProxyHttpContext.getInstance();
+  context.add(proxyCallback);
+
+  proxyXhr(context);
+  proxyFetch(context);
+};
+```
+
+Thanks to the complex encapsulation above, it is now very simple to proxy the `XMLHttpRequest` and `Fetch` at the same time
+
+```typescript
+export const initHttpProxy = (upload: Uploader) => {
+  const handler: ProxyCallback<HttpDetail> = httpDetail => {
+    const { request } = BehaviorType;
+    
+    const userBehavior: UserBehavior = {
+      time: getNow(),
+      value: {
+        type: request,
+        page: window.location.pathname,
+        time: getNow(),
+        detail: httpDetail
+      }
+    };
+    upload(userBehaviorTarget, userBehavior);
+  };
+
+  proxyHttp(handler);
+};
+```
+
+
 
 #### User Actions
 
@@ -224,12 +659,8 @@ And when any of the above conditions are broken, the data will be reported immed
 ##### init
 
 ```typescript
-// packages/core/userBehavior/behaviorIndex/getOperationInfo.ts
-export const initOperationListener = (
-  store: Store<BehaviorType, UserBehavior>,
-  upload: Uploader,
-  immediately: boolean
-) => {
+// packages/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
+export const initOperationListener = (upload: Uploader) => {
   const prevEvent = {
     type: '',
     e: null,
@@ -272,7 +703,7 @@ export const initOperationListener = (
 ##### track
 
 ```typescript
-// packages/core/userBehavior/behaviorIndex/getOperationInfo.ts
+// packages/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
 const createTracker = (target: Element | null, type: EventType) => {
   const operationDetail: OperationDetail = {
     type,
@@ -314,152 +745,83 @@ const createTracker = (target: Element | null, type: EventType) => {
 ##### trigger
 
 ```typescript
-// packages/core/userBehavior/behaviorIndex/getOperationInfo.ts
-const trigger = (
-  detail: OperationDetail,
-  store: Store<BehaviorType, UserBehavior>,
-  upload: Uploader,
-  immediately: boolean
-) => {
-  const behaviorItem: BehaviorItem = {
-    type: operation,
-    page: '',
+// packages/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
+const trigger = (detail: OperationDetail, upload: Uploader) => {
+  const userBehavior: UserBehavior = {
     time: getNow(),
-    detail
+    value: {
+      type: operation,
+      page: '',
+      time: getNow(),
+      detail
+    }
   };
 
-  if (store.has(operation)) {
-    store.get(operation)!.value.push(behaviorItem);
-  } else {
-    store.set(operation, { time: getNow(), value: [behaviorItem] });
-  }
-
-  immediately &&
-    upload(userBehaviorTarget, {
-      time: getNow(),
-      value: [behaviorItem]
-    });
+  upload(userBehaviorTarget, userBehavior);
 };
 ```
+
+
 
 ### Error Listener
 
-Just listenen to the corresponding error events
+```typescript
+// packages/plugins/errorListener/index.ts
+export const errorCatcherPlugin: PluginDefineFunction<Config> = options => {
+  const { stackLimit } = options;
+  const stackParser = getStackParser(stackLimit);
+  const submitedErrorUids = new Set<uid>();
+
+  return {
+    install(uploader) {
+      initJsError(options, stackParser, submitedErrorUids, uploader);
+      initPromiseReject(options, stackParser, submitedErrorUids, uploader);
+      initResourceError(options, submitedErrorUids, uploader);
+      initHttpError(submitedErrorUids, uploader);
+      initCorsError(options, submitedErrorUids, uploader);
+    }
+  };
+};
+```
+
+Just listenen to the corresponding error events, like this
 
 ```typescript
-// packages/core/errListener/index.ts
-private initJsError() {
+// packages/plugins/errorListener/errorCatcher/catchJsError.ts
+export const initJsError = (
+  options: Config,
+  stackParser: StackParser,
+  submitedErrorUids: Set<uid>,
+  uploader: Uploader
+) => {
+  const { logError } = options;
+
   const handler = (event: ErrorEvent) => {
-    // 阻止向上抛出控制台报错
-    this.logError || event.preventDefault();
+    logError || event.preventDefault();
 
-    if (this.getErrorKey(event) !== ErrorType.JS) return;
+    if (getErrorKey(event) !== ErrorType.JS) return;
 
-    const errorUid = this.getUid(`${ErrorType.JS}-${event.message}-${event.filename}`);
-
+    const errorUid = getUid(`${ErrorType.JS}-${event.message}-${event.filename}`);
     const info: ErrorInfo = {
-      // 上报错误归类
       type: ErrorType.JS,
-      // 错误的标识码
       errorUid,
-      // 错误发生的时间
       time: getNow(),
-      // 错误信息
       message: event.message,
-      // 详细信息
       detail: {
         type: event.error?.name || 'Unknwon',
-        stackTrace: this.stackParser(event.error)
+        stackTrace: stackParser(event.error)
       }
     };
-    // 若当前错误未上报过则上报, 并记录其 uid
-    if (!this.submitedErrorUids.has(errorUid)) {
-      this.uploader(erorrInfoTarget, info);
-      this.submitedErrorUids.add(errorUid);
-    }
 
-    // 若需要暂存
-    this.store.set(errorUid, info);
+    if (!submitedErrorUids.has(errorUid)) {
+      uploader(erorrInfoTarget, info);
+      submitedErrorUids.add(errorUid);
+    }
   };
 
   createlistener(EventType.error)(handler as EventHandler);
-}
-```
-
-### Reporter
-
-Three report methods are set here to solve CORS problems
-
-#### createUploader
-
-```typescript
-export const createUploader =
-  (baseUrl: string): Uploader =>
-  (path: string, data: any) => {
-    const base = join(baseUrl, path);
-    let url = join(base, 'empty.gif');
-
-    const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(
-      JSON.stringify(data)
-    )}`.length;
-
-    // 2083 compatible with ie browser
-    // chrome 8182
-    // safari 80000
-    // firefox 65536
-    // opera 190000
-    if (len < 2083) {
-      imgRequest(url, data);
-    } else if (isBeaconSupported()) {
-       beaconRequest(join(base, 'add'), data);
-    } else {
-      ajaxRequest(join(base, 'add'), data);
-    }
-  };
-```
-
-#### ImageRequest
-
-```typescript
-const imgRequest = (url: string, data: any) => {
-  if (!url || !data) return;
-	const img = new Image();
-
-  img.onerror = () => {
-    ajaxRequest(url, data);
-  };
-
-  img.src = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(JSON.stringify(data))}`;
 };
 ```
 
-#### Beacon API
 
-```typescript
-const beaconRequest = (url: string, data: any) => {
-  if (!url || !data) return;
 
-  navigator.sendBeacon(
-    url,
-    new Blob([JSON.stringify(data)], {
-      type: 'application/x-www-form-urlencoded'
-    })
-  );
-};
-```
-
-#### Ajax
-
-```typescript
-const ajaxRequest = (url: string, data: any) => {
-  if (!url || !data) return;
-
-  // send ajax request with native XMLHttpRequest
-  const xhr = get(window, has(window, 'nativeXhr') ? 'nativeXhr' : 'XMLHttpRequest');
-
-  const client = new xhr();
-  client.open('POST', url, true);
-  client.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-  client.send(JSON.stringify(data));
-};
-```

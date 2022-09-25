@@ -1,4 +1,4 @@
-import { Uploader } from 'types/uploader';
+import { Uploader, ErrorHandler } from 'types/index';
 import { disconnect, observe, ObserveHandler, takeRecords, onHidden } from 'core/index';
 import {
   isPerformanceObserverSupported,
@@ -36,7 +36,7 @@ const getCLS = (cls: { value: number }): Promise<PerformanceObserver> =>
     }
   });
 
-export const initCLS = (upload: Uploader) => {
+export const initCLS = (upload: Uploader, errorHandler: ErrorHandler) => {
   const { CLS } = PerformanceInfoType;
   const cls = { value: 0 };
 
@@ -65,5 +65,5 @@ export const initCLS = (upload: Uploader) => {
       // report while the page is hidden
       onHidden(clearListener);
     })
-    .catch(err => console.error(err));
+    .catch(errorHandler);
 };

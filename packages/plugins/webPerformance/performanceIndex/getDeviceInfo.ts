@@ -1,4 +1,4 @@
-import { Uploader } from 'types/uploader';
+import { Uploader, ErrorHandler } from 'types/index';
 import {
   isNavigatorSupported,
   isPerformanceSupported,
@@ -83,13 +83,13 @@ const getOS: GetMetaInfoFn<OSType> = ua => {
   };
 };
 
-const getDeviceInfo = (): DeviceEnvInfo | undefined => {
+const getDeviceInfo = (errorHandler: ErrorHandler): DeviceEnvInfo | undefined => {
   if (!isPerformanceSupported()) {
-    console.error('browser do not support performance');
+    errorHandler(new Error('browser do not support performance'));
     return;
   }
   if (!isNavigatorSupported()) {
-    console.error('browser do not support navigator');
+    errorHandler(new Error('browser do not support navigator'));
     return;
   }
 
@@ -111,10 +111,10 @@ const getDeviceInfo = (): DeviceEnvInfo | undefined => {
   };
 };
 
-export const initDeviceInfo = (upload: Uploader) => {
+export const initDeviceInfo = (upload: Uploader, errorHandler: ErrorHandler) => {
   const { DI } = PerformanceInfoType;
 
-  const deviceInfo = getDeviceInfo();
+  const deviceInfo = getDeviceInfo(errorHandler);
   if (deviceInfo) {
     const value: PerformanceInfo = {
       time: getNow(),

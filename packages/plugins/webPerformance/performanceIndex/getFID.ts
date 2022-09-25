@@ -1,5 +1,5 @@
 import { disconnect, observe, ObserveHandler, takeRecords, onHidden } from 'core/index';
-import { Uploader } from 'types/uploader';
+import { Uploader, ErrorHandler } from 'types/index';
 import {
   isPerformanceObserverSupported,
   isPerformanceSupported,
@@ -40,7 +40,7 @@ const getFID = (): Promise<PerformanceEventTiming> =>
     }
   });
 
-export const initFID = (upload: Uploader) => {
+export const initFID = (upload: Uploader, errorHandler: ErrorHandler) => {
   getFID()
     .then((entry: PerformanceEventTiming) => {
       const { FID } = PerformanceInfoType;
@@ -60,5 +60,5 @@ export const initFID = (upload: Uploader) => {
 
       upload(performanceTimingTarget, indexValue);
     })
-    .catch(err => console.error(err));
+    .catch(errorHandler);
 };

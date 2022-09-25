@@ -13,22 +13,22 @@ import {
 
 export const performanceIndexPlugin: PluginDefineFunction<null> = () => {
   return {
-    install(uploader) {
-      initDeviceInfo(uploader);
+    install(uploader, errorHandler) {
+      initDeviceInfo(uploader, errorHandler);
 
-      initCLS(uploader);
-      initLCP(uploader);
+      initCLS(uploader, errorHandler);
+      initLCP(uploader, errorHandler);
 
       // monitor FP and FCP while page had shown
       onPageShow(() => {
-        initFP(uploader);
-        initFCP(uploader);
+        initFP(uploader, errorHandler);
+        initFCP(uploader, errorHandler);
       });
 
       afterLoad(() => {
-        initNavigationTiming(uploader);
-        initResourceFlowTiming(uploader);
-        initFID(uploader);
+        initNavigationTiming(uploader, errorHandler);
+        initResourceFlowTiming(uploader, errorHandler);
+        initFID(uploader, errorHandler);
       });
     }
   };

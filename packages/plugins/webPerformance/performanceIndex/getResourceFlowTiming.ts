@@ -1,5 +1,5 @@
 import { disconnect, observe, ObserveHandler } from 'core/index';
-import { Uploader } from 'types/uploader';
+import { Uploader, ErrorHandler } from 'types/index';
 import {
   isPerformanceObserverSupported,
   isPerformanceSupported,
@@ -78,7 +78,7 @@ const getResourceFlowTiming = (): Promise<Array<ResourceFlowTiming>> => {
   });
 };
 
-export const initResourceFlowTiming = (upload: Uploader) => {
+export const initResourceFlowTiming = (upload: Uploader, errorHandler: ErrorHandler) => {
   const { RF } = PerformanceInfoType;
 
   getResourceFlowTiming()
@@ -91,5 +91,5 @@ export const initResourceFlowTiming = (upload: Uploader) => {
 
       upload(resourceFlowTarget, indexValue);
     })
-    .catch(err => console.error(err));
+    .catch(errorHandler);
 };

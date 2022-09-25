@@ -1,5 +1,5 @@
 import { disconnect, observe, ObserveHandler } from 'core/index';
-import { Uploader } from 'types/uploader';
+import { Uploader, ErrorHandler } from 'types/index';
 import {
   isPerformanceObserverSupported,
   isPerformanceSupported,
@@ -89,7 +89,7 @@ const getNavigationTiming = (): Promise<PerformanceNavigationIndex> => {
   });
 };
 
-export const initNavigationTiming = (upload: Uploader) => {
+export const initNavigationTiming = (upload: Uploader, errorHandler: ErrorHandler) => {
   const { NT } = PerformanceInfoType;
 
   getNavigationTiming()
@@ -102,5 +102,5 @@ export const initNavigationTiming = (upload: Uploader) => {
 
       upload(navigationTimingTarget, indexValue);
     })
-    .catch(err => console.error(err));
+    .catch(errorHandler);
 };

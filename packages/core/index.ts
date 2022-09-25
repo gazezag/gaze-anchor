@@ -4,6 +4,7 @@ import { createUploader } from './upload';
 import { errorHandler } from './errorHandler';
 import { Uploader } from 'types/uploader';
 import { get, getKeys, has, isObject, set } from 'utils/index';
+import { ErrorHandler } from 'types/index';
 
 /**
  * @description merge configurations recursively
@@ -41,7 +42,7 @@ const mergeConfig = (userConfig?: Record<string, any>): GazeConfig => {
   else return mergeRecursive(userConfig, defaultConfig);
 };
 
-const nextTick = (fn: Function) => {
+const nextTick = (fn: Function, errorHandler: ErrorHandler) => {
   const timer = setTimeout(() => {
     try {
       fn();
@@ -56,11 +57,13 @@ const nextTick = (fn: Function) => {
 class Gaze {
   private plugins: Set<Plugin>;
   private uploader: Uploader;
+  private errorHandler: ErrorHandler;
 
   constructor(config?: Record<string, any>) {
     const { target } = mergeConfig(config);
     this.plugins = new Set<Plugin>();
     this.uploader = createUploader(target);
+    this.errorHandler = errorHandler;
   }
 
   use(plugin: Plugin): this {
@@ -68,9 +71,9 @@ class Gaze {
     nextTick(() => {
       if (!this.plugins.has(plugin)) {
         this.plugins.add(plugin);
-        plugin.install(this.uploader);
+        plugin.install(this.uploader, this.errorHandler);
       }
-    });
+    }, this.errorHandler);
 
     return this;
   }

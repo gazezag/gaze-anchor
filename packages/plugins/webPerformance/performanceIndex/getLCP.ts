@@ -1,5 +1,5 @@
 import { disconnect, observe, ObserveHandler, takeRecords, EventType, onHidden } from 'core/index';
-import { Uploader } from 'types/uploader';
+import { Uploader, ErrorHandler } from 'types/index';
 import {
   isPerformanceObserverSupported,
   roundOff,
@@ -34,7 +34,7 @@ const getLCP = (lcp: LCPCache): Promise<PerformanceObserver> =>
     }
   });
 
-export const initLCP = (upload: Uploader) => {
+export const initLCP = (upload: Uploader, errorHandler: ErrorHandler) => {
   const lcp: LCPCache = { entry: {} as PerformanceEntry };
 
   getLCP(lcp)
@@ -65,5 +65,5 @@ export const initLCP = (upload: Uploader) => {
         capture: true
       });
     })
-    .catch(err => console.error(err));
+    .catch(errorHandler);
 };
