@@ -1,5 +1,5 @@
-import { get, getKeys, has, isObject, set } from 'shared-utils';
-import { Uploader, Plugin } from 'shared-types';
+import { get, getKeys, has, isObject, set } from '@gaze-anchor/shared-utils';
+import { Uploader, Plugin } from '@gaze-anchor/shared-types';
 import { errorHandler } from './errorHandler';
 import { GazeConfig } from './types';
 import { createUploader } from './upload';

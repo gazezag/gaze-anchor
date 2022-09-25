@@ -1,6 +1,6 @@
-import { EventType } from 'static';
-import { Uploader } from 'shared-types';
-import { set, getNow, proxyForwardAndBackward, proxyRouterLink } from 'shared-utils';
+import { EventType } from '@gaze-anchor/static';
+import { Uploader } from '@gaze-anchor/shared-types';
+import { set, getNow, proxyForwardAndBackward, proxyRouterLink } from '@gaze-anchor/shared-utils';
 import { RouterChangeDetail, UserBehavior } from '../types/userBehavior';
 import { UploadTarget, BehaviorType } from '../static';
 

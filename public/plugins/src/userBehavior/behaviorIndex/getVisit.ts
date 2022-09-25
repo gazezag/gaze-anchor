@@ -1,6 +1,6 @@
-import { EventType } from 'static';
-import { Uploader } from 'shared-types';
-import { createlistener, removeListener, getNow } from 'shared-utils';
+import { EventType } from '@gaze-anchor/static';
+import { Uploader } from '@gaze-anchor/shared-types';
+import { createlistener, removeListener, getNow } from '@gaze-anchor/shared-utils';
 import { VisitInfo } from '../types/userBehavior';
 import { UploadTarget } from '../static';
 

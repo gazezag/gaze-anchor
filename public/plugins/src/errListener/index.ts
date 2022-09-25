@@ -1,4 +1,4 @@
-import { PluginDefineFunction } from 'shared-types';
+import { PluginDefineFunction } from '@gaze-anchor/shared-types';
 import { uid } from './types/errorInfo';
 import { Config } from './types/config';
 import { getStackParser } from './getStackParser';

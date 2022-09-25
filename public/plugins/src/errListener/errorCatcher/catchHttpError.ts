@@ -1,5 +1,5 @@
-import { Uploader } from 'shared-types';
-import { getNow, proxyHttp, ProxyCallback, HttpDetail } from 'shared-utils';
+import { Uploader } from '@gaze-anchor/shared-types';
+import { getNow, proxyHttp, ProxyCallback, HttpDetail } from '@gaze-anchor/shared-utils';
 import { ErrorType } from '../static';
 import { ErrorInfo, uid } from '../types/errorInfo';
 import { getUid } from '../getUid';

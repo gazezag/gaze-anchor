@@ -1,11 +1,11 @@
-import { Uploader } from 'shared-types';
+import { Uploader } from '@gaze-anchor/shared-types';
 import {
   isNavigatorSupported,
   isPerformanceSupported,
   getMatched,
   getTestStrFn,
   getNow
-} from 'shared-utils';
+} from '@gaze-anchor/shared-utils';
 import { PerformanceInfo } from '../types/performanceIndex';
 import { BrowserType, OSType, PerformanceInfoType, UploadTarget } from '../static';
 import { DeviceEnvInfo } from '../types/deviceEnvInfo';

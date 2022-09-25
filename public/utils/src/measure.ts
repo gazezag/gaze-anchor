@@ -1,5 +1,5 @@
+import { roundOff } from '@gaze-anchor/shared-utils';
 import { CustomMeasure, MeasureOptions, Once } from './types';
-import { roundOff } from 'shared-utils';
 
 /**
  * @description the mark to start this measurement

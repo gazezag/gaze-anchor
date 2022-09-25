@@ -1,5 +1,5 @@
-import { EventType } from 'static';
-import { createlistener, EventHandler } from 'shared-utils';
+import { EventType } from '@gaze-anchor/static';
+import { createlistener, EventHandler } from '@gaze-anchor/shared-utils';
 
 /**
  * @description accumulate the number of clicks on an DOM element

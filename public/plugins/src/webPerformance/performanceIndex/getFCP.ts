@@ -1,4 +1,4 @@
-import { Uploader } from 'shared-types';
+import { Uploader } from '@gaze-anchor/shared-types';
 import {
   isPerformanceObserverSupported,
   isPerformanceSupported,
@@ -7,7 +7,7 @@ import {
   disconnect,
   observe,
   ObserveHandler
-} from 'shared-utils';
+} from '@gaze-anchor/shared-utils';
 import { PerformanceInfo } from '../types/performanceIndex';
 import { EntryNames, EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
 

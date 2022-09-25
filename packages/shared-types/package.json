@@ -1,5 +1,5 @@
 {
-  "name": "shared-types",
+  "name": "@gaze-anchor/shared-types",
   "version": "1.0.0",
   "main": "./dist/index.ts",
   "types": "./dist/index.d.ts",
@@ -9,6 +9,6 @@
   },
   "devDependencies": {
     "tsup": "^6.2.3",
-    "tsconfig": "workspace:*"
+    "@gaze-anchor/tsconfig": "workspace:*"
   }
 }

@@ -1,5 +1,5 @@
-import { EventType } from 'static';
-import { Uploader } from 'shared-types';
+import { EventType } from '@gaze-anchor/static';
+import { Uploader } from '@gaze-anchor/shared-types';
 import {
   isPerformanceObserverSupported,
   roundOff,
@@ -11,7 +11,7 @@ import {
   ObserveHandler,
   takeRecords,
   onHidden
-} from 'shared-utils';
+} from '@gaze-anchor/shared-utils';
 import { PerformanceInfo } from '../types/performanceIndex';
 import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
 

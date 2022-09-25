@@ -1,5 +1,5 @@
 {
-  "name": "shared-utils",
+  "name": "@gaze-anchor/shared-utils",
   "version": "1.0.0",
   "private": true,
   "main": "./dist/index.ts",
@@ -10,9 +10,9 @@
   },
   "devDependencies": {
     "tsup": "^6.2.3",
-    "tsconfig": "workspace:*"
+    "@gaze-anchor/tsconfig": "workspace:*"
   },
   "dependencies": {
-    "static": "workspace:*"
+    "@gaze-anchor/static": "workspace:*"
   }
 }

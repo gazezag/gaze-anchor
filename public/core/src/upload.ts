@@ -1,5 +1,5 @@
-import { get, getNow, has, join, set } from 'shared-utils';
-import { Uploader } from 'shared-types';
+import { get, getNow, has, join, set } from '@gaze-anchor/shared-utils';
+import { Uploader } from '@gaze-anchor/shared-types';
 
 const imgRequest = (url: string, data: any) => {
   if (!url || !data) return;

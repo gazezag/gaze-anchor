@@ -1,5 +1,5 @@
-import { PluginDefineFunction } from 'shared-types';
-import { afterLoad, onPageShow } from 'shared-utils';
+import { PluginDefineFunction } from '@gaze-anchor/shared-types';
+import { afterLoad, onPageShow } from '@gaze-anchor/shared-utils';
 import {
   initCLS,
   initDeviceInfo,

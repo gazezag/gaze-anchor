@@ -1,4 +1,4 @@
-import { EventType } from 'static';
+import { EventType } from '@gaze-anchor/static';
 import { EventHandler } from './types';
 
 interface Option {
