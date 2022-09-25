@@ -1,7 +1,6 @@
 {
   "name": "@gaze-anchor/shared-utils",
   "version": "1.0.0",
-  "private": true,
   "main": "./dist/index.ts",
   "types": "./dist/index.d.ts",
   "license": "MIT",
