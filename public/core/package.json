@@ -12,10 +12,10 @@
   },
   "devDependencies": {
     "tsup": "^6.2.3",
-    "@gaze-anchor/tsconfig": "workspace:*",
-    "@gaze-anchor/shared-types": "workspace:*"
+    "@gaze-anchor/tsconfig": "1.0.0",
+    "@gaze-anchor/shared-types": "1.0.0"
   },
   "dependencies": {
-    "@gaze-anchor/shared-utils": "workspace:*"
+    "@gaze-anchor/shared-utils": "1.0.0"
   }
 }
