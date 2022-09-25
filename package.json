@@ -7,34 +7,17 @@
     "name": "Ethan Teng"
   },
   "keywords": [],
-  "main": "dist/core/core/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/core/core/index.js",
-      "require": "./dist/core/core/index.js"
-    },
-    "./plugins": {
-      "import": "./dist/plugins/plugins/index.js",
-      "require": "./dist/plugins/plugins/index.js"
-    },
-    "./utils": {
-      "import": "./dist/publicAPI/publicAPI/index.js",
-      "require": "./dist/publicAPI/publicAPI/index.js"
-    }
-  },
-  "types": "dist/types/index.d.ts",
-  "typings": "dist/types/index.d.ts",
-  "files": [
-    "dist"
+  "workspaces": [
+    "public/*",
+    "packages/*"
   ],
   "scripts": {
     "test": "jest",
     "test:ncc": "jest --no-cache",
     "test:cover": "jest --coverage",
     "test:verbose": "jest --verbose",
-    "build": "rm -rf dist && rollup --config",
-    "format": "prettier --write \"packages/**/*.ts?(x)\" && eslint --fix --ext .ts packages",
-    "format:package": "prettier --write \"packages/**/package.json\"",
+    "build": "turbo run build",
+    "format": "prettier --write \"**/*.{ts,md}\" && eslint --fix --ext .ts packages",
     "release": "node scripts/release.js --patch",
     "release:patch": "node scripts/release.js --patch",
     "release:minor": "node scripts/release.js --minor",
@@ -49,11 +32,13 @@
     "@types/node": "^18.6.2",
     "@typescript-eslint/eslint-plugin": "^5.32.0",
     "@typescript-eslint/parser": "^5.32.0",
+    "chalk": "^5.0.1",
     "eslint": "^8.21.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-prettier": "^4.2.1",
+    "execa": "^6.1.0",
     "husky": "^8.0.1",
     "jest": "^28.1.3",
     "prettier": "^2.7.1",
@@ -63,6 +48,7 @@
     "ts-jest": "^28.0.7",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.0",
+    "turbo": "latest",
     "typescript": "^4.6.4"
   },
   "eslintConfig": {
@@ -101,5 +87,9 @@
     "insertPragma": false,
     "proseWrap": "preserve",
     "endOfLine": "lf"
-  }
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "packageManager": "pnpm@7.8.0"
 }
