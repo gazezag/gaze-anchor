@@ -9,6 +9,6 @@
   },
   "devDependencies": {
     "tsup": "^6.2.3",
-    "@gaze-anchor/tsconfig": "workspace:*"
+    "@gaze-anchor/tsconfig": "1.0.0"
   }
 }
