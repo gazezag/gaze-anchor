@@ -70,23 +70,21 @@ import {
 } from 'gaze-anchor/plugins'
 
 const gaze = createGaze({
-	target: 'http://localhost:8080/'  
+  target: 'http://localhost:8080/'  
 });
 
 // install plugins
 gaze
   .use(performanceIndexPlugin())
   .use(userBehaviorObserverPlugin())
-	.use(errorCatcherPlugin({
-  	stackLimit: 10
-	 }));
+  .use(errorCatcherPlugin({ stackLimit: 10 }));
 ```
 
 
 
 ## Implement
 
-![sdk](https://user-images.githubusercontent.com/76992456/192145852-afd232ab-6e36-4e73-a49b-b142e6d97609.jpg)
+![sdk](https://user-images.githubusercontent.com/76992456/192312434-de862399-c55e-484b-84a5-6d7e1fb51897.jpg)
 
 
 
@@ -205,13 +203,14 @@ Therefore, its usage looks like this
 const getPlugin = () => {
   return {
     install(uplaod, errorHandler, { onInstalled, onBeforeUpload, onUploaded }) {
-			// ...
+      // ...
+      
       onInstalled(() => {
-				// do something after this plugin is installed
+        // do something after this plugin is installed
       })
       
       onBeforeUpload(() => {
-				// do something before uploading
+        // do something before uploading
       })
       
       onUploaded(() => {
@@ -230,7 +229,7 @@ const getPlugin = () => {
     // due to code architecture
     // this hook function must be defined here
     beforeInstall() {
-    	// do something before installing this plugin
+      // do something before installing this plugin
     },
     install() {
       // ...
@@ -262,10 +261,10 @@ const getPlugin = () => {
   return {
     beforeInstall() {
       // this plugin will not install on the MacOS
-    	if(isMacOS()) return false
+      if(isMacOS()) return false
     },
     install(upload, _, { onBeforeUpload }) {
-			onBeforeUpload((path: string, data: any) => {
+      onBeforeUpload((path: string, data: any) => {
         // will not report data when the target is 'any-interface'
         if(path === 'any-interface') return false
         // will not report data when hash code of the data has already existed
@@ -408,7 +407,7 @@ export const createUploader =
     // opera 190000
     if (len < 2083) {
       imgRequest(url, data);
-		} else if (isBeaconSupported()) {
+    } else if (isBeaconSupported()) {
       beaconRequest(join(base, 'add'), data);
     } else {
       ajaxRequest(join(base, 'add'), data);
@@ -421,7 +420,7 @@ export const createUploader =
 ```typescript
 const imgRequest = (url: string, data: any) => {
   if (!url || !data) return;
-	const img = new Image();
+  const img = new Image();
 
   img.onerror = () => {
     ajaxRequest(url, data);
