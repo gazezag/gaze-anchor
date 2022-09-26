@@ -7,6 +7,11 @@
 ## Feature
 
 - 插件化
+  - 内置插件
+  - 自定义插件
+    - 好用的工具方法
+    - 好用的生命周期钩子
+
 - 错误隔离
 - 常见数据的采集
   - 页面性能信息
@@ -95,32 +100,48 @@ gaze
 ```typescript
 // 插件的类型接口
 interface Plugin {
-  install: (uploader: Uploader, errorHandler: ErrorHandler) => void;
+  install: (uploader: Uploader, errorHandler: ErrorHandler, hooks: Hooks) => void;
+
+  // 生命周期钩子
+  [LifeCycleHookTypes.BEFORE_INSTALL]?: HookCallback<PluginConfig>;
+  [LifeCycleHookTypes.INSTALLED]?: HookCallback;
+  [LifeCycleHookTypes.BEFOR_UPLOAD]?: HookCallback;
+  [LifeCycleHookTypes.UPLOADED]?: HookCallback;
 }
 ```
 
 ```typescript
-// packages/core/index.ts
-
 // 核心模块
 class Gaze {
+  static instance: Gaze;
+  private target: string;
   private plugins: Set<Plugin>;
-  private uploader: Uploader;
   private errorHandler: ErrorHandler;
 
-  constructor(config?: Record<string, any>) {
+  private constructor(config?: Record<string, any>) {
     const { target } = mergeConfig(config);
+    this.target = target;
     this.plugins = new Set<Plugin>();
-    this.uploader = createUploader(target);
     this.errorHandler = errorHandler;
   }
 
+  // 单例模式
+  static getInstance(config?: Record<string, any>) {
+    if (!this.instance) {
+      this.instance = new Gaze(config);
+    }
+    return this.instance;
+  }
+
   use(plugin: Plugin): this {
-    // 异步执行插件的安装,避免阻塞主线程执行
+    // 异步执行避免阻塞主线程
     nextTick(() => {
       if (!this.plugins.has(plugin)) {
         this.plugins.add(plugin);
-        plugin.install(this.uploader, this.errorHandler);
+        // 这里会给每个插件注入生命周期
+        // 实际上是在代理插件上的 install 方法
+        // 然后给代理好的 install 传入生命周期钩子
+        initLifeCycle(plugin, createUploader(this.target))(this.errorHandler);
       }
     }, this.errorHandler);
 
@@ -154,6 +175,205 @@ const customPlugin: PluginDefineFunction<SomeConfig> = (
       initSomething(someData, upload, errorHandler);
       initOther(someData, upload, errorHandler);
     }
+  };
+};
+```
+
+
+
+#### Life Cycle Hooks
+
+基于 `AOP` 设计实现
+
+每个插件会有自己的生命周期, 目前只暴露了以下钩子
+
++ beforeInstall
++ installed
++ beforeUpload
++ uploaded
+
+
+
+##### Usage
+
+钩子函数会作为最后一个参数传入 `install` 函数
+
+因此声明接收后可以直接使用, 用法长这样
+
+```typescript
+const getPlugin = () => {
+  return {
+    install(uplaod, errorHandler, { onInstalled, onBeforeUpload, onUploaded }) {
+			// ...
+      onInstalled(() => {
+        // 插件挂载好了
+      })
+      
+      onBeforeUpload(() => {
+        // 数据上报之前
+      })
+      
+      onUploaded(() => {
+        // 数据上报完成
+      })
+    }
+  }
+}
+```
+
+但是, `onBeforeInstall` 呢, 原来它在这里
+
+```typescript
+const getPlugin = () => {
+  return {
+    // 由于代码结构的原因
+    // 这个钩子必须在这里定义
+    beforeInstall() {
+      // 插件挂载前
+    },
+    install() {
+      // ...
+    }
+  }
+}
+```
+
+当然也可以像 `onBeforeInstall` 一样使用其他的钩子
+
+```typescript
+const getPlugin = () => {
+  return {
+    beforeInstall() {},
+    install() {},
+    installed() {},
+    beforeUpload() {},
+    uploaded() {}
+  }
+}
+```
+
+此外, 所有的前置钩子都具有拦截操作的能力, 只需要返回 false 就可以拦截对应的操作
+
+而且一些钩子函数可以接受参数来进行控制
+
+```typescript
+const getPlugin = () => {
+  return {
+    beforeInstall() {
+      // 运行在 MacOS 时, 这个插件不会挂载
+    	if(isMacOS()) return false
+    },
+    install(upload, _, { onBeforeUpload }) {
+			onBeforeUpload((path: string, data: any) => {
+        // 上报地址是 'any-interface' 的话就不会上报数据
+        if(path === 'any-interface') return false
+        // 如果数据的哈希值已经存在, 则不上报
+        if(hashSet.has(data.hash)) return false
+      })
+    }
+  }
+}
+```
+
+
+
+##### Injection & Trigger
+
+生命周期的注入和触发大体上是使用`发布订阅模式`
+
+下面这个函数会直接在插件实例上挂载生命周期钩子
+
+```typescript
+// packages/core/lifeCycle.ts
+const injectHook = (
+  type: LifeCycleHookTypes, 
+  target: Plugin, 
+  hookCallback: HookCallback
+) => {
+  if (!has(target, type)) {
+    set(target, type, hookCallback);
+  }
+};
+```
+
+下面这个函数可以触发钩子
+
+```typescript
+// packages/core/lifeCycle.ts
+const triggerHook = (
+  type: LifeCycleHookTypes,
+  target: Plugin,
+  once: boolean = true,
+  param: Array<any> = []
+) => {
+  if (has(target, type)) {
+    const hook: HookCallback<any> = get(target, type);
+    once && del(target, type);
+
+    if (typeof hook === 'function') {
+      return hook(...param);
+    }
+  }
+};
+```
+
+
+
+##### Initialization
+
+生命周期的整体初始化使用`代理模式`
+
+目的:
+
++ 减少对原有代码结构的侵入性
++ 支持拦截操作
++ 方便后续维护
+
+```typescript
+// packages/core/lifeCycle.ts
+const proxyInstall = (target: Plugin) => {
+  return new Proxy(target.install, {
+    apply(fn, thisArg, args: Parameters<typeof target.install>) {
+      const isContinue = triggerHook(BEFORE_INSTALL, target);
+      // 钩子返回 false 则不执行
+      if (isContinue !== false) {
+        const res = fn.apply(thisArg, args);
+        triggerHook(INSTALLED, target);
+        return res;
+      }
+
+      return;
+    }
+  });
+};
+const proxyUploader = (target: Plugin, uploader: Uploader) => {
+  return new Proxy(uploader, {
+    apply(fn, thisArg, args: Parameters<Uploader>) {
+      const isContinue = triggerHook(BEFOR_UPLOAD, target, false, args);
+			// 钩子返回 false 则不执行
+      if (isContinue !== false) {
+        const res = fn.apply(thisArg, args);
+        triggerHook(UPLOADED, target, false);
+        return res;
+      }
+
+      return;
+    }
+  });
+};
+
+export const initLifeCycle = (target: Plugin, uploader: Uploader) => {
+  // 这里单独抽出一个函数, 由 Gaze 实例来注入全局的错误处理
+  // 这样搞比较方便对错误进行统一管理
+  return (errorHandler: ErrorHandler) => {
+    // 代理 install 方法并调用
+    proxyInstall(target)(
+      // 获取代理过的 uploader
+      proxyUploader(target, uploader),
+      errorHandler,
+      // 获取绑定好上下文的钩子函数
+      getHooks(target)
+    );
   };
 };
 ```

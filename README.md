@@ -9,6 +9,11 @@ A SDK for front-end performance monitoring
 ## Feature
 
 - Plugin architecture
+  - internal plugins
+  - custom plugins
+    - useful tools
+    - useful life cycle hooks
+
 - Error isolation
 - Collection of common performance data
   - Page performance
@@ -90,37 +95,54 @@ gaze
 The function of the core module is extremely simple
 
 + Basic uploader
-+ Basic error handler
++ Global error handler
 + Mounting plugins
 
 ```typescript
 // type interface of plugins
 interface Plugin {
-  install: (uploader: Uploader, errorHandler: ErrorHandler) => void;
+  install: (uploader: Uploader, errorHandler: ErrorHandler, hooks: Hooks) => void;
+
+  // life cycle hook
+  [LifeCycleHookTypes.BEFORE_INSTALL]?: HookCallback<PluginConfig>;
+  [LifeCycleHookTypes.INSTALLED]?: HookCallback;
+  [LifeCycleHookTypes.BEFOR_UPLOAD]?: HookCallback;
+  [LifeCycleHookTypes.UPLOADED]?: HookCallback;
 }
 ```
 
 ```typescript
 // core module
 class Gaze {
+  static instance: Gaze;
+  private target: string;
   private plugins: Set<Plugin>;
-  private uploader: Uploader;
   private errorHandler: ErrorHandler;
 
-  constructor(config?: Record<string, any>) {
+  private constructor(config?: Record<string, any>) {
     const { target } = mergeConfig(config);
+    this.target = target;
     this.plugins = new Set<Plugin>();
-    this.uploader = createUploader(target);
     this.errorHandler = errorHandler;
   }
 
-  // mount plugin asynchronously
+  // singleton mode
+  static getInstance(config?: Record<string, any>) {
+    if (!this.instance) {
+      this.instance = new Gaze(config);
+    }
+    return this.instance;
+  }
+
   use(plugin: Plugin): this {
     // execute asynchronously to avoid blocking the main process
     nextTick(() => {
       if (!this.plugins.has(plugin)) {
         this.plugins.add(plugin);
-        plugin.install(this.uploader, this.errorHandler);
+        // initialize the life cycle of each plugin
+        // it will proxy the install function actually
+        // and inject the life cycle hooks automatically
+        initLifeCycle(plugin, createUploader(this.target))(this.errorHandler);
       }
     }, this.errorHandler);
 
@@ -141,7 +163,7 @@ const nextTick = (fn: Function, errorHandler: ErrorHandler) => {
 };
 ```
 
-Therefore, gaze will treat any object with method "install" as a plugin, It's probably like this
+Therefore, gaze will treat any object with method `install` as a plugin, It's probably like this
 
 ```typescript
 const customPlugin: PluginDefineFunction<SomeConfig> = (
@@ -151,9 +173,208 @@ const customPlugin: PluginDefineFunction<SomeConfig> = (
 
   return {
     install(upload, errorHandler) {
-      initSomething(someData, upload, errorHandler);
-      initOther(someData, upload, errorHandler);
+      doSomething(someData, upload, errorHandler);
+      doOther(someData, upload, errorHandler);
     }
+  };
+};
+```
+
+
+
+#### Life Cycle Hooks
+
+Its implementation and design based on `AOP`
+
+Each plugin has its own life cycle, and only the following hooks have been exposed for the time being
+
++ beforeInstall
++ installed
++ beforeUpload
++ uploaded
+
+
+
+##### Usage
+
+All of the hooks will be pased to the `install` function as the last parameter
+
+Therefore, its usage looks like this
+
+```typescript
+const getPlugin = () => {
+  return {
+    install(uplaod, errorHandler, { onInstalled, onBeforeUpload, onUploaded }) {
+			// ...
+      onInstalled(() => {
+				// do something after this plugin is installed
+      })
+      
+      onBeforeUpload(() => {
+				// do something before uploading
+      })
+      
+      onUploaded(() => {
+        // do something after this upload operation is completed
+      })
+    }
+  }
+}
+```
+
+But, where's `onBeforeInstall`, here it is
+
+```typescript
+const getPlugin = () => {
+  return {
+    // due to code architecture
+    // this hook function must be defined here
+    beforeInstall() {
+    	// do something before installing this plugin
+    },
+    install() {
+      // ...
+    }
+  }
+}
+```
+
+You can also use other hooks like `onBeforeInstall`
+
+```typescript
+const getPlugin = () => {
+  return {
+    beforeInstall() {},
+    install() {},
+    installed() {},
+    beforeUpload() {},
+    uploaded() {}
+  }
+}
+```
+
+In addition, all the front hooks have the ability to intercept operations through returning false
+
+And some of them have some parameters to help
+
+```typescript
+const getPlugin = () => {
+  return {
+    beforeInstall() {
+      // this plugin will not install on the MacOS
+    	if(isMacOS()) return false
+    },
+    install(upload, _, { onBeforeUpload }) {
+			onBeforeUpload((path: string, data: any) => {
+        // will not report data when the target is 'any-interface'
+        if(path === 'any-interface') return false
+        // will not report data when hash code of the data has already existed
+        if(hashSet.has(data.hash)) return false
+      })
+    }
+  }
+}
+```
+
+
+
+##### Injection & Trigger
+
+Here the `Publish-Subscribe mode` is used for injection and trigger
+
+This function will mount the hook callbacks on the plugin instance
+
+```typescript
+// packages/core/lifeCycle.ts
+const injectHook = (
+  type: LifeCycleHookTypes, 
+  target: Plugin, 
+  hookCallback: HookCallback
+) => {
+  if (!has(target, type)) {
+    set(target, type, hookCallback);
+  }
+};
+```
+
+Then trigger the hook like this
+
+```typescript
+// packages/core/lifeCycle.ts
+const triggerHook = (
+  type: LifeCycleHookTypes,
+  target: Plugin,
+  once: boolean = true,
+  param: Array<any> = []
+) => {
+  if (has(target, type)) {
+    const hook: HookCallback<any> = get(target, type);
+    once && del(target, type);
+
+    if (typeof hook === 'function') {
+      return hook(...param);
+    }
+  }
+};
+```
+
+
+
+##### Initialization
+
+Here the `Proxy mode` is used
+
+In order to: 
+
++ reduce the invasiveness of the original code structure
++ support for interception of operation
++ convenient for follow-up development
+
+```typescript
+// packages/core/lifeCycle.ts
+const proxyInstall = (target: Plugin) => {
+  return new Proxy(target.install, {
+    apply(fn, thisArg, args: Parameters<typeof target.install>) {
+      const isContinue = triggerHook(BEFORE_INSTALL, target);
+      // prevent install function from executing while the onBeforeInstall returned false
+      if (isContinue !== false) {
+        const res = fn.apply(thisArg, args);
+        triggerHook(INSTALLED, target);
+        return res;
+      }
+
+      return;
+    }
+  });
+};
+const proxyUploader = (target: Plugin, uploader: Uploader) => {
+  return new Proxy(uploader, {
+    apply(fn, thisArg, args: Parameters<Uploader>) {
+      const isContinue = triggerHook(BEFOR_UPLOAD, target, false, args);
+      // prevent upload function from executing while the onBeforeUpload returned false
+      if (isContinue !== false) {
+        const res = fn.apply(thisArg, args);
+        triggerHook(UPLOADED, target, false);
+        return res;
+      }
+
+      return;
+    }
+  });
+};
+
+export const initLifeCycle = (target: Plugin, uploader: Uploader) => {
+  // the errorHandler is passed from the Gaze instance
+  // which is convenient for centralized management of error
+  return (errorHandler: ErrorHandler) => {
+    // proxy install function and call it
+    proxyInstall(target)(
+      // get proxyed uploader
+      proxyUploader(target, uploader),
+      errorHandler,
+      // get hooks which had been bound to the context
+      getHooks(target)
+    );
   };
 };
 ```
