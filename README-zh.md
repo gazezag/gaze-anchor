@@ -69,23 +69,21 @@ import {
 } from 'gaze-anchor/plugins'
 
 const gaze = createGaze({
-	target: 'http://localhost:8080/'  
+  target: 'http://localhost:8080/'  
 });
 
 // 安装插件
 gaze
   .use(performanceIndexPlugin())
   .use(userBehaviorObserverPlugin())
-	.use(errorCatcherPlugin({
-  	stackLimit: 10
-	 }));
+  .use(errorCatcherPlugin({ stackLimit: 10 }));
 ```
 
 
 
 ## Implement
 
-![sdk](https://user-images.githubusercontent.com/76992456/192145879-d43e6fa2-3bfa-4874-a8b8-e2ad3ba03112.jpg)
+![sdk](https://user-images.githubusercontent.com/76992456/192314191-6186af66-e0fe-4bb4-b062-88f2daf01cf1.jpg)
 
 
 
@@ -172,8 +170,8 @@ const customPlugin: PluginDefineFunction<SomeConfig> = (
 
   return {
     install(upload, errorHandler) {
-      initSomething(someData, upload, errorHandler);
-      initOther(someData, upload, errorHandler);
+      doSomething(someData, upload, errorHandler);
+      doOther(someData, upload, errorHandler);
     }
   };
 };
@@ -204,7 +202,8 @@ const customPlugin: PluginDefineFunction<SomeConfig> = (
 const getPlugin = () => {
   return {
     install(uplaod, errorHandler, { onInstalled, onBeforeUpload, onUploaded }) {
-			// ...
+      // ...
+      
       onInstalled(() => {
         // 插件挂载好了
       })
@@ -261,10 +260,10 @@ const getPlugin = () => {
   return {
     beforeInstall() {
       // 运行在 MacOS 时, 这个插件不会挂载
-    	if(isMacOS()) return false
+      if(isMacOS()) return false
     },
     install(upload, _, { onBeforeUpload }) {
-			onBeforeUpload((path: string, data: any) => {
+      onBeforeUpload((path: string, data: any) => {
         // 上报地址是 'any-interface' 的话就不会上报数据
         if(path === 'any-interface') return false
         // 如果数据的哈希值已经存在, 则不上报
@@ -350,7 +349,7 @@ const proxyUploader = (target: Plugin, uploader: Uploader) => {
   return new Proxy(uploader, {
     apply(fn, thisArg, args: Parameters<Uploader>) {
       const isContinue = triggerHook(BEFOR_UPLOAD, target, false, args);
-			// 钩子返回 false 则不执行
+      // 钩子返回 false 则不执行
       if (isContinue !== false) {
         const res = fn.apply(thisArg, args);
         triggerHook(UPLOADED, target, false);
@@ -407,7 +406,7 @@ export const createUploader =
     // opera 190000
     if (len < 2083) {
       imgRequest(url, data);
-		} else if (isBeaconSupported()) {
+    } else if (isBeaconSupported()) {
       beaconRequest(join(base, 'add'), data);
     } else {
       ajaxRequest(join(base, 'add'), data);
@@ -420,7 +419,7 @@ export const createUploader =
 ```typescript
 const imgRequest = (url: string, data: any) => {
   if (!url || !data) return;
-	const img = new Image();
+  const img = new Image();
 
   img.onerror = () => {
     ajaxRequest(url, data);
@@ -807,8 +806,8 @@ const proxyFetch = (context: ProxyHttpContext) => {
       return (
         nativeFetch
           .call(window, input, init)
-        	// fetch 只会在发生内部错误时 reject
-        	// 因此只处理 resolve 出来的数据
+	  // fetch 只会在发生内部错误时 reject
+	  // 因此只处理 resolve 出来的数据
           .then(async resposne => {
             fetchDetail.status = resposne.status;
             fetchDetail.statusText = resposne.statusText;
