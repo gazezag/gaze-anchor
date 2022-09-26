@@ -1,4 +1,4 @@
-import { Uploader } from 'types/uploader';
+import { Uploader } from 'types/index';
 import { get, getNow, has, join, set } from 'utils/index';
 
 const imgRequest = (url: string, data: any) => {
@@ -45,7 +45,6 @@ export const createUploader =
     const len = `${url}${url.indexOf('?') < 0 ? '?' : '&'}${encodeURIComponent(
       JSON.stringify(data)
     )}`.length;
-
     has(data, 'time') || set(data, 'time', getNow());
 
     // 2083 compatible with ie browser

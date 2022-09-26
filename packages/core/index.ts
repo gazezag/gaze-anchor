@@ -2,9 +2,9 @@ import { GazeConfig } from 'types/gaze';
 import { Plugin } from 'types/plugin';
 import { createUploader } from './upload';
 import { errorHandler } from './errorHandler';
-import { Uploader } from 'types/uploader';
 import { get, getKeys, has, isObject, set } from 'utils/index';
 import { ErrorHandler } from 'types/index';
+import { initLifeCycle } from './lifeCycle';
 
 /**
  * @description merge configurations recursively
@@ -55,15 +55,24 @@ const nextTick = (fn: Function, errorHandler: ErrorHandler) => {
 };
 
 class Gaze {
+  static instance: Gaze;
+  private target: string;
   private plugins: Set<Plugin>;
-  private uploader: Uploader;
   private errorHandler: ErrorHandler;
 
-  constructor(config?: Record<string, any>) {
+  private constructor(config?: Record<string, any>) {
     const { target } = mergeConfig(config);
+    this.target = target;
     this.plugins = new Set<Plugin>();
-    this.uploader = createUploader(target);
     this.errorHandler = errorHandler;
+  }
+
+  // singleton mode
+  static getInstance(config?: Record<string, any>) {
+    if (!this.instance) {
+      this.instance = new Gaze(config);
+    }
+    return this.instance;
   }
 
   use(plugin: Plugin): this {
@@ -71,7 +80,10 @@ class Gaze {
     nextTick(() => {
       if (!this.plugins.has(plugin)) {
         this.plugins.add(plugin);
-        plugin.install(this.uploader, this.errorHandler);
+        // initialize the life cycle of each plugin
+        // it will proxy the install function actually
+        // and inject the life cycle hooks automatically
+        initLifeCycle(plugin, createUploader(this.target))(this.errorHandler);
       }
     }, this.errorHandler);
 
@@ -80,7 +92,7 @@ class Gaze {
 }
 
 export const createGaze = (config?: Record<string, any>) => {
-  return new Gaze(config);
+  return Gaze.getInstance(config);
 };
 
 export * from './static';
