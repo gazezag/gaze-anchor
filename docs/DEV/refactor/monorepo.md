@@ -113,3 +113,46 @@ core 里面对 @gaze-anchor/shared-utils 的依赖没有构建, 这里面本来�
 发布脚本一定要写, 手动发布要死人
 
 找时间去看一下 next 的源码, 看看他的 turborepo 怎么用的....
+
+
+
+
+
+# 9.27
+
+重构好咯
+
+之前碰到的发布问题
+
+通过配置 package.json 里的 bundledDeps 解决
+
+这个字段可以指定发布时需要进行bundle 的依赖
+
+发布后是这样的结构
+
+```tex
+|--node_modules
+				|--@gaze-anchor
+								|--core
+										|--dist
+												|--...
+										|--node_modules
+												|--@gaze-anchor
+															|--shared
+															|--static
+										|--package.json
+                |--plugins
+                |--utils
+```
+
+之前没配置的时候, 发布的包里面没有 node_modules, 所以会说找不到包
+
+
+
+
+
+这次引入了 changesets 进行版本发布管理
+
+大体上就是打包后运行 `pnpm changeset` 生成更改信息
+
+然后 `pnpm version-packages` 消耗之前生成的更改信息, 进行发布
