@@ -1,40 +1,26 @@
 const { resolve } = require('path');
-const { baseRunner, npmRunner, gitRunner, getArgs } = require('./utils');
-const packageJSON = require('../package.json');
+const { readdirSync, readFileSync, writeFileSync } = require('fs');
+const { run, step } = require('./utils');
 
-const rootPath = resolve(__dirname, '..');
+const packages = readdirSync(resolve(__dirname, '../packages'));
+const public = readdirSync(resolve(__dirname, '../public'));
 
-const moveFiles = async () => {
-  await baseRunner('cp', ['package.json', 'README.md', 'README-zh.md', 'dist'], rootPath);
+const getPkgRoot = (p, flag = 0) => resolve(__dirname, flag ? '../packages' : '../public', p);
+
+const updateVersion = version => {
+  // update root
+  updatePackage(resolve(__dirname, '..'), version);
+  // update sub packages
+  public.forEach(path => updatePackage(getPkgRoot(path)), version);
 };
 
-const getUpdatedVersion = () => {
-  // const [mainVersion, subVersion, phaseVersion] = packageJSON.version.split('.');
-  // return `${mainVersion}.${subVersion}.${+phaseVersion + 1}`;
-  return packageJSON.version;
+const updatePackage = (pkgRoot, version) => {
+  const path = resolve(pkgRoot, 'package.json');
+  const pkgContent = JSON.parse(readFileSync(path, 'utf-8'));
+  pkgContent.version = version;
+  writeFileSync(path, JSON.stringify(pkgContent, null, 2) + '\n');
 };
 
-const updateVersion = async () => {
-  const [kind] = getArgs();
-  await npmRunner('version', kind.slice(2), rootPath);
-};
+const publishPackage = async (pkgName, version) => {};
 
-const commit = async () => {
-  await gitRunner('add', '-a');
-  await gitRunner('commit', ['-m', `updated version: ${getUpdatedVersion()}`]);
-  await gitRunner('push', ['github', 'master']);
-};
-
-const publish = async () => {
-  await baseRunner('cd', 'dist');
-  await npmRunner('run', 'publish');
-};
-
-const release = async () => {
-  await moveFiles();
-  await updateVersion();
-  await commit();
-  await publish();
-};
-
-release();
+// TODO
