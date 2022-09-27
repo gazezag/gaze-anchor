@@ -39,8 +39,7 @@ A SDK for front-end performance monitoring
 
 ### refactor
 
-1. refactor with monorepo
-2. release script
+1. release script
 
 
 

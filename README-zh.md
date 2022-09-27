@@ -37,8 +37,7 @@
 
 ### refactor
 
-1. monorepo 重构
-2. 发布脚本
+1. 发布脚本
 
 
 
