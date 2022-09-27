@@ -1,14 +1,8 @@
 import { get, getKeys, has, isObject, set, ErrorHandler, Plugin } from '@gaze-anchor/shared';
 import { createUploader } from './upload';
 import { errorHandler } from './errorHandler';
-<<<<<<< HEAD:packages/core/index.ts
-import { get, getKeys, has, isObject, set } from 'utils/index';
-import { ErrorHandler } from 'types/index';
-import { initLifeCycle } from './lifeCycle';
-=======
 import { initLifeCycle } from './lifeCycle';
 import { GazeConfig } from './types';
->>>>>>> refactor-monorepo:public/core/src/index.ts
 
 /**
  * @description merge configurations recursively

@@ -1,9 +1,4 @@
-<<<<<<< HEAD:packages/core/upload.ts
-import { Uploader } from 'types/index';
-import { get, getNow, has, join, set } from 'utils/index';
-=======
 import { get, getNow, has, join, set, Uploader } from '@gaze-anchor/shared';
->>>>>>> refactor-monorepo:public/core/src/upload.ts
 
 const imgRequest = (url: string, data: any) => {
   if (!url || !data) return;
