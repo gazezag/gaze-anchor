@@ -28,5 +28,9 @@
   "dependencies": {
     "@gaze-anchor/static": "workspace:*",
     "@gaze-anchor/shared": "workspace:*"
-  }
+  },
+  "bundledDependencies": [
+    "@gaze-anchor/static",
+    "@gaze-anchor/shared"
+  ]
 }

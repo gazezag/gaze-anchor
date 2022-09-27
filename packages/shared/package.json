@@ -24,5 +24,8 @@
   },
   "dependencies": {
     "@gaze-anchor/static": "workspace:../static"
-  }
+  },
+  "bundledDependencies": [
+    "@gaze-anchor/static"
+  ]
 }
