@@ -10,6 +10,8 @@ export const get = (o: Object, k: PropertyKey): any => {
   throw new Error(`${k.toString()} not exist`);
 };
 
+export const del = (o: Object, k: PropertyKey): boolean => Reflect.deleteProperty(o, k);
+
 // can clear the sdie-effect
 export const set = (o: Object, k: PropertyKey, v: any): boolean => Reflect.set(o, k, v);
 
