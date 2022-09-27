@@ -19,12 +19,13 @@
     "test:verbose": "jest --verbose",
     "build": "turbo run build",
     "format": "prettier --write \"**/*.{ts,md}\" && eslint --fix --ext .ts packages",
-    "release": "node scripts/release.js --patch",
-    "release:patch": "node scripts/release.js --patch",
-    "release:minor": "node scripts/release.js --minor",
-    "release:major": "node scripts/release.js --major"
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && pnpm release:only",
+    "release:only": "changeset publish --registry=https://registry.npmjs.com/"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.24.4",
     "@rollup/plugin-commonjs": "^22.0.2",
     "@rollup/plugin-node-resolve": "^14.1.0",
     "@rollup/plugin-strip": "^2.1.0",
