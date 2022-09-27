@@ -1,0 +1,24 @@
+{
+  "name": "@gaze-anchor/static",
+  "version": "1.0.1",
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "tsup index.ts --format cjs,esm --dts --legacy-output"
+  },
+  "devDependencies": {
+    "tsup": "^6.2.3",
+    "@gaze-anchor/tsconfig": "workspace:../tsconfig"
+  }
+}

@@ -13,7 +13,6 @@ tests/mock-project/node_modules
 
 # output
 dist
-/types
 coverage
 
 # dev
@@ -36,3 +35,4 @@ tests/mock-project/.vscode
 
 # other
 *.local
+.turbo
