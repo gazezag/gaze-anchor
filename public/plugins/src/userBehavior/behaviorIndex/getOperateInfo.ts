@@ -1,6 +1,5 @@
 import { EventType } from '@gaze-anchor/static';
-import { beforeUnload, createlistener, getNow } from '@gaze-anchor/shared-utils';
-import { Uploader } from '@gaze-anchor/shared-types';
+import { beforeUnload, createlistener, getNow, Uploader } from '@gaze-anchor/shared';
 import { BehaviorType, UploadTarget } from '../static';
 import { OperationDetail, UserBehavior } from '../types/userBehavior';
 

@@ -3,6 +3,7 @@
   "version": "1.0.7",
   "description": "A SDK for front-end performance monitoring",
   "license": "MIT",
+  "type": "module",
   "author": {
     "name": "Ethan Teng"
   },

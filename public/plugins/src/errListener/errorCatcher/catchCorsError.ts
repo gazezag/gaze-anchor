@@ -1,6 +1,5 @@
 import { EventType } from '@gaze-anchor/static';
-import { Uploader } from '@gaze-anchor/shared-types';
-import { createlistener, EventHandler, getNow } from '@gaze-anchor/shared-utils';
+import { createlistener, EventHandler, getNow, Uploader } from '@gaze-anchor/shared';
 import { ErrorInfo, uid } from '../types/errorInfo';
 import { getUid } from '../getUid';
 import { Config } from '../types/config';

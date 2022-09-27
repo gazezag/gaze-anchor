@@ -1,4 +1,4 @@
-import { PluginConfig } from '@gaze-anchor/shared-types';
+import { PluginConfig } from '@gaze-anchor/shared';
 
 export interface Config extends PluginConfig {
   logError: boolean;

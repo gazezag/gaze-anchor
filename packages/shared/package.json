@@ -1,11 +1,7 @@
 {
-  "name": "@gaze-anchor/core",
-  "version": "1.0.4",
-  "license": "MIT",
+  "name": "@gaze-anchor/shared",
+  "version": "1.0.0",
   "type": "module",
-  "author": {
-    "name": "Ethan Teng"
-  },
   "main": "./dist/index.js",
   "module": "./dist/esm/index.js",
   "exports": {
@@ -18,15 +14,15 @@
   "files": [
     "dist/*"
   ],
+  "license": "MIT",
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --legacy-output"
   },
   "devDependencies": {
     "tsup": "^6.2.3",
-    "@gaze-anchor/tsconfig": "1.0.0"
+    "@gaze-anchor/tsconfig": "workspace:../tsconfig"
   },
   "dependencies": {
-    "@gaze-anchor/static": "workspace:*",
-    "@gaze-anchor/shared": "workspace:*"
+    "@gaze-anchor/static": "workspace:../static"
   }
 }

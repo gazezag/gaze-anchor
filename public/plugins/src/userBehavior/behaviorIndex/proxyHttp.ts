@@ -1,5 +1,4 @@
-import { Uploader } from '@gaze-anchor/shared-types';
-import { getNow, HttpDetail, ProxyCallback, proxyHttp } from '@gaze-anchor/shared-utils';
+import { getNow, HttpDetail, ProxyCallback, proxyHttp, Uploader } from '@gaze-anchor/shared';
 import { UserBehavior } from '../types/userBehavior';
 import { BehaviorType, UploadTarget } from '../static';
 

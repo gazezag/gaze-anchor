@@ -1,4 +1,4 @@
-import { roundOff } from '@gaze-anchor/shared-utils';
+import { roundOff } from '@gaze-anchor/shared';
 import { CustomMeasure, MeasureOptions, Once } from './types';
 
 /**

@@ -19,3 +19,10 @@ export enum EventType {
   beforeunload = 'beforeunload',
   visibilitychange = 'visibilitychange'
 }
+
+export enum LifeCycleHookTypes {
+  BEFORE_INSTALL = 'beforeInstall',
+  INSTALLED = 'installed',
+  BEFOR_UPLOAD = 'beforeUpload',
+  UPLOADED = 'uploaded'
+}

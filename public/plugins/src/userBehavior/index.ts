@@ -1,4 +1,4 @@
-import { PluginDefineFunction } from '@gaze-anchor/shared-types';
+import { PluginDefineFunction } from '@gaze-anchor/shared';
 import { initPV, initRouterProxy, initHttpProxy, initOperationListener } from './behaviorIndex';
 
 export const userBehaviorObserverPlugin: PluginDefineFunction<null> = () => {
