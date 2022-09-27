@@ -22,6 +22,7 @@
     "clear": "rimraf 'packages/*/{lib,node_modules}' && rimraf 'public/*/{lib,node_modules}' && rimraf node_modules",
     "format": "prettier --write \"**/*.{ts,md}\" && eslint --fix --ext .ts packages",
     "changeset": "changeset",
+    "vp": "pnpm version-packages",
     "version-packages": "changeset version",
     "release": "pnpm build && pnpm release:only",
     "release:only": "changeset publish --registry=https://registry.npmjs.com/"
