@@ -48,25 +48,25 @@ A SDK for front-end performance monitoring
 ### install
 ```sh
 # npm
-npm install gaze-anchor -S
+npm install @gaze-anchor/core @gaze-anchro/plugins
 
 # yarn
-yarn add gaze-anchor -S
+yarn add @gaze-anchor/core @gaze-anchro/plugins
 
 # pnpm
-pnpm add gaze-anchor -S
+pnpm add @gaze-anchor/core @gaze-anchro/plugins
 ```
 
 ### init
 
 ```typescript
 // main.ts
-import { createGaze } from 'gaze-anchor/core';
+import { createGaze } from '@gaze-anchor/core';
 import { 
   performanceIndexPlugin, 
   userBehaviorObserverPlugin, 
   errorCatcherPlugin 
-} from 'gaze-anchor/plugins'
+} from '@gaze-anchor/plugins'
 
 const gaze = createGaze({
   target: 'http://localhost:8080/'  
