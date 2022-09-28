@@ -1,8 +1,3 @@
-<<<<<<< HEAD:packages/plugins/webPerformance/performanceIndex/getCLS.ts
-import { Uploader, ErrorHandler } from 'types/index';
-import { disconnect, observe, ObserveHandler, takeRecords, onHidden } from 'core/index';
-=======
->>>>>>> refactor-monorepo:public/plugins/src/webPerformance/performanceIndex/getCLS.ts
 import {
   disconnect,
   observe,
@@ -13,7 +8,8 @@ import {
   isPerformanceSupported,
   roundOff,
   getNow,
-  Uploader
+  Uploader,
+  ErrorHandler
 } from '@gaze-anchor/shared';
 import { PerformanceInfo } from '../types/performanceIndex';
 import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';

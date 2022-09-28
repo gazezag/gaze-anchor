@@ -12,7 +12,11 @@ import {
 
 export const performanceIndexPlugin: PluginDefineFunction<null> = () => {
   return {
-    install(uploader, errorHandler) {
+    install(uploader) {
+      const errorHandler = (e: Error) => {
+        throw e;
+      };
+
       initDeviceInfo(uploader, errorHandler);
 
       initCLS(uploader, errorHandler);
