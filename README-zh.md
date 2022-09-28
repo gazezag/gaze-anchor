@@ -97,7 +97,7 @@ gaze
 ```typescript
 // 插件的类型接口
 interface Plugin {
-  install: (uploader: Uploader, errorHandler: ErrorHandler, hooks: Hooks) => void;
+  install: (uploader: Uploader, hooks: Hooks) => void;
 
   // 生命周期钩子
   [LifeCycleHookTypes.BEFORE_INSTALL]?: HookCallback<PluginConfig>;
@@ -111,14 +111,14 @@ interface Plugin {
 // 核心模块
 class Gaze {
   static instance: Gaze;
-  private target: string;
   private plugins: Set<Plugin>;
+  private injector: Injector;
   private errorHandler: ErrorHandler;
 
   private constructor(config?: Record<string, any>) {
     const { target } = mergeConfig(config);
-    this.target = target;
     this.plugins = new Set<Plugin>();
+    this.injector = Injector.getInstance([createUploader(target)]);
     this.errorHandler = errorHandler;
   }
 
@@ -135,10 +135,8 @@ class Gaze {
     nextTick(() => {
       if (!this.plugins.has(plugin)) {
         this.plugins.add(plugin);
-        // 这里会给每个插件注入生命周期
-        // 实际上是在代理插件上的 install 方法
-        // 然后给代理好的 install 传入生命周期钩子
-        initLifeCycle(plugin, createUploader(this.target))(this.errorHandler);
+        // 给插件动态注入依赖并进行装载
+        this.injector.resolve(plugin)();
       }
     }, this.errorHandler);
 
@@ -168,9 +166,9 @@ const customPlugin: PluginDefineFunction<SomeConfig> = (
   const { someData } = options;
 
   return {
-    install(upload, errorHandler) {
-      doSomething(someData, upload, errorHandler);
-      doOther(someData, upload, errorHandler);
+    install(upload) {
+      doSomething(someData, upload);
+      doOther(someData, upload);
     }
   };
 };
@@ -193,14 +191,14 @@ const customPlugin: PluginDefineFunction<SomeConfig> = (
 
 ##### Usage
 
-钩子函数会作为最后一个参数传入 `install` 函数
+钩子函数会作为第二个参数传入 `install` 函数
 
 因此声明接收后可以直接使用, 用法长这样
 
 ```typescript
 const getPlugin = () => {
   return {
-    install(uplaod, errorHandler, { onInstalled, onBeforeUpload, onUploaded }) {
+    install(uplaod, { onInstalled, onBeforeUpload, onUploaded }) {
       // ...
       
       onInstalled(() => {
@@ -250,7 +248,7 @@ const getPlugin = () => {
 }
 ```
 
-此外, 所有的前置钩子都具有拦截操作的能力, 只需要返回 false 就可以拦截对应的操作
+所有的前置钩子都具有拦截操作的能力, 只需要返回 false 就可以拦截对应的操作
 
 而且一些钩子函数可以接受参数来进行控制
 
@@ -273,6 +271,20 @@ const getPlugin = () => {
 }
 ```
 
+此外, 所有的依赖都是动态注入的, 这意味着, 如果插件中并未使用到生命周期钩子函数, 那么将不会进行生命周期的注入
+
+比如下面这样, 就是一个没有生命周期钩子的插件
+
+```typescript
+const getPlugin = () => {
+  return {
+    install(upload) {
+      // do something...
+    }
+  }
+}
+```
+
 
 
 ##### Injection & Trigger
@@ -282,7 +294,7 @@ const getPlugin = () => {
 下面这个函数会直接在插件实例上挂载生命周期钩子
 
 ```typescript
-// packages/core/lifeCycle.ts
+// public/core/lifeCycle.ts
 const injectHook = (
   type: LifeCycleHookTypes, 
   target: Plugin, 
@@ -297,7 +309,7 @@ const injectHook = (
 下面这个函数可以触发钩子
 
 ```typescript
-// packages/core/lifeCycle.ts
+// public/core/lifeCycle.ts
 const triggerHook = (
   type: LifeCycleHookTypes,
   target: Plugin,
@@ -328,7 +340,7 @@ const triggerHook = (
 + 方便后续维护
 
 ```typescript
-// packages/core/lifeCycle.ts
+// public/core/lifeCycle.ts
 const proxyInstall = (target: Plugin) => {
   return new Proxy(target.install, {
     apply(fn, thisArg, args: Parameters<typeof target.install>) {
@@ -359,21 +371,49 @@ const proxyUploader = (target: Plugin, uploader: Uploader) => {
     }
   });
 };
+```
 
-export const initLifeCycle = (target: Plugin, uploader: Uploader) => {
-  // 这里单独抽出一个函数, 由 Gaze 实例来注入全局的错误处理
-  // 这样搞比较方便对错误进行统一管理
-  return (errorHandler: ErrorHandler) => {
-    // 代理 install 方法并调用
-    proxyInstall(target)(
-      // 获取代理过的 uploader
-      proxyUploader(target, uploader),
-      errorHandler,
-      // 获取绑定好上下文的钩子函数
-      getHooks(target)
+```typescript
+// public/core/injector.ts
+class Injector {
+  private deps: Array<Dependence>;
+  private idx: number;
+
+  private isLifeCycleRequired(plugin: Plugin): boolean {
+    for (const type in LifeCycleHookTypes) {
+      if (has(plugin, LifeCycleHookTypes[type as keyof typeof LifeCycleHookTypes])) return true;
+    }
+
+    return plugin.install.length >= 2;
+  }
+
+  // 给插件注入生命周期
+  // 实际上是在代理 install
+  // 再传入同样代理过的 uploader
+  private initLifeCycle(plugin: Plugin) {
+    const install = proxyInstall(plugin);
+    // 第一个依赖项必须是 uploader
+    const upload = proxyUploader(plugin, this.deps[this.idx++] as Uploader);
+    const hooks = getHooks(plugin);
+
+    return install.bind(plugin, upload, hooks);
+  }
+
+  resolve(plugin: Plugin) {
+    let resolvedInstall = plugin.install;
+    this.idx = 0;
+
+    if (this.isLifeCycleRequired(plugin)) {
+      resolvedInstall = this.initLifeCycle(plugin);
+    }
+
+    return resolvedInstall.bind(
+      plugin,
+      // 绕开 ts 类型检查....
+      ...(this.deps.slice(this.idx) as Parameters<Plugin['install']>)
     );
-  };
-};
+  }
+}
 ```
 
 
@@ -385,7 +425,7 @@ export const initLifeCycle = (target: Plugin, uploader: Uploader) => {
 ##### createUploader
 
 ```typescript
-// packages/core/upload.ts
+// public/core/upload.ts
 export const createUploader =
   (baseUrl: string): Uploader =>
   (path: string, data: any) => {
@@ -468,10 +508,15 @@ const ajaxRequest = (url: string, data: any) => {
 用来采集性能数据
 
 ```typescript
-// packages/plugins/webPerformance/index.ts
+// public/plugins/webPerformance/index.ts
 export const performanceIndexPlugin: PluginDefineFunction<null> = () => {
   return {
-    install(uploader, errorHandler) {
+    install(uploader) {
+      // 将异常交给全局异常处理器来处理
+      const errorHandler = (e: Error) => {
+        throw e;
+      }
+
       initDeviceInfo(uploader, errorHandler);
 
       initCLS(uploader, errorHandler);
@@ -496,7 +541,7 @@ export const performanceIndexPlugin: PluginDefineFunction<null> = () => {
 以下以 FP(First Paint) 的采集为例
 
 ```typescript
-// packages/plugins/webPerformance/performacneIndex/getFP.ts
+// public/plugins/webPerformance/performacneIndex/getFP.ts
 const getFP = (): Promise<PerformanceEntry> =>
   new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
@@ -541,7 +586,7 @@ export const initFP = (upload: Uploader, errorHandler: ErrorHandler) => {
 用来采集用户行为数据
 
 ```typescript
-// packages/plugins/userBehavior/index.ts
+// public/plugins/userBehavior/index.ts
 export const userBehaviorObserverPlugin: PluginDefineFunction<null> = () => {
   return {
     install(uploader) {
@@ -561,7 +606,7 @@ export const userBehaviorObserverPlugin: PluginDefineFunction<null> = () => {
 调用核心模块暴露出的代理方法来实现这个功能
 
 ```typescript
-// packages/core/proxyRouter.ts
+// packages/shared/src/proxyRouter.ts
 export const proxyRouterLink = (
   types: Array<EventType>, 
   handler: EventHandler
@@ -597,7 +642,7 @@ export const proxyForwardAndBackward = (
 ```
 
 ```typescript
-// packages/core/userBehavior/behaviorIndex/proxyRouter.ts
+// public/plugins/userBehavior/behaviorIndex/proxyRouter.ts
 export const initRouterProxy = (upload: Uploader) => {
   const { routerChange } = BehaviorType;
 
@@ -637,7 +682,7 @@ export const initRouterProxy = (upload: Uploader) => {
 + Fetch: 直接重写原生方法
 
 ```typescript
-// packages/core/proxyHttp.ts
+// packages/shared/src/proxyHttp.ts
 
 // 这里用发布订阅模式封装了一个上下文对象来管理所有已经注册了的事件处理函数
 class ProxyHttpContext {
@@ -669,7 +714,7 @@ class ProxyHttpContext {
 ```
 
 ```typescript
-// packages/core/proxyHttp.ts
+// packages/shared/src/proxyHttp.ts
 const proxyXhr = (context: ProxyHttpContext) => {
   if (!has(window, 'XMLHttpRequest')) {
     errorHandler(new Error('there has no XMLHttpRequest...'));
@@ -748,7 +793,7 @@ const proxyXhr = (context: ProxyHttpContext) => {
 ```
 
 ```typescript
-// packages/core/proxyHttp.ts
+// packages/shared/src/proxyHttp.ts
 const proxyFetch = (context: ProxyHttpContext) => {
   if (!has(window, 'fetch')) {
     errorHandler(new Error('there has no Fetch...'));
@@ -805,8 +850,8 @@ const proxyFetch = (context: ProxyHttpContext) => {
       return (
         nativeFetch
           .call(window, input, init)
-	  // fetch 只会在发生内部错误时 reject
-	  // 因此只处理 resolve 出来的数据
+	        // fetch 只会在发生内部错误时 reject
+	        // 因此只处理 resolve 出来的数据
           .then(async resposne => {
             fetchDetail.status = resposne.status;
             fetchDetail.statusText = resposne.statusText;
@@ -870,7 +915,7 @@ export const initHttpProxy = (upload: Uploader) => {
 ##### init
 
 ```typescript
-// packages/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
+// public/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
 export const initOperationListener = (upload: Uploader) => {
   const prevEvent = {
     type: '',
@@ -914,7 +959,7 @@ export const initOperationListener = (upload: Uploader) => {
 ##### track
 
 ```typescript
-// packages/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
+// public/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
 const createTracker = (target: Element | null, type: EventType) => {
   const operationDetail: OperationDetail = {
     type,
@@ -955,7 +1000,7 @@ const createTracker = (target: Element | null, type: EventType) => {
 ##### trigger
 
 ```typescript
-// packages/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
+// public/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
 const trigger = (detail: OperationDetail, upload: Uploader) => {
   const userBehavior: UserBehavior = {
     time: getNow(),
@@ -976,7 +1021,7 @@ const trigger = (detail: OperationDetail, upload: Uploader) => {
 ### Error Listener
 
 ```typescript
-// packages/plugins/errorListener/index.ts
+// public/plugins/errorListener/index.ts
 export const errorCatcherPlugin: PluginDefineFunction<Config> = options => {
   const { stackLimit } = options;
   const stackParser = getStackParser(stackLimit);
@@ -997,7 +1042,7 @@ export const errorCatcherPlugin: PluginDefineFunction<Config> = options => {
 只需要监听对应的错误事件就行了, 如下
 
 ```typescript
-// packages/plugins/errorListener/errorCatcher/catchJsError.ts
+// public/plugins/errorListener/errorCatcher/catchJsError.ts
 export const initJsError = (
   options: Config,
   stackParser: StackParser,

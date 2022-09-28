@@ -98,7 +98,7 @@ The function of the core module is extremely simple
 ```typescript
 // type interface of plugins
 interface Plugin {
-  install: (uploader: Uploader, errorHandler: ErrorHandler, hooks: Hooks) => void;
+  install: (uploader: Uploader, hooks: Hooks) => void;
 
   // life cycle hook
   [LifeCycleHookTypes.BEFORE_INSTALL]?: HookCallback<PluginConfig>;
@@ -111,15 +111,15 @@ interface Plugin {
 ```typescript
 // core module
 class Gaze {
-  static instance: Gaze;
-  private target: string;
+ static instance: Gaze;
   private plugins: Set<Plugin>;
+  private injector: Injector;
   private errorHandler: ErrorHandler;
 
   private constructor(config?: Record<string, any>) {
     const { target } = mergeConfig(config);
-    this.target = target;
     this.plugins = new Set<Plugin>();
+    this.injector = Injector.getInstance([createUploader(target)]);
     this.errorHandler = errorHandler;
   }
 
@@ -136,10 +136,8 @@ class Gaze {
     nextTick(() => {
       if (!this.plugins.has(plugin)) {
         this.plugins.add(plugin);
-        // initialize the life cycle of each plugin
-        // it will proxy the install function actually
-        // and inject the life cycle hooks automatically
-        initLifeCycle(plugin, createUploader(this.target))(this.errorHandler);
+        // inject dependencies into the plugin dynamically and execute it
+        this.injector.resolve(plugin)();
       }
     }, this.errorHandler);
 
@@ -169,9 +167,9 @@ const customPlugin: PluginDefineFunction<SomeConfig> = (
   const { someData } = options;
 
   return {
-    install(upload, errorHandler) {
-      doSomething(someData, upload, errorHandler);
-      doOther(someData, upload, errorHandler);
+    install(upload) {
+      doSomething(someData, upload);
+      doOther(someData, upload);
     }
   };
 };
@@ -194,14 +192,14 @@ Each plugin has its own life cycle, and only the following hooks have been expos
 
 ##### Usage
 
-All of the hooks will be pased to the `install` function as the last parameter
+All of the hooks will be pased to the `install` function as the second parameter
 
 Therefore, its usage looks like this
 
 ```typescript
 const getPlugin = () => {
   return {
-    install(uplaod, errorHandler, { onInstalled, onBeforeUpload, onUploaded }) {
+    install(uplaod, { onInstalled, onBeforeUpload, onUploaded }) {
       // ...
       
       onInstalled(() => {
@@ -251,7 +249,7 @@ const getPlugin = () => {
 }
 ```
 
-In addition, all the front hooks have the ability to intercept operations through returning false
+All the front hooks have the ability to intercept operations through returning false
 
 And some of them have some parameters to help
 
@@ -262,13 +260,29 @@ const getPlugin = () => {
       // this plugin will not install on the MacOS
       if(isMacOS()) return false
     },
-    install(upload, _, { onBeforeUpload }) {
+    install(upload, { onBeforeUpload }) {
       onBeforeUpload((path: string, data: any) => {
         // will not report data when the target is 'any-interface'
         if(path === 'any-interface') return false
         // will not report data when hash code of the data has already existed
         if(hashSet.has(data.hash)) return false
       })
+    }
+  }
+}
+```
+
+In addition, all dependencies are dynamically injected
+
+That is, if you don't use any life cycle hooks, the core will not initialize the life cycle
+
+Here is a plugin without the life cycle hooks
+
+```typescript
+const getPlugin = () => {
+  return {
+    install(upload) {
+      // do something...
     }
   }
 }
@@ -283,7 +297,7 @@ Here the `Publish-Subscribe mode` is used for injection and trigger
 This function will mount the hook callbacks on the plugin instance
 
 ```typescript
-// packages/core/lifeCycle.ts
+// public/core/lifeCycle.ts
 const injectHook = (
   type: LifeCycleHookTypes, 
   target: Plugin, 
@@ -298,7 +312,7 @@ const injectHook = (
 Then trigger the hook like this
 
 ```typescript
-// packages/core/lifeCycle.ts
+// public/core/lifeCycle.ts
 const triggerHook = (
   type: LifeCycleHookTypes,
   target: Plugin,
@@ -329,7 +343,7 @@ In order to:
 + convenient for follow-up development
 
 ```typescript
-// packages/core/lifeCycle.ts
+// public/core/lifeCycle.ts
 const proxyInstall = (target: Plugin) => {
   return new Proxy(target.install, {
     apply(fn, thisArg, args: Parameters<typeof target.install>) {
@@ -360,21 +374,49 @@ const proxyUploader = (target: Plugin, uploader: Uploader) => {
     }
   });
 };
+```
 
-export const initLifeCycle = (target: Plugin, uploader: Uploader) => {
-  // the errorHandler is passed from the Gaze instance
-  // which is convenient for centralized management of error
-  return (errorHandler: ErrorHandler) => {
-    // proxy install function and call it
-    proxyInstall(target)(
-      // get proxyed uploader
-      proxyUploader(target, uploader),
-      errorHandler,
-      // get hooks which had been bound to the context
-      getHooks(target)
+```typescript
+// public/core/injector.ts
+class Injector {
+  private deps: Array<Dependence>;
+  private idx: number;
+
+  private isLifeCycleRequired(plugin: Plugin): boolean {
+    for (const type in LifeCycleHookTypes) {
+      if (has(plugin, LifeCycleHookTypes[type as keyof typeof LifeCycleHookTypes])) return true;
+    }
+
+    return plugin.install.length >= 2;
+  }
+
+  // initialize the life cycle of each plugin
+  // it will proxy the install function actually
+  // and inject the life cycle hooks automatically
+  private initLifeCycle(plugin: Plugin) {
+    const install = proxyInstall(plugin);
+    // the first incoming dependency must be uploader
+    const upload = proxyUploader(plugin, this.deps[this.idx++] as Uploader);
+    const hooks = getHooks(plugin);
+
+    return install.bind(plugin, upload, hooks);
+  }
+
+  resolve(plugin: Plugin) {
+    let resolvedInstall = plugin.install;
+    this.idx = 0;
+
+    if (this.isLifeCycleRequired(plugin)) {
+      resolvedInstall = this.initLifeCycle(plugin);
+    }
+
+    return resolvedInstall.bind(
+      plugin,
+      // silent ts type error...
+      ...(this.deps.slice(this.idx) as Parameters<Plugin['install']>)
     );
-  };
-};
+  }
+}
 ```
 
 
@@ -386,7 +428,7 @@ Three report methods are set here to solve CORS problems
 ##### createUploader
 
 ```typescript
-// packages/core/upload.ts
+// public/core/upload.ts
 export const createUploader =
   (baseUrl: string): Uploader =>
   (path: string, data: any) => {
@@ -469,10 +511,15 @@ const ajaxRequest = (url: string, data: any) => {
 Used to collect performance data
 
 ```typescript
-// packages/plugins/webPerformance/index.ts
+// public/plugins/webPerformance/index.ts
 export const performanceIndexPlugin: PluginDefineFunction<null> = () => {
   return {
-    install(uploader, errorHandler) {
+    install(uploader) {
+      // hand over the error to the global exception processor to handle
+      const errorHandler = (e: Error) => {
+        throw e;
+      }
+
       initDeviceInfo(uploader, errorHandler);
 
       initCLS(uploader, errorHandler);
@@ -497,7 +544,7 @@ export const performanceIndexPlugin: PluginDefineFunction<null> = () => {
 Take getting the FP(First Paint) as an example
 
 ```typescript
-// packages/plugins/webPerformance/performacneIndex/getFP.ts
+// public/plugins/webPerformance/performacneIndex/getFP.ts
 const getFP = (): Promise<PerformanceEntry> =>
   new Promise((resolve, reject) => {
     if (!isPerformanceObserverSupported()) {
@@ -543,7 +590,7 @@ export const initFP = (upload: Uploader, errorHandler: ErrorHandler) => {
 Used to collect user behavior data
 
 ```typescript
-// packages/plugins/userBehavior/index.ts
+// public/plugins/userBehavior/index.ts
 export const userBehaviorObserverPlugin: PluginDefineFunction<null> = () => {
   return {
     install(uploader) {
@@ -563,7 +610,7 @@ export const userBehaviorObserverPlugin: PluginDefineFunction<null> = () => {
 Call the proxy method exposed by the core module to implement
 
 ```typescript
-// packages/core/proxyRouter.ts
+// packages/shared/src/proxyRouter.ts
 export const proxyRouterLink = (
   types: Array<EventType>, 
   handler: EventHandler
@@ -598,7 +645,7 @@ export const proxyForwardAndBackward = (
 ```
 
 ```typescript
-// packages/core/userBehavior/behaviorIndex/proxyRouter.ts
+// public/core/userBehavior/behaviorIndex/proxyRouter.ts
 export const initRouterProxy = (upload: Uploader) => {
   const { routerChange } = BehaviorType;
 
@@ -640,7 +687,7 @@ Similar to the above, call the proxy method exposed by the core module
 + Fetch: Rewrite the native function directly
 
 ```typescript
-// packages/core/proxyHttp.ts
+// packages/shared/src/proxyHttp.ts
 
 // encapsulate a context object to manage the callbacks
 // using the publishing subscription mode
@@ -673,7 +720,7 @@ class ProxyHttpContext {
 ```
 
 ```typescript
-// packages/core/proxyHttp.ts
+// packages/shared/src/proxyHttp.ts
 const proxyXhr = (context: ProxyHttpContext) => {
   if (!has(window, 'XMLHttpRequest')) {
     errorHandler(new Error('there has no XMLHttpRequest...'));
@@ -752,7 +799,7 @@ const proxyXhr = (context: ProxyHttpContext) => {
 ```
 
 ```typescript
-// packages/core/proxyHttp.ts
+// packages/shared/src/proxyHttp.ts
 const proxyFetch = (context: ProxyHttpContext) => {
   if (!has(window, 'fetch')) {
     errorHandler(new Error('there has no Fetch...'));
@@ -878,7 +925,7 @@ And when any of the above conditions are broken, the data will be reported immed
 ##### init
 
 ```typescript
-// packages/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
+// public/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
 export const initOperationListener = (upload: Uploader) => {
   const prevEvent = {
     type: '',
@@ -922,7 +969,7 @@ export const initOperationListener = (upload: Uploader) => {
 ##### track
 
 ```typescript
-// packages/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
+// public/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
 const createTracker = (target: Element | null, type: EventType) => {
   const operationDetail: OperationDetail = {
     type,
@@ -964,7 +1011,7 @@ const createTracker = (target: Element | null, type: EventType) => {
 ##### trigger
 
 ```typescript
-// packages/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
+// public/plugins/userBehavior/behaviorIndex/getOperationInfo.ts
 const trigger = (detail: OperationDetail, upload: Uploader) => {
   const userBehavior: UserBehavior = {
     time: getNow(),
@@ -985,7 +1032,7 @@ const trigger = (detail: OperationDetail, upload: Uploader) => {
 ### Error Listener
 
 ```typescript
-// packages/plugins/errorListener/index.ts
+// public/plugins/errorListener/index.ts
 export const errorCatcherPlugin: PluginDefineFunction<Config> = options => {
   const { stackLimit } = options;
   const stackParser = getStackParser(stackLimit);
@@ -1006,7 +1053,7 @@ export const errorCatcherPlugin: PluginDefineFunction<Config> = options => {
 Just listenen to the corresponding error events, like this
 
 ```typescript
-// packages/plugins/errorListener/errorCatcher/catchJsError.ts
+// public/plugins/errorListener/errorCatcher/catchJsError.ts
 export const initJsError = (
   options: Config,
   stackParser: StackParser,
