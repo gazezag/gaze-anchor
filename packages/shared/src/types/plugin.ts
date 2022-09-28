@@ -1,13 +1,12 @@
 import { LifeCycleHookTypes } from '@gaze-anchor/static';
 import { Uploader } from './uploader';
 import { HookCallback, Hooks } from './hook';
-import { ErrorHandler } from './errorHandler';
-
-type PluginInstallFunction = (uploader: Uploader, errorHandler: ErrorHandler, hooks: Hooks) => void;
 
 export interface PluginConfig {
   // TODO
 }
+
+type PluginInstallFunction = (upload: Uploader, hooks: Hooks) => void;
 
 export interface Plugin {
   install: PluginInstallFunction;

@@ -1,8 +1,3 @@
-<<<<<<< HEAD:packages/plugins/webPerformance/performanceIndex/getFP.ts
-import { disconnect, observe, ObserveHandler } from 'core/index';
-import { Uploader, ErrorHandler } from 'types/index';
-=======
->>>>>>> refactor-monorepo:public/plugins/src/webPerformance/performanceIndex/getFP.ts
 import {
   isPerformanceObserverSupported,
   isPerformanceSupported,
@@ -11,7 +6,8 @@ import {
   disconnect,
   observe,
   ObserveHandler,
-  Uploader
+  Uploader,
+  ErrorHandler
 } from '@gaze-anchor/shared';
 import { PerformanceInfo } from '../types/performanceIndex';
 import { EntryNames, EntryTypes, PerformanceInfoType, UploadTarget } from '../static';

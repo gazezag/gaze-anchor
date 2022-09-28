@@ -1,9 +1,3 @@
-<<<<<<< HEAD:packages/plugins/webPerformance/performanceIndex/getLCP.ts
-import { disconnect, observe, ObserveHandler, takeRecords, EventType, onHidden } from 'core/index';
-import { Uploader, ErrorHandler } from 'types/index';
-=======
-import { EventType } from '@gaze-anchor/static';
->>>>>>> refactor-monorepo:public/plugins/src/webPerformance/performanceIndex/getLCP.ts
 import {
   isPerformanceObserverSupported,
   roundOff,
@@ -15,10 +9,12 @@ import {
   ObserveHandler,
   takeRecords,
   onHidden,
-  Uploader
+  Uploader,
+  ErrorHandler
 } from '@gaze-anchor/shared';
 import { PerformanceInfo } from '../types/performanceIndex';
 import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
+import { EventType } from '@gaze-anchor/static';
 
 const { performanceTimingTarget } = UploadTarget;
 

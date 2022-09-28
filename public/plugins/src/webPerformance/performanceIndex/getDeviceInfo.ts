@@ -1,14 +1,11 @@
-<<<<<<< HEAD:packages/plugins/webPerformance/performanceIndex/getDeviceInfo.ts
-import { Uploader, ErrorHandler } from 'types/index';
-=======
->>>>>>> refactor-monorepo:public/plugins/src/webPerformance/performanceIndex/getDeviceInfo.ts
 import {
   isNavigatorSupported,
   isPerformanceSupported,
   getMatched,
   getTestStrFn,
   getNow,
-  Uploader
+  Uploader,
+  ErrorHandler
 } from '@gaze-anchor/shared';
 import { PerformanceInfo } from '../types/performanceIndex';
 import { BrowserType, OSType, PerformanceInfoType, UploadTarget } from '../static';
@@ -90,11 +87,9 @@ const getOS: GetMetaInfoFn<OSType> = ua => {
 const getDeviceInfo = (errorHandler: ErrorHandler): DeviceEnvInfo | undefined => {
   if (!isPerformanceSupported()) {
     errorHandler(new Error('browser do not support performance'));
-    return;
   }
   if (!isNavigatorSupported()) {
     errorHandler(new Error('browser do not support navigator'));
-    return;
   }
 
   const { navigator: nvg, location: loc, document: doc } = window;

@@ -1,8 +1,3 @@
-<<<<<<< HEAD:packages/plugins/webPerformance/performanceIndex/getFID.ts
-import { disconnect, observe, ObserveHandler, takeRecords, onHidden } from 'core/index';
-import { Uploader, ErrorHandler } from 'types/index';
-=======
->>>>>>> refactor-monorepo:public/plugins/src/webPerformance/performanceIndex/getFID.ts
 import {
   isPerformanceObserverSupported,
   isPerformanceSupported,
@@ -14,7 +9,8 @@ import {
   ObserveHandler,
   takeRecords,
   onHidden,
-  Uploader
+  Uploader,
+  ErrorHandler
 } from '@gaze-anchor/shared';
 import { PerformanceInfo } from '../types/performanceIndex';
 import { EntryTypes, PerformanceInfoType, UploadTarget } from '../static';
