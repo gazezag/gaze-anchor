@@ -1,13 +1,4 @@
-import {
-  has,
-  get,
-  set,
-  del,
-  Plugin,
-  HookCallback,
-  Uploader,
-  ErrorHandler
-} from '@gaze-anchor/shared';
+import { has, get, set, del, Plugin, HookCallback, Uploader } from '@gaze-anchor/shared';
 import { LifeCycleHookTypes } from '@gaze-anchor/static';
 
 const { BEFORE_INSTALL, INSTALLED, BEFOR_UPLOAD, UPLOADED } = LifeCycleHookTypes;
@@ -21,14 +12,6 @@ const injectHook = (type: LifeCycleHookTypes, target: Plugin, hookCallback: Hook
 const createHook = (type: LifeCycleHookTypes, target: Plugin) => {
   return (hookCallback: HookCallback) => {
     injectHook(type, target, hookCallback);
-  };
-};
-
-const getHooks = (target: Plugin) => {
-  return {
-    onInstalled: createHook(INSTALLED, target),
-    onBeforeUpload: createHook(BEFOR_UPLOAD, target),
-    onUploaded: createHook(UPLOADED, target)
   };
 };
 
@@ -48,7 +31,15 @@ const triggerHook = (
   }
 };
 
-const proxyInstall = (target: Plugin) => {
+export const getHooks = (target: Plugin) => {
+  return {
+    onInstalled: createHook(INSTALLED, target),
+    onBeforeUpload: createHook(BEFOR_UPLOAD, target),
+    onUploaded: createHook(UPLOADED, target)
+  };
+};
+
+export const proxyInstall = (target: Plugin) => {
   return new Proxy(target.install, {
     apply(fn, thisArg, args: Parameters<typeof target.install>) {
       const isContinue = triggerHook(BEFORE_INSTALL, target);
@@ -63,7 +54,7 @@ const proxyInstall = (target: Plugin) => {
     }
   });
 };
-const proxyUploader = (target: Plugin, uploader: Uploader) => {
+export const proxyUploader = (target: Plugin, uploader: Uploader) => {
   return new Proxy(uploader, {
     apply(fn, thisArg, args: Parameters<Uploader>) {
       const isContinue = triggerHook(BEFOR_UPLOAD, target, false, args);
@@ -77,19 +68,4 @@ const proxyUploader = (target: Plugin, uploader: Uploader) => {
       return;
     }
   });
-};
-
-export const initLifeCycle = (target: Plugin, uploader: Uploader) => {
-  // the errorHandler is passed in from gaze
-  // which is convenient for centralized management of error
-  return (errorHandler: ErrorHandler) => {
-    // proxy install function and call it
-    proxyInstall(target)(
-      // get proxyed uploader
-      proxyUploader(target, uploader),
-      errorHandler,
-      // get hooks which had been bound to the context
-      getHooks(target)
-    );
-  };
 };

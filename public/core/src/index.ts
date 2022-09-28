@@ -1,8 +1,8 @@
 import { get, getKeys, has, isObject, set, ErrorHandler, Plugin } from '@gaze-anchor/shared';
 import { createUploader } from './upload';
 import { errorHandler } from './errorHandler';
-import { initLifeCycle } from './lifeCycle';
 import { GazeConfig } from './types';
+import { Injector } from './injector';
 
 /**
  * @description merge configurations recursively
@@ -54,14 +54,14 @@ const nextTick = (fn: Function, errorHandler: ErrorHandler) => {
 
 class Gaze {
   static instance: Gaze;
-  private target: string;
   private plugins: Set<Plugin>;
+  private injector: Injector;
   private errorHandler: ErrorHandler;
 
   private constructor(config?: Record<string, any>) {
     const { target } = mergeConfig(config);
-    this.target = target;
     this.plugins = new Set<Plugin>();
+    this.injector = Injector.getInstance([createUploader(target)]);
     this.errorHandler = errorHandler;
   }
 
@@ -78,10 +78,8 @@ class Gaze {
     nextTick(() => {
       if (!this.plugins.has(plugin)) {
         this.plugins.add(plugin);
-        // initialize the life cycle of each plugin
-        // it will proxy the install function actually
-        // and inject the life cycle hooks automatically
-        initLifeCycle(plugin, createUploader(this.target))(this.errorHandler);
+        // inject dependencies into the plugin dynamically and execute it
+        this.injector.resolve(plugin)();
       }
     }, this.errorHandler);
 
